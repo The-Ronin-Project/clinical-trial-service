@@ -1,6 +1,6 @@
-rootProject.name = "clinical-one-service"
+rootProject.name = "clinical-trial-service"
 
-include("clinical-one-server")
+include("clinical-trial-server")
 
 for (project in rootProject.children) {
     project.buildFileName = "${project.name}.gradle.kts"

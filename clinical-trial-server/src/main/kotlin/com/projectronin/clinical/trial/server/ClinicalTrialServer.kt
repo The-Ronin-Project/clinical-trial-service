@@ -1,15 +1,15 @@
-package com.projectronin.clinical.one.server
+package com.projectronin.clinical.trial.server
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 /**
- * Main Spring Boot application for the Clinical One Server
+ * Main Spring Boot application for the Clinical Trial Server
  */
 
 @SpringBootApplication
-class ValidationServer
+class ClinicalTrialServer
 
 fun main(args: Array<String>) {
-    runApplication<ValidationServer>(*args)
+    runApplication<ClinicalTrialServer>(*args)
 }

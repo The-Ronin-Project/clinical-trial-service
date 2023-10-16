@@ -1,4 +1,4 @@
-package com.projectronin.clinical.one.server.controller
+package com.projectronin.clinical.trial.server.controller
 
 import org.springframework.web.bind.annotation.RestController
 
