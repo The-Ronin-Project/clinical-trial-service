@@ -2,23 +2,31 @@
 apache-kafka = "3.5.1"
 idea-ext = "1.1.7"
 interop-common = "3.12.0"
+interop-fhir = "8.10.2"
 interop-gradle = "3.2.0"
 jackson = "2.15.2"
 # @pin until Spring Boot 3
 jakarta = "2.0.2"
+kotlinx-coroutines-core = "1.7.3"
 kotlin-logging = "3.0.5"
 ktor = "2.3.4"
 ktorm = "3.6.0"
 mockk = "1.13.8"
+mysql-connector-java = "8.1.0"
+protobuf-java = "3.24.4"
+ronin-test = "0.2.0"
 # @pin until JDK 17
 spring-boot = "2.7.13"
 springdoc = "1.7.0"
+testcontainers-bom = "1.19.1"
 
 [libraries]
 interop-common = { module = "com.projectronin.interop:interop-common", version.ref = "interop-common" }
 interop-commonHttp = { module = "com.projectronin.interop:interop-common-http", version.ref = "interop-common" }
 interop-commonJackson = { module = "com.projectronin.interop:interop-common-jackson", version.ref = "interop-common" }
 interop-commonKtorm = { module = "com.projectronin.interop:interop-common-ktorm", version.ref = "interop-common" }
+interop-fhir = { module = "com.projectronin.interop.fhir:interop-fhir", version.ref = "interop-fhir" }
+interop-fhirGenerators = { module = "com.projectronin.interop.fhir:interop-fhir-generators", version.ref = "interop-fhir" }
 jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }
 jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
 jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
@@ -26,6 +34,7 @@ jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-
 jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api", version.ref = "jakarta" }
 kafka-clients = { module = "org.apache.kafka:kafka-clients", version.ref = "apache-kafka" }
 kotlin-logging = { module = "io.github.microutils:kotlin-logging", version.ref = "kotlin-logging" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -33,9 +42,14 @@ ktor-serialization-jackson = { module = "io.ktor:ktor-serialization-jackson", ve
 ktorm-core = { module = "org.ktorm:ktorm-core", version.ref = "ktorm" }
 ktorm-support-mysql = { module = "org.ktorm:ktorm-support-mysql", version.ref = "ktorm" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+mysql-connector-java = { module = "com.mysql:mysql-connector-j", version.ref = "mysql-connector-java" }
+protobuf-java = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuf-java" }
+ronin-test-data-generator = { module = "com.projectronin.test:ronin-test-data-generator", version.ref = "ronin-test" }
 spring-boot-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator", version.ref = "spring-boot" }
 spring-boot-parent = { module = "org.springframework.boot:spring-boot-parent", version.ref = "spring-boot" }
 springdoc-openapi-ui = { module = "org.springdoc:springdoc-openapi-ui", version.ref = "springdoc" }
+testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers-bom" }
+
 
 [bundles]
 jackson = [
