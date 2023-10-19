@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: sponsor-create
+      author: Jiahan Deng
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - tableExists:
+                tableName: sponsor
+      changes:
+        - createTable:
+            tableName: sponsor
+            columns:
+              - column:
+                  name: sponsor_id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_sponsor

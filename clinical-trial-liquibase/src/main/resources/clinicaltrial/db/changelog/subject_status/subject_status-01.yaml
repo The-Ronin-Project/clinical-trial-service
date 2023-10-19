@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: subject-status-create
+      author: Jiahan Deng
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - tableExists:
+                tableName: subject_status
+      changes:
+        - createTable:
+            tableName: subject_status
+            columns:
+              - column:
+                  name: study_site_id
+                  type: BINARY(16)
+                  constraints:
+                    nullable: false
+                    references: study_site(study_site_id)
+                    foreignKeyName: fk_subject_status_study_site
+              - column:
+                  name: subject_id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                    references: subject(subject_id)
+                    foreignKeyName: fk_subject_status_subject
+              - column:
+                  name: status
+                  type: VARCHAR(16)
+                  constraints:
+                    nullable: false
+              - sql:
+                  sql: ALTER TABLE subject_status ADD CONSTRAINT subject_status_check_status CHECK (status IN (NEW,SCREENED,ACTIVE,ENROLLED,WITHDRAWN,COMPLETE,'SCREEN FAILED'))
+              - sql:
+                  sql: ALTER TABLE subject_status ADD CONSTRAINT pk_subject_status PRIMARY KEY (study_site_id,subject_id)

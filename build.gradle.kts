@@ -16,3 +16,11 @@ plugins {
     // We need to force IntelliJ to do some actions they expose through this plugin.
     alias(libs.plugins.idea.ext)
 }
+
+subprojects {
+    apply(plugin = "com.projectronin.interop.gradle.base")
+
+    if (project.name != "clinical-trial-server") {
+        apply(plugin = "com.projectronin.interop.gradle.server-publish")
+    }
+}

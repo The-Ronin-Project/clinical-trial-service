@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: study-create
+      author: Jiahan Deng
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - tableExists:
+                tableName: study
+      changes:
+        - createTable:
+            tableName: study
+            columns:
+              - column:
+                  name: study_id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_study

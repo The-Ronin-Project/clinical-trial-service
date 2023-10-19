@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: site-create
+      author: Jiahan Deng
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - tableExists:
+                tableName: site
+      changes:
+        - createTable:
+            tableName: site
+            columns:
+              - column:
+                  name: site_id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_site
+              - column:
+                  name: ronin_tenant_mnemonic
+                  type: VARCHAR(10)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uk_ronin_tenant_mnemonic

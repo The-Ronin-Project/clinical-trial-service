@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - changeSet:
+      id: study-site-create
+      author: Jiahan Deng
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - tableExists:
+                tableName: study_site
+      changes:
+        - createTable:
+            tableName: study_site
+            columns:
+              - column:
+                  name: study_site_id
+                  type: BINARY(16)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_study_site
+              - column:
+                  name: study_id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                    references: study(study_id)
+                    foreignKeyName: fk_study_site_study_id
+              - column:
+                  name: site_id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                    references: site(site_id)
+                    foreignKeyName: fk_study_site_site_id

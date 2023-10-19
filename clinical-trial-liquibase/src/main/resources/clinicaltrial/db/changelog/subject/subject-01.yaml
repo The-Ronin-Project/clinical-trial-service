@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: subject-create
+      author: Jiahan Deng
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - tableExists:
+                tableName: subject
+      changes:
+        - createTable:
+            tableName: subject
+            columns:
+              - column:
+                  name: subject_id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_subject
+              - column:
+                  name: ronin_patient_id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false

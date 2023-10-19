@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: databasechangelog-create-pk
+      author: Jiahan Deng
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            -primaryKeyExists:
+              tableName: DATABASECHANGELOG
+      changes:
+        - addPrimaryKey:
+            tableName: DATABASECHANGELOG
+            columnNames: ID, AUTHOR, FILENAME

@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: sponsor_study-create
+      author: Jiahan Deng
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - tableExists:
+                tableName: sponsor_study
+      changes:
+        - createTable:
+            tableName: sponsor_study
+            columns:
+              - column:
+                  name: sponsor_id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                    references: sponsor(sponsor_id)
+                    foreignKeyName: fk_sponsor_study_study_sponsor
+              - column:
+                  name: study_id
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+                    references: study(study_id)
+                    foreignKeyName: fk_sponsor_study_study
+              - sql:
+                  sql: ALTER TABLE sponsor_study ADD CONSTRAINT pk_sponsor_study (sponsor_id,study_id)
