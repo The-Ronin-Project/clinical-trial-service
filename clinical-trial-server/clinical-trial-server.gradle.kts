@@ -17,6 +17,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.interop.fhir)
     implementation(libs.protobuf.java)
+    implementation(libs.interop.common)
     implementation(libs.interop.commonJackson)
     implementation(libs.ronin.test.data.generator)
 
