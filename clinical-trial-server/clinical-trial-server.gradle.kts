@@ -1,6 +1,7 @@
 
 plugins {
     `maven-publish`
+    alias(libs.plugins.interop.docker.integration)
     alias(libs.plugins.interop.junit)
     alias(libs.plugins.interop.spring.boot)
 }
@@ -20,6 +21,8 @@ dependencies {
     implementation(libs.interop.common)
     implementation(libs.interop.commonJackson)
     implementation(libs.ronin.test.data.generator)
+    implementation(libs.spring.boot.kafka)
+    implementation(libs.ronin.kafka)
 
     runtimeOnly(project(":clinical-trial-liquibase"))
     runtimeOnly(libs.liquibase.core)
@@ -32,4 +35,16 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.testcontainers:mysql")
     testImplementation(libs.interop.fhirGenerators)
+
+    itImplementation(libs.interop.commonHttp)
+    itImplementation(libs.interop.fhir)
+
+    itImplementation(libs.ronin.kafka)
+    itImplementation(libs.ktorm.core)
+    itImplementation(libs.ronin.test.data.generator)
+    itImplementation(libs.interop.fhirGenerators)
+
+    itImplementation(platform(libs.testcontainers.bom))
+    itImplementation("org.testcontainers:mysql")
+    itImplementation(project)
 }

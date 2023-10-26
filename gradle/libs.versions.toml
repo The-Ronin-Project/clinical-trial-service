@@ -15,6 +15,7 @@ liquibase = "4.24.0"
 mockk = "1.13.8"
 mysql-connector-java = "8.1.0"
 protobuf-java = "3.24.4"
+ronin-kafka = "1.1.1"
 ronin-test = "0.2.0"
 # @pin until JDK 17
 spring-boot = "2.7.13"
@@ -47,9 +48,11 @@ liquibase-core = { module = "org.liquibase:liquibase-core", version.ref = "liqui
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mysql-connector-java = { module = "com.mysql:mysql-connector-j", version.ref = "mysql-connector-java" }
 protobuf-java = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuf-java" }
+ronin-kafka = { module = "com.projectronin:ronin-kafka", version.ref = "ronin-kafka" }
 ronin-test-data-generator = { module = "com.projectronin.test:ronin-test-data-generator", version.ref = "ronin-test" }
 spring-boot-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator", version.ref = "spring-boot" }
 spring-boot-parent = { module = "org.springframework.boot:spring-boot-parent", version.ref = "spring-boot" }
+spring-boot-kafka = { module = "org.springframework.kafka:spring-kafka", version.ref = "spring-boot" }
 springdoc-openapi-ui = { module = "org.springdoc:springdoc-openapi-ui", version.ref = "springdoc" }
 testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers-bom" }
 
