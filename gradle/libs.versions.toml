@@ -3,7 +3,7 @@ apache-kafka = "3.5.1"
 idea-ext = "1.1.7"
 interop-common = "3.12.0"
 interop-fhir = "8.10.2"
-interop-gradle = "3.2.0"
+interop-gradle = "3.3.0"
 jackson = "2.15.2"
 # @pin until Spring Boot 3
 jakarta = "2.0.2"
@@ -79,3 +79,4 @@ interop-server-publish = { id = "com.projectronin.interop.gradle.server-publish"
 interop-server-version = { id = "com.projectronin.interop.gradle.server-version", version.ref = "interop-gradle" }
 interop-spring-boot = { id = "com.projectronin.interop.gradle.spring-boot", version.ref = "interop-gradle" }
 interop-version-catalog = { id = "com.projectronin.interop.gradle.version-catalog-update", version.ref = "interop-gradle" }
+interop-sonarqube = { id = "com.projectronin.interop.gradle.sonarqube", version.ref = "interop-gradle" }

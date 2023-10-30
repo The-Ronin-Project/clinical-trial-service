@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.interop.server.publish) apply false
     alias(libs.plugins.interop.server.version)
     alias(libs.plugins.interop.version.catalog)
+    alias(libs.plugins.interop.sonarqube)
 
     // We need to force IntelliJ to do some actions they expose through this plugin.
     alias(libs.plugins.idea.ext)
