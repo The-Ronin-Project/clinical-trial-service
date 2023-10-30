@@ -30,7 +30,19 @@ databaseChangeLog:
                   type: VARCHAR(16)
                   constraints:
                     nullable: false
-              - sql:
-                  sql: ALTER TABLE subject_status ADD CONSTRAINT subject_status_check_status CHECK (status IN (NEW,SCREENED,ACTIVE,ENROLLED,WITHDRAWN,COMPLETE,'SCREEN FAILED'))
-              - sql:
-                  sql: ALTER TABLE subject_status ADD CONSTRAINT pk_subject_status PRIMARY KEY (study_site_id,subject_id)
+              - column:
+                  name: created_datetime
+                  type: DATETIME(6)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_datetime
+                  type: DATETIME(6)
+                  constraints:
+                    nullable: true
+        - addPrimaryKey:
+            columnNames: study_site_id, subject_id
+            constraintName: pk_subject_status
+            tableName: subject_status
+        - sql:
+            sql: ALTER TABLE subject_status ADD CONSTRAINT subject_status_check_status CHECK (status IN ('NEW','SCREENED','ACTIVE','ENROLLED','WITHDRAWN','COMPLETE','SCREEN_FAILED'));

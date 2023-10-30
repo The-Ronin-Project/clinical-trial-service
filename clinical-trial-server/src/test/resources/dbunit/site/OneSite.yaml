@@ -1,0 +1,3 @@
+site:
+  - site_id: "siteId"
+    ronin_tenant_mnemonic: "ronincer"

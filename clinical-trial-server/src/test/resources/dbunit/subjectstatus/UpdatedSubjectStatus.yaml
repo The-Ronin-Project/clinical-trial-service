@@ -1,0 +1,19 @@
+site:
+  - site_id: "siteId"
+    ronin_tenant_mnemonic: "ronincer"
+study:
+  - study_id: "studyId"
+study_site:
+  - study_site_id: "X3gcMALzTwatz3BVvLxXcA=="
+    # UUID: 5f781c30-02f3-4f06-adcf-7055bcbc5770
+    study_id: "studyId"
+    site_id: "siteId"
+subject:
+  - subject_id: "subjectId"
+    ronin_patient_id: "roninFhirId"
+subject_status:
+  - study_site_id: "X3gcMALzTwatz3BVvLxXcA=="
+    subject_id: "subjectId"
+    status: "WITHDRAWN"
+    created_datetime: "2023-10-26 21:03:41.270212"
+    updated_datetime: "2023-10-26 22:03:41.270212"

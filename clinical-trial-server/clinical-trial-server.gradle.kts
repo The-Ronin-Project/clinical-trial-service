@@ -20,6 +20,7 @@ dependencies {
     implementation(libs.protobuf.java)
     implementation(libs.interop.common)
     implementation(libs.interop.commonJackson)
+    implementation(libs.interop.commonKtorm)
     implementation(libs.ronin.test.data.generator)
     implementation(libs.spring.boot.kafka)
     implementation(libs.ronin.kafka)

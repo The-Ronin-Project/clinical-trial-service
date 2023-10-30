@@ -1,0 +1,7 @@
+site:
+  - site_id: "siteId1"
+    ronin_tenant_mnemonic: "ronincer"
+  - site_id: "siteId2"
+    ronin_tenant_mnemonic: "mda"
+  - site_id: "siteId3"
+    ronin_tenant_mnemonic: "psj"

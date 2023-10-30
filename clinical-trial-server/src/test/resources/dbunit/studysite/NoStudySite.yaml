@@ -1,0 +1,6 @@
+site:
+  - site_id: "siteId"
+    ronin_tenant_mnemonic: "ronincer"
+study:
+  - study_id: "studyId"
+study_site:

@@ -1,0 +1,27 @@
+site:
+  - site_id: "siteId1"
+    ronin_tenant_mnemonic: "ronincer"
+  - site_id: "siteId2"
+    ronin_tenant_mnemonic: "mda"
+  - site_id: "siteId3"
+    ronin_tenant_mnemonic: "psj"
+study:
+  - study_id: "studyId1"
+  - study_id: "studyId2"
+study_site:
+  - study_site_id: "X3gcMALzTwatz3BVvLxXcA=="
+    # UUID: 5f781c30-02f3-4f06-adcf-7055bcbc5770
+    study_id: "studyId1"
+    site_id: "siteId1"
+  - study_site_id: "d4r7LowORKithgAAkFi87A=="
+    # UUID: 778afb2e-8c0e-44a8-ad86-9058bcec
+    study_id: "studyId2"
+    site_id: "siteId2"
+  - study_site_id: "Tg8mHz3UQa2QZpczxBmTpw=="
+    # UUID: 4e0f261f-3dd4-41ad-9066-9733c41993a7
+    study_id: "studyId2"
+    site_id: "siteId3"
+  - study_site_id: "lpHVUJD1T7iD+eSjhA436w=="
+    # UUID: 9691d550-90f5-4fb8-83f9-e4a3840e37eb
+    study_id: "studyId1"
+    site_id: "siteId3"
