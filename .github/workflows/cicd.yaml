@@ -6,6 +6,7 @@ on:
 env:
   DB_MODULE: clinical-trial-liquibase
   SERVICE_MODULE: clinical-trial-server
+  SERVICE_NAME: clinical-trial-service
 jobs:
   build:
     runs-on: self-hosted
@@ -19,8 +20,8 @@ jobs:
         run: |
           version=$(./gradlew -q -Prelease.quiet :currentVersion)
           echo $version
-          git tag -a "${version}" -m "${version}"
-          echo "version=${version}" >> $GITHUB_OUTPUT
+          git tag -fa "${version}" -m "${version}"
+          echo "version=${version}" >> $GITHUB_OUTPUT]
       - name: Build and Test
         uses: projectronin/github/.github/actions/basic-gradle-build-publish@basic_gradle_build_publish/v5
         with:
@@ -46,8 +47,8 @@ jobs:
         id: build-service-image
         uses: projectronin/github/build-image@build-image/v3
         with:
-          image: ${{ env.SERVICE_MODULE }}
-          build-args: "JAR_NAME=${{ env.SERVICE_MODULE }}"
+          image: ${{ env.SERVICE_NAME }}
+          build-args: "JAR_NAME=${{ env.SERVICE_NAME }}"
           tags: "${{ github.sha }},${{ steps.get-version.outputs.version }}"
           docker-context-directory: ./${{ env.SERVICE_MODULE }}
           push: "${{ github.ref_name == 'main' }}"
