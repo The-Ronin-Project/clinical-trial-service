@@ -2,6 +2,7 @@
 apache-kafka = "3.5.1"
 idea-ext = "1.1.7"
 interop-common = "3.12.0"
+interop-event-resource-request = "1.1.0"
 interop-fhir = "8.10.2"
 interop-gradle = "3.3.0"
 jackson = "2.15.2"
@@ -23,6 +24,7 @@ springdoc = "1.7.0"
 testcontainers-bom = "1.19.1"
 
 [libraries]
+event-interop-resource-request = { module = "com.projectronin.contract.event:event-interop-resource-request", version.ref = "interop-event-resource-request" }
 interop-common = { module = "com.projectronin.interop:interop-common", version.ref = "interop-common" }
 interop-commonHttp = { module = "com.projectronin.interop:interop-common-http", version.ref = "interop-common" }
 interop-commonJackson = { module = "com.projectronin.interop:interop-common-jackson", version.ref = "interop-common" }

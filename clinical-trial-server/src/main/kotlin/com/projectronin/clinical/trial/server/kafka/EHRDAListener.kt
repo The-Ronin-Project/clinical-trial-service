@@ -1,4 +1,4 @@
-package com.projectronin.clinical.trial.server
+package com.projectronin.clinical.trial.server.kafka
 
 import com.projectronin.interop.fhir.r4.resource.Observation
 import com.projectronin.interop.fhir.r4.resource.Patient

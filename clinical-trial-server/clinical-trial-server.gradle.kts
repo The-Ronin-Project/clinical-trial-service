@@ -19,6 +19,7 @@ dependencies {
     implementation(libs.interop.fhir)
     implementation(libs.protobuf.java)
     implementation(libs.interop.common)
+    implementation(libs.event.interop.resource.request)
     implementation(libs.interop.commonJackson)
     implementation(libs.interop.commonKtorm)
     implementation(libs.ronin.test.data.generator)
