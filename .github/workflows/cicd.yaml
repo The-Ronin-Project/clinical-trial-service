@@ -21,7 +21,7 @@ jobs:
           version=$(./gradlew -q -Prelease.quiet :currentVersion)
           echo $version
           git tag -fa "${version}" -m "${version}"
-          echo "version=${version}" >> $GITHUB_OUTPUT]
+          echo "version=${version}" >> $GITHUB_OUTPUT
       - name: Build and Test
         uses: projectronin/github/.github/actions/basic-gradle-build-publish@basic_gradle_build_publish/v5
         with:
