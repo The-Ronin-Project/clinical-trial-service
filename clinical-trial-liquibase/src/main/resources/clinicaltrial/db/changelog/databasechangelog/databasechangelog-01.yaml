@@ -5,8 +5,8 @@ databaseChangeLog:
       preConditions:
         - onFail: MARK_RAN
           not:
-            -primaryKeyExists:
-              tableName: DATABASECHANGELOG
+            - primaryKeyExists:
+                tableName: DATABASECHANGELOG
       changes:
         - addPrimaryKey:
             tableName: DATABASECHANGELOG
