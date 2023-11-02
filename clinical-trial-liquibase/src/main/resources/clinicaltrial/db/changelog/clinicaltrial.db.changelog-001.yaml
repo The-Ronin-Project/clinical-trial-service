@@ -1,15 +1,3 @@
 databaseChangeLog:
   - include:
-      file: clinicaltrial/db/changelog/sponsor/sponsor-01.yaml
-  - include:
-      file: clinicaltrial/db/changelog/study/study-01.yaml
-  - include:
-      file: clinicaltrial/db/changelog/site/site-01.yaml
-  - include:
-      file: clinicaltrial/db/changelog/subject/subject-01.yaml
-  - include:
-      file: clinicaltrial/db/changelog/sponsor_study/sponsor_study-01.yaml
-  - include:
-      file: clinicaltrial/db/changelog/study_site/study_site-01.yaml
-  - include:
-      file: clinicaltrial/db/changelog/subject_status/subject_status-01.yaml
+      file: clinicaltrial/db/changelog/databasechangelog/databasechangelog-01.yaml
