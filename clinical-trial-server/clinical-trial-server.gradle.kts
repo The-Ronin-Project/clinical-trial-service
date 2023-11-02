@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.interop.spring.boot)
 }
 
+group = "com.projectronin"
+
 dependencies {
     implementation(platform(libs.spring.boot.parent))
 
