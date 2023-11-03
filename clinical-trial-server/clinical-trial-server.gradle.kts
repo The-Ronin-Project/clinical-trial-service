@@ -15,6 +15,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
 
     implementation(libs.mysql.connector.java)
     implementation(libs.kotlinx.coroutines.core)
@@ -24,6 +25,7 @@ dependencies {
     implementation(libs.event.interop.resource.request)
     implementation(libs.interop.commonJackson)
     implementation(libs.interop.commonKtorm)
+    implementation(libs.interop.datalake)
     implementation(libs.ronin.test.data.generator)
     implementation(libs.spring.boot.kafka)
     implementation(libs.ronin.kafka)

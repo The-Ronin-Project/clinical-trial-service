@@ -2,6 +2,7 @@
 apache-kafka = "3.5.1"
 idea-ext = "1.1.7"
 interop-common = "3.12.0"
+interop-datalake = "8.4.2"
 interop-event-resource-request = "1.1.0"
 interop-fhir = "8.10.2"
 interop-gradle = "3.3.0"
@@ -30,6 +31,7 @@ interop-commonHttp = { module = "com.projectronin.interop:interop-common-http", 
 interop-commonJackson = { module = "com.projectronin.interop:interop-common-jackson", version.ref = "interop-common" }
 interop-commonKtorm = { module = "com.projectronin.interop:interop-common-ktorm", version.ref = "interop-common" }
 interop-commonTestDb = { module = "com.projectronin.interop:interop-common-test-db", version.ref = "interop-common" }
+interop-datalake = { module = "com.projectronin.interop.publish:interop-datalake", version.ref = "interop-datalake" }
 interop-fhir = { module = "com.projectronin.interop.fhir:interop-fhir", version.ref = "interop-fhir" }
 interop-fhirGenerators = { module = "com.projectronin.interop.fhir:interop-fhir-generators", version.ref = "interop-fhir" }
 jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }

@@ -1,0 +1,42 @@
+{
+  "resourceType": "ValueSet",
+  "id": "DataDictionary2",
+  "meta": {
+    "profile": [
+      "http://projectronin.io/fhir/StructureDefinition/ronin-valueSet"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://projectronin.io/fhir/StructureDefinition/Extension/ronin-valueSetSchema",
+      "valueString": "2"
+    }
+  ],
+  "url": "http://hl7.org/fhir/ValueSet/USCoreDocumentReferenceType",
+  "name": "USCoreDocumentReferenceType",
+  "title": "US Core DocumentReference Type",
+  "description": "{{pagelink:Ronin-Implementation-Guide-Home/List/ValueSets/DocumentReferenceType.page.md}}  New version created to update to LOINC 2.74",
+  "experimental": false,
+  "purpose": "FHIR Interops",
+  "version": "2",
+  "expansion": {
+    "identifier": "urn:uuid:47262b88-c368-11ed-ab73-561f1d820399",
+    "total": 10986,
+    "contains": [
+      {
+        "system": "http://loinc.org",
+        "version": "2.74",
+        "code": "37581-6",
+        "display": "XR Acromioclavicular joint - left Views WO and W weight"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.74",
+        "code": "84302-9",
+        "display": "Wound care management Nurse Note"
+      }
+    ],
+    "timestamp": "2023-03-15"
+  },
+  "date": "2023-03-16T14:46:16.000000+00:00"
+}
