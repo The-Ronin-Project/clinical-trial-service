@@ -37,6 +37,14 @@ class StudySiteDAO(private val database: Database) {
         return database.from(StudySiteDOs).select().map { StudySiteDOs.createEntity(it) }
     }
 
+    fun getStudySiteByStudyIdAndSiteId(studyId: String, siteId: String): StudySiteDO? {
+        return database.from(StudySiteDOs)
+            .select()
+            .where(StudySiteDOs.siteId eq siteId)
+            .where(StudySiteDOs.studyId eq studyId)
+            .map { StudySiteDOs.createEntity(it) }.firstOrNull()
+    }
+
     /**
      * Retrieves list of [StudySiteDO]s by Ronin Tenant Mnemonic
      */

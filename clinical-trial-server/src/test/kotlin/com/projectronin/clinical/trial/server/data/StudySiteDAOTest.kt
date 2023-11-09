@@ -8,6 +8,8 @@ import com.projectronin.interop.common.test.database.dbrider.DBRiderConnection
 import com.projectronin.interop.common.test.database.ktorm.KtormHelper
 import com.projectronin.interop.common.test.database.liquibase.LiquibaseTest
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
 @LiquibaseTest(changeLog = "clinicaltrial/db/changelog/clinicaltrial.db.changelog-master.yaml")
@@ -42,5 +44,15 @@ class StudySiteDAOTest {
     fun `get all StudySites by tenant`() {
         val studysites = studySiteDAO.getStudySitesByTenant("psj")
         assertEquals(studysites.size, 2)
+    }
+
+    @Test
+    @DataSet(value = ["/dbunit/studysite/MultipleStudySites.yaml"], cleanAfter = true)
+    fun `get StudySite by Site ID and Study ID`() {
+        val studySite = studySiteDAO.getStudySiteByStudyIdAndSiteId("studyId1", "siteId1")
+        assertNotNull(studySite)
+
+        val noStudySite = studySiteDAO.getStudySiteByStudyIdAndSiteId("noStudy", "siteId1")
+        assertNull(noStudySite)
     }
 }

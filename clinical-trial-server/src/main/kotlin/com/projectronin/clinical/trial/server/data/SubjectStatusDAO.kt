@@ -29,6 +29,17 @@ class SubjectStatusDAO(private val database: Database) {
     }
 
     /**
+     * Retrieves one [SubjectStatusDO] by Subject ID
+     */
+    fun getSubjectStatusBySubjectId(subjectId: String): List<SubjectStatusDO> {
+        return database.from(SubjectStatusDOs).select()
+            .where {
+                (SubjectStatusDOs.subjectId eq subjectId)
+            }
+            .map { SubjectStatusDOs.createEntity(it) }
+    }
+
+    /**
      * Retrieves list of [SubjectStatusDO]s based on a list of SubjectStatus values
      */
     fun getSubjectsByStatus(statuses: List<SubjectStatus>): List<SubjectStatusDO> {

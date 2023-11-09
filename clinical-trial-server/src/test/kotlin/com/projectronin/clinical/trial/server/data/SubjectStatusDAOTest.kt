@@ -45,7 +45,7 @@ class SubjectStatusDAOTest {
             it.status = SubjectStatus.WITHDRAWN
         }
         assertEquals(updated!!.studySiteId, studysite)
-        assertEquals(updated!!.status, SubjectStatus.WITHDRAWN)
+        assertEquals(updated.status, SubjectStatus.WITHDRAWN)
     }
 
     @DataSet(value = ["/dbunit/subjectstatus/MultipleSubjectStatuses.yaml"], cleanAfter = true)
@@ -53,6 +53,14 @@ class SubjectStatusDAOTest {
     fun `get all Subject Status`() {
         val subjectStatus = subjectStatusDAO.getSubjectStatus()
         assertEquals(subjectStatus.size, 9)
+    }
+
+    @DataSet(value = ["/dbunit/subjectstatus/MultipleSubjectStatuses.yaml"], cleanAfter = true)
+    @Test
+    fun `get Subject Status by Subject ID`() {
+        val subjectStatus = subjectStatusDAO.getSubjectStatusBySubjectId("subjectId6")
+        assertEquals(subjectStatus.size, 2)
+        assertEquals(listOf(UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770"), UUID.fromString("9691d550-90f5-4fb8-83f9-e4a3840e37eb")), subjectStatus.map { it.studySiteId })
     }
 
     @DataSet(value = ["/dbunit/subjectstatus/MultipleSubjectStatuses.yaml"], cleanAfter = true)
