@@ -1,3 +1,11 @@
 productGroupLabel,productItemLabel,sequence,valueSetUuid,valueSetDisplayTitle,valueSetCodeName,valueSetVersion
-Demographics,Birth Date,1,DataDictionary1,Birth Date,birthdate,1
-Demographics,Gender,2,DataDictionary2,Sex,sex,1
+Demographics,Birth Date,1,10f8c49a-635b-4928-aee6-f6e47c2e7c50,Birth Date,birthdate,1
+Demographics,Gender,2,daf6a5fc-5705-400b-abd0-852e060c9325,Sex,sex,1
+Demographics,Marital Status,3,474a2e8e-14ca-46fb-a955-04c00f9dab7d,Marital Status,maritalstatus,1
+Demographics,Multiple Birth,4,7e11ab3e-54f9-447f-8a29-c7dbdf3aff73,Multiple Birth,multiplebirth,1
+Demographics,Communication Language,5,bf688200-19eb-441f-b8b8-cfcd7f2c000e,Communication Language,communicationlanguage,2
+Demographics,Religion,6,a68a0a01-c6ba-4de0-a9cf-fcccf9b1eeee,Religion,religion,1
+Demographics,Birth Sex,7,ca5545b1-64d9-4476-9206-8a9b1ba603b9,Birth Sex Observation,birthsexobservation,1
+Demographics,Gender Identity,8,53abdce0-9e4d-4fa3-97b0-426775ceb70c,Gender Identity,genderidentity,1
+Demographics,Ethnicity,9,f1ef1444-1c66-477a-9221-9a1590da8a34,Ethnicity,ethnicity,1
+Demographics,Race,10,1a056f49-0e24-4eca-93bf-32cf3678141d,Race,race,1

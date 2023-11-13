@@ -3,6 +3,7 @@ apache-kafka = "3.5.1"
 idea-ext = "1.1.7"
 interop-common = "3.12.0"
 interop-datalake = "8.4.2"
+interop-ehr = "12.0.0"
 interop-event-resource-request = "1.1.0"
 interop-fhir = "8.10.2"
 interop-gradle = "3.3.0"
@@ -32,6 +33,8 @@ interop-commonJackson = { module = "com.projectronin.interop:interop-common-jack
 interop-commonKtorm = { module = "com.projectronin.interop:interop-common-ktorm", version.ref = "interop-common" }
 interop-commonTestDb = { module = "com.projectronin.interop:interop-common-test-db", version.ref = "interop-common" }
 interop-datalake = { module = "com.projectronin.interop.publish:interop-datalake", version.ref = "interop-datalake" }
+interop-ehr-fhir-ronin = { module = "com.projectronin.interop.ehr:interop-fhir-ronin", version.ref = "interop-ehr" }
+interop-ehr-fhir-roninGenerators = { module = "com.projectronin.interop.ehr:interop-fhir-ronin-generators", version.ref = "interop-ehr" }
 interop-fhir = { module = "com.projectronin.interop.fhir:interop-fhir", version.ref = "interop-fhir" }
 interop-fhirGenerators = { module = "com.projectronin.interop.fhir:interop-fhir-generators", version.ref = "interop-fhir" }
 jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }
@@ -62,6 +65,10 @@ testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version
 
 
 [bundles]
+data-generators = [
+    "interop-fhirGenerators",
+    "ronin-test-data-generator",
+]
 jackson = [
     "jackson-dataformat-xml",
     "jackson-dataformat-yaml",

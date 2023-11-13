@@ -23,7 +23,8 @@ class DataDictionaryService(private val ociClient: OCIClient) {
     private val schema = CsvSchema.emptySchema().withHeader()
 
     // Using ConcurrentHashMap for thread safety. contains a map of 'SystemValue' to a list of Data Dictionary UUIDs
-    private var lookupMap: Map<SystemValue, List<String>> = ConcurrentHashMap()
+    private var lookupMap: Map<SystemValue, List<DataDictionaryRow>> = ConcurrentHashMap()
+    private var dataDictionary: List<DataDictionaryRow> = emptyList()
 
     @PostConstruct
     fun init() {
@@ -32,7 +33,7 @@ class DataDictionaryService(private val ociClient: OCIClient) {
 
     @Scheduled(fixedRate = 24 * 60 * 60 * 1000) // 24 hours in milliseconds
     fun load() {
-        val tempMap = mutableMapOf<SystemValue, MutableList<String>>()
+        val tempMap = mutableMapOf<SystemValue, MutableList<DataDictionaryRow>>()
         val registryCSV =
             ociClient.getObjectFromINFX("Registries/v1/data dictionary/prod/38efb390-497f-4b49-9619-a45d33048a3a")
         val reader: MappingIterator<DataDictionaryRow> =
@@ -49,23 +50,33 @@ class DataDictionaryService(private val ociClient: OCIClient) {
                     logger.error { "Either code or system is null for value set item $value" }
                     return@valueSetLoop
                 }
-                tempMap.computeIfAbsent(key) { mutableListOf() }.add(dataDictionaryRow.valueSetUuid)
+                tempMap.computeIfAbsent(key) { mutableListOf() }.add(dataDictionaryRow)
             }
         }
         lookupMap = tempMap
+        dataDictionary = rows
     }
 
     /**
      * For a given LOINC or SNOMED system and code value, return the associated data dictionary UUID(s)
      */
-    fun getDataDictionaryByCode(system: String, value: String): List<String>? {
+    fun getDataDictionaryByCode(system: String, value: String): List<DataDictionaryRow>? {
         return lookupMap[SystemValue(system, value)]
+    }
+
+    fun getValueSetUuidVersionByDisplay(display: String): Pair<String, String>? {
+        dataDictionary.find { it.valueSetDisplayTitle == display }?.let {
+            return Pair(it.valueSetUuid, it.valueSetVersion)
+        }
+        return null
     }
 }
 
 data class DataDictionaryRow(
     val valueSetUuid: String,
-    val productItemLabel: String
+    val productItemLabel: String,
+    val valueSetVersion: String,
+    val valueSetDisplayTitle: String
 )
 
 data class SystemValue(
