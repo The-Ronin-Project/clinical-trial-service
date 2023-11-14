@@ -32,7 +32,7 @@ class SubjectService(
         )?.let { studySite ->
             subjectDAO.getSubjectByFhirId(subject.roninFhirId)?.let {
                 updateSubjectStatus(it, studySite.studySiteId, SubjectStatus.ACTIVE)
-                return subject.copy(id = it)
+                return subject.copy(id = it, status = SubjectStatus.ACTIVE.toString())
             }
 
             val newSubjectId = clinicalOneClient.getSubjectId(subject.siteId, subject.studyId)

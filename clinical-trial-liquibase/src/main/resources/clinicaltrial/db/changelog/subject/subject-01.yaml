@@ -13,13 +13,13 @@ databaseChangeLog:
             columns:
               - column:
                   name: subject_id
-                  type: VARCHAR(64)
+                  type: VARCHAR(32)
                   constraints:
                     nullable: false
                     primaryKey: true
                     primaryKeyName: pk_subject
               - column:
                   name: ronin_patient_id
-                  type: VARCHAR(64)
+                  type: VARCHAR(32)
                   constraints:
                     nullable: false

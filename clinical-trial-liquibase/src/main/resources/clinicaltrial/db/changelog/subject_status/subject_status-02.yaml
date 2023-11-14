@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: subject-id-length
+      author: Tripp Whaley
+      preConditions:
+        - onFail: MARK_RAN
+      changes:
+        -  dropForeignKeyConstraint:
+             baseTableName:  subject_status
+             constraintName:  fk_subject_status_subject
+        - modifyDataType:
+            columnName: subject_id
+            newDataType: varchar(64)
+            tableName: subject
+        - modifyDataType:
+            columnName: ronin_patient_id
+            newDataType: varchar(64)
+            tableName: subject
+        - modifyDataType:
+            columnName: subject_id
+            newDataType: varchar(64)
+            tableName: subject_status
+        - sql:
+            sql: ALTER TABLE subject_status ADD CONSTRAINT fk_subject_status_subject FOREIGN KEY (subject_id) REFERENCES subject(subject_id);
+
