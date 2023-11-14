@@ -1,9 +1,11 @@
 package com.projectronin.clinical.trial.server.kafka
 
+import com.projectronin.clinical.trial.server.services.SubjectService
 import com.projectronin.interop.fhir.r4.resource.Observation
 import com.projectronin.interop.fhir.r4.resource.Patient
 import com.projectronin.kafka.data.RoninEvent
 import mu.KotlinLogging
+import org.springframework.context.annotation.DependsOn
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
 import javax.annotation.PostConstruct
@@ -31,33 +33,30 @@ class EHRDAListener(private val activePatientService: ActivePatientService) {
 }
 
 @Service
-class ActivePatientService() { // inject subject DAO
-
+@DependsOn("liquibase")
+class ActivePatientService(
+    val subjectService: SubjectService
+) {
     private val activePatients = mutableSetOf<String>()
 
     @PostConstruct
     fun initialize() {
-        // TODO: call subject DAO for current list of active patients
-        addActivePatient("InitTestPatient")
+        subjectService.getActiveFhirIds().forEach(this::addActivePatient)
     }
 
     @Synchronized
-    fun addActivePatient(patientID: String) {
-        activePatients.add(patientID)
+    fun addActivePatient(patientRoninFhirId: String) {
+        activePatients.add(patientRoninFhirId)
     }
 
     @Synchronized
-    fun removeActivePatient(patientID: String) {
-        activePatients.remove(patientID)
+    fun removeActivePatient(patientRoninFhirId: String) {
+        activePatients.remove(patientRoninFhirId)
     }
 
     @Synchronized
-    fun isActivePatient(patientID: String?): Boolean {
-        return activePatients.contains(patientID)
-    }
+    fun isActivePatient(patientRoninFhirId: String?): Boolean = activePatients.contains(patientRoninFhirId)
 
     @Synchronized
-    fun getActivePatients(): List<String> {
-        return activePatients.toList()
-    }
+    fun getActivePatients(): List<String> = activePatients.toList()
 }

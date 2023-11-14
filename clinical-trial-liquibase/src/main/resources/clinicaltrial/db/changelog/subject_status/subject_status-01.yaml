@@ -20,7 +20,7 @@ databaseChangeLog:
                     foreignKeyName: fk_subject_status_study_site
               - column:
                   name: subject_id
-                  type: VARCHAR(32)
+                  type: VARCHAR(64)
                   constraints:
                     nullable: false
                     references: subject(subject_id)

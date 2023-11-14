@@ -1,16 +1,20 @@
 package com.projectronin.clinical.trial.server
 
 import com.projectronin.clinical.trial.server.dataauthority.XDevConfig
+import com.projectronin.interop.common.http.spring.HttpSpringConfig
 import org.ktorm.database.Database
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Import
 import javax.sql.DataSource
 
 @Configuration
+@Import(HttpSpringConfig::class)
 class ClinicalTrialServerConfig {
+
     /**
-     * The Database used by validation based off the [dataSource].
+     * The database!
      */
     @Bean
     fun database(dataSource: DataSource): Database = Database.connectWithSpringSupport(dataSource)

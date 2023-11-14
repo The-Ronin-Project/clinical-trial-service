@@ -1,7 +1,7 @@
 [versions]
 apache-kafka = "3.5.1"
 idea-ext = "1.1.7"
-interop-common = "3.12.0"
+interop-common = "3.12.2"
 interop-datalake = "8.4.2"
 interop-ehr = "12.0.0"
 interop-event-resource-request = "1.1.0"
@@ -16,6 +16,7 @@ ktor = "2.3.4"
 ktorm = "3.6.0"
 liquibase = "4.24.0"
 mockk = "1.13.8"
+mockwebserver = "4.11.0"
 mysql-connector-java = "8.1.0"
 protobuf-java = "3.24.4"
 ronin-kafka = "1.1.1"
@@ -47,12 +48,14 @@ kotlin-logging = { module = "io.github.microutils:kotlin-logging", version.ref =
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-serialization-jackson = { module = "io.ktor:ktor-serialization-jackson", version.ref = "ktor" }
 ktorm-core = { module = "org.ktorm:ktorm-core", version.ref = "ktorm" }
 ktorm-support-mysql = { module = "org.ktorm:ktorm-support-mysql", version.ref = "ktorm" }
 liquibase-core = { module = "org.liquibase:liquibase-core", version.ref = "liquibase" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "mockwebserver" }
 mysql-connector-java = { module = "com.mysql:mysql-connector-j", version.ref = "mysql-connector-java" }
 protobuf-java = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuf-java" }
 ronin-kafka = { module = "com.projectronin:ronin-kafka", version.ref = "ronin-kafka" }
@@ -89,5 +92,6 @@ interop-junit = { id = "com.projectronin.interop.gradle.junit", version.ref = "i
 interop-server-publish = { id = "com.projectronin.interop.gradle.server-publish", version.ref = "interop-gradle" }
 interop-server-version = { id = "com.projectronin.interop.gradle.server-version", version.ref = "interop-gradle" }
 interop-spring-boot = { id = "com.projectronin.interop.gradle.spring-boot", version.ref = "interop-gradle" }
+interop-spring-framework = { id = "com.projectronin.interop.gradle.spring", version.ref = "interop-gradle" }
 interop-version-catalog = { id = "com.projectronin.interop.gradle.version-catalog-update", version.ref = "interop-gradle" }
 interop-sonarqube = { id = "com.projectronin.interop.gradle.sonarqube", version.ref = "interop-gradle" }

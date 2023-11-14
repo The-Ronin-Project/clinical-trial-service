@@ -14,6 +14,10 @@ services:
       - CONEDA_DB_PASS=ThePassword
       - AUTH0_AUDIENCE=https://clinical-trial-service.dev.projectronin.io
       - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://mock-oauth2:8080/clinical-trial
+      - CLINICALONE_CLIENT_SCOPE=tenantqa2.ec-dc-svc.all
+      - CLINICALONE_AUTH_URL=https://tenantqa2-hs-sso-uat.iams.hs.ocs.oraclecloud.com/ms_oauth/oauth2/endpoints/tenantqa2/tokens
+      - CLINICALONE_CLIENT_ID=ficticious_client_id
+      - CLINICALONE_CLIENT_SECRET=ficticious_client_secret
     ports:
       - "8080:8080"
     depends_on:

@@ -6,7 +6,6 @@ import org.springframework.boot.runApplication
 /**
  * Main Spring Boot application for the Clinical Trial Server
  */
-
 @SpringBootApplication
 class ClinicalTrialServer
 

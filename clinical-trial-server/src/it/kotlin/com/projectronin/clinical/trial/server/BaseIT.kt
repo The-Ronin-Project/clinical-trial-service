@@ -1,6 +1,8 @@
 package com.projectronin.clinical.trial.server
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.projectronin.clinical.trial.client.ClinicalTrialClient
+import com.projectronin.clinical.trial.client.auth.ClinicalTrialAuthenticationService
 import com.projectronin.interop.common.auth.Authentication
 import com.projectronin.interop.common.http.spring.HttpSpringConfig
 import io.ktor.client.call.body
@@ -25,7 +27,18 @@ abstract class BaseIT {
 
     protected val serverUrl = "http://localhost:8080"
     protected val httpClient = HttpSpringConfig().getHttpClient()
-    protected val authUrl = "http://localhost:8081/clinical-trial/token"
+    private val authUrl = "http://localhost:8081/clinical-trial/token"
+    private val authenticationService =
+        ClinicalTrialAuthenticationService(
+            httpClient,
+            "http://localhost:8081/clinical-trial/token",
+            "https://clinical-trial-service.dev.projectronin.io",
+            "id",
+            "secret",
+            false
+        )
+
+    protected val client = ClinicalTrialClient(serverUrl, httpClient, authenticationService)
     data class FormBasedAuthentication(override val accessToken: String) : Authentication {
         override val tokenType: String = "Bearer"
         override val expiresAt: Instant? = null

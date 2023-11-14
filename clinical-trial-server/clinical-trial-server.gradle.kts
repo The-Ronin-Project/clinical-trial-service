@@ -19,11 +19,13 @@ dependencies {
 
     implementation(libs.mysql.connector.java)
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.bundles.ktor)
     implementation(libs.interop.fhir)
     implementation(libs.interop.fhirGenerators)
     implementation(libs.protobuf.java)
     implementation(libs.interop.common)
     implementation(libs.event.interop.resource.request)
+    implementation(libs.interop.commonHttp)
     implementation(libs.interop.commonJackson)
     implementation(libs.interop.commonKtorm)
     implementation(libs.interop.datalake)
@@ -44,6 +46,7 @@ dependencies {
     testImplementation(libs.bundles.data.generators)
     testImplementation(libs.interop.ehr.fhir.roninGenerators)
 
+    itImplementation(project(":clinical-trial-client"))
     itImplementation(libs.interop.commonHttp)
     itImplementation(libs.interop.fhir)
 
