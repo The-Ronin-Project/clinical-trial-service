@@ -15,13 +15,11 @@ on:
           - Patch
           - Minor
           - Major
-      skip_publish:
-        description: 'Skip publishing (use if changelog failed)'
-        type: boolean
-        required: false
-        default: false
 
 env:
+  DB_MODULE: clinical-trial-liquibase
+  SERVICE_MODULE: clinical-trial-server
+  SERVICE_NAME: clinical-trial-service
   ronin.release: true
 
 jobs:
@@ -41,12 +39,10 @@ jobs:
         run: chmod +x gradlew
 
       - name: Execute build
-        if: ${{ github.event.inputs.skip_publish == 'false' }}
         run: ./gradlew build
 
       - name: Axion Release
         id: release
-        if: ${{ github.event.inputs.skip_publish == 'false' }}
         run: |
           ./gradlew release \
              -Prelease.versionIncrementer=increment${{ github.event.inputs.increment }} \
@@ -80,7 +76,6 @@ jobs:
         run: chmod +x gradlew
 
       - name: Publish
-        if: ${{ github.event.inputs.skip_publish == 'false' }}
         run: ./gradlew publish
         env:
           NEXUS_USER: ${{ secrets.NEXUS_MAVEN_USER }}
@@ -88,7 +83,6 @@ jobs:
 
       - name: Build Database Image
         id: build-database-image
-        if: ${{ github.event.inputs.skip_publish == 'false' }}
         uses: projectronin/github/build-image@build-image/v3
         with:
           image: ${{ env.DB_MODULE }}
@@ -100,7 +94,6 @@ jobs:
 
       - name: Build Service Image
         id: build-service-image
-        if: ${{ github.event.inputs.skip_publish == 'false' }}
         uses: projectronin/github/build-image@build-image/v3
         with:
           image: ${{ env.SERVICE_NAME }}
