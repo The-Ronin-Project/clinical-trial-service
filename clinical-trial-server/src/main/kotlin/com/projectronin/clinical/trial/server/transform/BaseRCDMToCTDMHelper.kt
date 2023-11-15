@@ -1,6 +1,5 @@
 package com.projectronin.clinical.trial.server.transform
 
-import com.projectronin.interop.datalake.oci.client.OCIClient
 import com.projectronin.interop.fhir.generators.datatypes.DynamicValues
 import com.projectronin.interop.fhir.generators.datatypes.codeableConcept
 import com.projectronin.interop.fhir.generators.datatypes.coding
@@ -12,15 +11,15 @@ import com.projectronin.interop.fhir.r4.datatype.CodeableConcept
 import com.projectronin.interop.fhir.r4.datatype.Extension
 import com.projectronin.interop.fhir.r4.datatype.Meta
 import com.projectronin.interop.fhir.r4.datatype.primitive.Canonical
+import org.springframework.stereotype.Component
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
+@Component
 class BaseRCDMToCTDMHelper(
-    private val ociClient: OCIClient
+    private val dataDictionaryService: DataDictionaryService
 ) {
     fun setProfileMeta(displayValue: String): Meta? {
-        val dataDictionaryService = DataDictionaryService(ociClient)
-        dataDictionaryService.init()
         dataDictionaryService.getValueSetUuidVersionByDisplay(displayValue)?.let {
             return meta {
                 profile of listOf(Canonical("https://projectronin.io/fhir/StructureDefinition/CTDM-Observation"))

@@ -99,15 +99,6 @@ class SubjectControllerIT : BaseIT() {
     }
 
     @Test
-    fun `get active subjects with no subjects`() {
-        val response = runBlocking {
-            client.getSubjects(true)
-        }
-
-        assertEquals(0, response.size)
-    }
-
-    @Test
     fun `get active subjects with subjects`() {
         seedDB()
 

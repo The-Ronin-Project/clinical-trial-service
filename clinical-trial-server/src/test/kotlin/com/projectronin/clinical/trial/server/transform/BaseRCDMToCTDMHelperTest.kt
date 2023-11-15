@@ -6,9 +6,12 @@ import com.projectronin.interop.fhir.r4.datatype.primitive.Uri
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import java.io.File
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BaseRCDMToCTDMHelperTest {
     private val registryCSV = File(DataDictionaryServiceTest::class.java.getResource("/transform/registryExample.csv")!!.file).readText()
     private val valueSetJSON1 =
@@ -26,7 +29,13 @@ class BaseRCDMToCTDMHelperTest {
         every { getObjectFromINFX("ValueSets/v2/published/f1ef1444-1c66-477a-9221-9a1590da8a34") } returns valueSetJSON1
         every { getObjectFromINFX("ValueSets/v2/published/1a056f49-0e24-4eca-93bf-32cf3678141d") } returns valueSetJSON1
     }
-    private val service = BaseRCDMToCTDMHelper(ociClient)
+    private val dataDictionaryService = DataDictionaryService(ociClient)
+    private val service = BaseRCDMToCTDMHelper(dataDictionaryService)
+
+    @BeforeAll
+    fun init() {
+        dataDictionaryService.load()
+    }
 
     @Test
     fun `set extensions`() {

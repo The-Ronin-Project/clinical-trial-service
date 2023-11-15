@@ -3,6 +3,7 @@ package com.projectronin.clinical.trial.server.controller
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.projectronin.clinical.trial.server.data.model.SubjectStatus
+import com.projectronin.clinical.trial.server.kafka.ActivePatientService
 import com.projectronin.clinical.trial.server.services.SubjectService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -24,7 +25,8 @@ data class StatusResponse(
 
 @RestController
 class SubjectStatusController(
-    val subjectService: SubjectService
+    val subjectService: SubjectService,
+    val activePatientService: ActivePatientService
 ) {
     // TODO: revisit scopes
     @GetMapping("studies/{studyId}/sites/{siteId}/subject/{subjectId}/status")
@@ -34,8 +36,12 @@ class SubjectStatusController(
         @PathVariable siteId: String,
         @PathVariable subjectId: String
     ): ResponseEntity<SubjectStatus> {
-        val studySite = subjectService.getStudySiteByStudyIdAndSiteId(studyId, siteId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-        val subjectStatus = subjectService.getSubjectStatus(subjectId, studySite.studySiteId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+        val studySite = subjectService.getStudySiteByStudyIdAndSiteId(studyId, siteId) ?: return ResponseEntity(
+            HttpStatus.NOT_FOUND
+        )
+        val subjectStatus = subjectService.getSubjectStatus(subjectId, studySite.studySiteId) ?: return ResponseEntity(
+            HttpStatus.NOT_FOUND
+        )
         return ResponseEntity(subjectStatus.status, HttpStatus.OK)
     }
 
@@ -50,9 +56,27 @@ class SubjectStatusController(
     ): ResponseEntity<StatusResponse> {
         val status = request.status.let {
             runCatching { SubjectStatus.valueOf(it) }.getOrNull()
-        } ?: return ResponseEntity(StatusResponse("Status must be one of ${SubjectStatus.values().joinToString()}."), HttpStatus.BAD_REQUEST)
-        val studySite = subjectService.getStudySiteByStudyIdAndSiteId(studyId, siteId) ?: return ResponseEntity(StatusResponse("No study found for ID $studyId at Site $siteId."), HttpStatus.NOT_FOUND)
-        subjectService.updateSubjectStatus(subjectId, studySite.studySiteId, status) ?: return ResponseEntity(StatusResponse("No subject $subjectId found in study $studyId at site $siteId"), HttpStatus.NOT_FOUND)
+        } ?: return ResponseEntity(
+            StatusResponse("Status must be one of ${SubjectStatus.values().joinToString()}."),
+            HttpStatus.BAD_REQUEST
+        )
+        val studySite = subjectService.getStudySiteByStudyIdAndSiteId(studyId, siteId) ?: return ResponseEntity(
+            StatusResponse("No study found for ID $studyId at Site $siteId."),
+            HttpStatus.NOT_FOUND
+        )
+        subjectService.updateSubjectStatus(subjectId, studySite.studySiteId, status) ?: return ResponseEntity(
+            StatusResponse("No subject $subjectId found in study $studyId at site $siteId"),
+            HttpStatus.NOT_FOUND
+        )
+        val fhirId = subjectService.subjectDAO.getFhirIdBySubject(subjectId) ?: return ResponseEntity(
+            StatusResponse("No Ronin FHIR ID found for subject: $subjectId"),
+            HttpStatus.NOT_FOUND
+        )
+        if (status in listOf(SubjectStatus.ACTIVE, SubjectStatus.ENROLLED, SubjectStatus.NEW)) {
+            activePatientService.addActivePatient(fhirId)
+        } else {
+            activePatientService.removeActivePatient(fhirId)
+        }
         return ResponseEntity(StatusResponse("Enrollment status updated successfully."), HttpStatus.OK)
     }
 }

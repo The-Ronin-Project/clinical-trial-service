@@ -10,10 +10,11 @@ import com.projectronin.interop.datalake.oci.client.OCIClient
 import com.projectronin.interop.fhir.r4.resource.ValueSet
 import mu.KotlinLogging
 import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.stereotype.Service
 import java.util.concurrent.ConcurrentHashMap
 import javax.annotation.PostConstruct
 
-// @Service OCI configuration needs to be set up before we hook this into our spring boot startup TODO
+@Service
 class DataDictionaryService(private val ociClient: OCIClient) {
     private val logger = KotlinLogging.logger { }
     private val mapper = CsvMapper().apply {

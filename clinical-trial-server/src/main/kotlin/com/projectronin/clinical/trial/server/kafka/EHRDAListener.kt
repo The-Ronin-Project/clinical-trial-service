@@ -1,6 +1,8 @@
 package com.projectronin.clinical.trial.server.kafka
 
+import com.projectronin.clinical.trial.server.dataauthority.ObservationDAO
 import com.projectronin.clinical.trial.server.services.SubjectService
+import com.projectronin.clinical.trial.server.transform.RCDMPatientToCTDMObservations
 import com.projectronin.interop.fhir.r4.resource.Observation
 import com.projectronin.interop.fhir.r4.resource.Patient
 import com.projectronin.kafka.data.RoninEvent
@@ -11,7 +13,7 @@ import org.springframework.stereotype.Service
 import javax.annotation.PostConstruct
 
 @Service
-class EHRDAListener(private val activePatientService: ActivePatientService) {
+class EHRDAListener(private val activePatientService: ActivePatientService, private val patientTransformer: RCDMPatientToCTDMObservations, private val observationDAO: ObservationDAO) {
 
     @KafkaListener(topics = ["oci.us-phoenix-1.ehr-data-authority.observation.v1"], groupId = "clinical-trial-service")
     fun consumeObservation(message: RoninEvent<Observation>) {
@@ -25,9 +27,11 @@ class EHRDAListener(private val activePatientService: ActivePatientService) {
     @KafkaListener(topics = ["oci.us-phoenix-1.ehr-data-authority.patient.v1"], groupId = "clinical-trial-service")
     fun consumePatient(message: RoninEvent<Patient>) {
         val patient = message.data
-        KotlinLogging.logger { }.error { "Got Patient" }
         if (activePatientService.isActivePatient(patient.id?.value)) {
-            KotlinLogging.logger { }.warn { "Active patient" }
+            val demographicObservations = patientTransformer.splitPatientDemographics(patient)
+            demographicObservations.forEach {
+                observationDAO.insert(it)
+            }
         }
     }
 }

@@ -3,8 +3,11 @@ package com.projectronin.clinical.trial.server.controller
 import com.projectronin.clinical.trial.server.data.model.StudySiteDO
 import com.projectronin.clinical.trial.server.data.model.SubjectStatus
 import com.projectronin.clinical.trial.server.data.model.SubjectStatusDO
+import com.projectronin.clinical.trial.server.kafka.ActivePatientService
 import com.projectronin.clinical.trial.server.services.SubjectService
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -13,8 +16,16 @@ import org.springframework.http.HttpStatus
 import java.util.UUID
 
 class SubjectStatusControllerTest {
-    private var subjectService = mockk<SubjectService>()
-    private var subjectStatusController = SubjectStatusController(subjectService)
+    private var subjectService = mockk<SubjectService> {
+        every { subjectDAO } returns mockk {
+            every { getFhirIdBySubject(any()) } returns "fhirId"
+        }
+    }
+    private var activePatientService = mockk<ActivePatientService> {
+        every { removeActivePatient(any()) } just Runs
+        every { addActivePatient(any()) } just Runs
+    }
+    private var subjectStatusController = SubjectStatusController(subjectService, activePatientService)
 
     private val studySiteId1 = UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770")
 

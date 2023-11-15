@@ -14,6 +14,7 @@ import com.projectronin.interop.fhir.r4.datatype.Coding
 import com.projectronin.interop.fhir.r4.datatype.Identifier
 import com.projectronin.interop.fhir.r4.datatype.primitive.Canonical
 import com.projectronin.interop.fhir.r4.datatype.primitive.Code
+import com.projectronin.interop.fhir.r4.datatype.primitive.Id
 import com.projectronin.interop.fhir.r4.datatype.primitive.Uri
 import com.projectronin.interop.fhir.r4.datatype.primitive.asFHIR
 import com.projectronin.interop.fhir.ronin.generators.resource.rcdmPatient
@@ -146,14 +147,15 @@ class RCDMPatientToCTDMObservationsTest {
     @BeforeEach
     fun setup() {
         subjectDAO = mockk {
-            every { getSubjectByFhirId("fhirId") } returns "subjectId"
-            every { getSubjectByFhirId("notfhirId") } returns null
+            every { getSubjectByFhirId("test-fhirId") } returns "subjectId"
+            every { getSubjectByFhirId("test-notfhirId") } returns null
         }
     }
 
     @Test
     fun `split rcdm Patient with all fields`() {
         val rcdmPatient = rcdmPatient("test") {
+            id of Id("fhirId")
             extension of listOf(
                 extension {
                     url of "http://hl7.org/fhir/StructureDefinition/patient-religion"
@@ -269,6 +271,7 @@ class RCDMPatientToCTDMObservationsTest {
     @Test
     fun `split rcdm Patient with birth date only`() {
         val rcdmPatient = rcdmPatient("test") {
+            id of Id("fhirId")
             identifier of listOf(roninFhir)
         }
         val observations = RCDMPatientToCTDMObservations(subjectDAO, rcdmHelper).splitPatientDemographics(rcdmPatient)

@@ -14,10 +14,12 @@ import com.projectronin.interop.fhir.r4.datatype.primitive.Markdown
 import com.projectronin.interop.fhir.r4.datatype.primitive.Uri
 import com.projectronin.interop.fhir.r4.resource.Observation
 import com.projectronin.interop.fhir.r4.resource.Patient
+import org.springframework.stereotype.Component
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID
 
+@Component
 class RCDMPatientToCTDMObservations(
     private val subjectDAO: SubjectDAO,
     private val rcdmHelper: BaseRCDMToCTDMHelper
@@ -27,8 +29,8 @@ class RCDMPatientToCTDMObservations(
         val obsList: MutableList<Observation> = ArrayList<Observation>()
 
         // get study patient info
-        val subject = rcdmPatient.findFhirId()?.let { subjectDAO.getSubjectByFhirId(it) }
-            ?: throw Exception("No subject found for Ronin FHIR Id")
+        val subject = rcdmPatient.id?.value?.let { subjectDAO.getSubjectByFhirId(it) }
+            ?: throw Exception("No subject found for Ronin FHIR Id: ${rcdmPatient.id?.value}")
 
         // set birthDate
         rcdmPatient.birthDate?.let {
