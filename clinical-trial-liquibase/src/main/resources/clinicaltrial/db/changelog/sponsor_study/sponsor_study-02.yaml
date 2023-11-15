@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: sponsor_study-pk
+      author: Tripp Whaley
+      preConditions:
+        - onFail: MARK_RAN
+      changes:
+        - addPrimaryKey:
+            columnNames: sponsor_id, study_id
+            constraintName: pk_sponsor_study
+            tableName: sponsor_study
+
