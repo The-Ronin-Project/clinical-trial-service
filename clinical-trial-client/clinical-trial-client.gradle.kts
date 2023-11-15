@@ -6,7 +6,7 @@ plugins {
 dependencies {
     implementation(platform(libs.spring.boot.parent))
 
-    api(project(":clinical-trial-server"))
+    api(project(":clinical-trial-models"))
     implementation(libs.bundles.jackson)
     implementation(libs.bundles.ktor)
     implementation(libs.interop.commonHttp)

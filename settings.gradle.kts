@@ -1,5 +1,6 @@
 rootProject.name = "clinical-trial-service"
 
+include("clinical-trial-models")
 include("clinical-trial-server")
 include("clinical-trial-client")
 include("clinical-trial-liquibase")

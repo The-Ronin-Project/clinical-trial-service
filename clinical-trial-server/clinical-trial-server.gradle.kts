@@ -1,12 +1,9 @@
-
 plugins {
     `maven-publish`
     alias(libs.plugins.interop.docker.integration)
     alias(libs.plugins.interop.junit)
     alias(libs.plugins.interop.spring.boot)
 }
-
-group = "com.projectronin"
 
 dependencies {
     implementation(platform(libs.spring.boot.parent))
@@ -17,6 +14,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.0")
 
+    implementation(project(":clinical-trial-models"))
     implementation(libs.mysql.connector.java)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.bundles.ktor)

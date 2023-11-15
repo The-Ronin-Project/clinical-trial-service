@@ -1,5 +1,6 @@
 package com.projectronin.clinical.trial.server.controller
 
+import com.projectronin.clinical.trial.models.Subject
 import com.projectronin.clinical.trial.server.BaseIT
 import com.projectronin.clinical.trial.server.data.binding.SiteDOs
 import com.projectronin.clinical.trial.server.data.binding.StudyDOs
@@ -7,7 +8,6 @@ import com.projectronin.clinical.trial.server.data.binding.StudySiteDOs
 import com.projectronin.clinical.trial.server.data.binding.SubjectDOs
 import com.projectronin.clinical.trial.server.data.binding.SubjectStatusDOs
 import com.projectronin.clinical.trial.server.data.model.SubjectStatus
-import com.projectronin.clinical.trial.server.model.Subject
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -23,7 +23,7 @@ import org.ktorm.dsl.deleteAll
 import org.ktorm.dsl.insert
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
-import java.util.*
+import java.util.UUID
 
 class SubjectControllerIT : BaseIT() {
     private val studyId = "studyId"

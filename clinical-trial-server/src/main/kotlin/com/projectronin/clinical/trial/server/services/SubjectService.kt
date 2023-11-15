@@ -1,5 +1,6 @@
 package com.projectronin.clinical.trial.server.services
 
+import com.projectronin.clinical.trial.models.Subject
 import com.projectronin.clinical.trial.server.clinicalone.ClinicalOneClient
 import com.projectronin.clinical.trial.server.data.StudySiteDAO
 import com.projectronin.clinical.trial.server.data.SubjectDAO
@@ -8,7 +9,6 @@ import com.projectronin.clinical.trial.server.data.model.StudySiteDO
 import com.projectronin.clinical.trial.server.data.model.SubjectDO
 import com.projectronin.clinical.trial.server.data.model.SubjectStatus
 import com.projectronin.clinical.trial.server.data.model.SubjectStatusDO
-import com.projectronin.clinical.trial.server.model.Subject
 import org.springframework.stereotype.Service
 import java.util.UUID
 

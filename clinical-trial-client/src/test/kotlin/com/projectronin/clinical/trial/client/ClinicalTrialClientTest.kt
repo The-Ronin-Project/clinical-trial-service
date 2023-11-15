@@ -1,7 +1,7 @@
 package com.projectronin.clinical.trial.client
 
 import com.projectronin.clinical.trial.client.auth.ClinicalTrialAuthenticationService
-import com.projectronin.clinical.trial.server.model.Subject
+import com.projectronin.clinical.trial.models.Subject
 import com.projectronin.interop.common.http.exceptions.ClientFailureException
 import com.projectronin.interop.common.http.ktor.ContentLengthSupplier
 import com.projectronin.interop.common.jackson.JacksonManager

@@ -1,7 +1,7 @@
 package com.projectronin.clinical.trial.server.controller
 
+import com.projectronin.clinical.trial.models.Subject
 import com.projectronin.clinical.trial.server.kafka.ActivePatientService
-import com.projectronin.clinical.trial.server.model.Subject
 import com.projectronin.clinical.trial.server.services.SubjectService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

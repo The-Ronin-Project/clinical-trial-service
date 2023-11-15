@@ -1,4 +1,4 @@
-package com.projectronin.clinical.trial.server.model
+package com.projectronin.clinical.trial.models
 
 data class Subject(
     val id: String = "",
