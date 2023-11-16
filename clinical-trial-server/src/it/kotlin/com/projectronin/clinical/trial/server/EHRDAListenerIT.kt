@@ -40,7 +40,7 @@ class EHRDAListenerIT : BaseIT() {
 
         database.insert(SiteDOs) {
             set(it.siteId, siteId)
-            set(it.roninTenantMnemonic, "ronin")
+            set(it.roninTenantMnemonic, "ronincer")
         }
 
         database.insert(StudySiteDOs) {
@@ -51,7 +51,7 @@ class EHRDAListenerIT : BaseIT() {
 
         database.insert(SubjectDOs) {
             set(it.subjectId, subjectId)
-            set(it.roninPatientId, "ronin-PatientId1")
+            set(it.roninPatientId, "ronincer-PatientId1")
         }
 
         database.insert(SubjectStatusDOs) {
@@ -88,7 +88,7 @@ class EHRDAListenerIT : BaseIT() {
     fun `listens to patient topic`() {
         seedDB()
         val subject = Subject(
-            roninFhirId = "ronin-PatientId2",
+            roninFhirId = "ronincer-PatientId2",
             siteId = siteId,
             studyId = studyId
         )
@@ -96,8 +96,8 @@ class EHRDAListenerIT : BaseIT() {
         runBlocking {
             client.createSubject(subject)
         }
-        val patient = rcdmPatient("ronin") {
-            id of Id("ronin-PatientId2")
+        val patient = rcdmPatient("ronincer") {
+            id of Id("PatientId2")
         }
         val event = RoninEvent(
             specVersion = "1.0",

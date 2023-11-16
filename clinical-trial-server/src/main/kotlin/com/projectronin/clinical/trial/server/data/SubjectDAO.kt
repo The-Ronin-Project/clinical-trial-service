@@ -36,12 +36,12 @@ class SubjectDAO(private val database: Database) {
     /**
      * Retrieves list of Ronin FHIR Ids for a list of SubjectStatus values
      */
-    fun getFhirIdsByStatus(statuses: List<SubjectStatus>): List<String> {
+    fun getFhirIdsByStatus(statuses: List<SubjectStatus>): Set<String> {
         return database.from(SubjectDOs)
             .innerJoin(SubjectStatusDOs, SubjectDOs.subjectId eq SubjectStatusDOs.subjectId)
             .select()
             .where(SubjectStatusDOs.status inList statuses)
-            .map { SubjectDOs.createEntity(it).roninPatientId }
+            .map { SubjectDOs.createEntity(it).roninPatientId }.toSet()
     }
 
     /**

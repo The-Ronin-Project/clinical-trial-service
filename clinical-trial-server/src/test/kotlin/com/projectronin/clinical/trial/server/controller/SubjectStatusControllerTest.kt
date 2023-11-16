@@ -3,11 +3,8 @@ package com.projectronin.clinical.trial.server.controller
 import com.projectronin.clinical.trial.server.data.model.StudySiteDO
 import com.projectronin.clinical.trial.server.data.model.SubjectStatus
 import com.projectronin.clinical.trial.server.data.model.SubjectStatusDO
-import com.projectronin.clinical.trial.server.kafka.ActivePatientService
 import com.projectronin.clinical.trial.server.services.SubjectService
-import io.mockk.Runs
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -21,11 +18,7 @@ class SubjectStatusControllerTest {
             every { getFhirIdBySubject(any()) } returns "fhirId"
         }
     }
-    private var activePatientService = mockk<ActivePatientService> {
-        every { removeActivePatient(any()) } just Runs
-        every { addActivePatient(any()) } just Runs
-    }
-    private var subjectStatusController = SubjectStatusController(subjectService, activePatientService)
+    private var subjectStatusController = SubjectStatusController(subjectService)
 
     private val studySiteId1 = UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770")
 
@@ -82,7 +75,10 @@ class SubjectStatusControllerTest {
         val response = subjectStatusController.update("1", "2", "1", UpdateStatusRequest("NOT_VALID_STATUS"))
 
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
-        assertEquals(response.body!!.message, "Status must be one of NEW, SCREENED, ACTIVE, ENROLLED, SCREEN_FAILED, WITHDRAWN, COMPLETE.")
+        assertEquals(
+            response.body!!.message,
+            "Status must be one of NEW, SCREENED, ACTIVE, ENROLLED, SCREEN_FAILED, WITHDRAWN, COMPLETE."
+        )
     }
 
     @Test

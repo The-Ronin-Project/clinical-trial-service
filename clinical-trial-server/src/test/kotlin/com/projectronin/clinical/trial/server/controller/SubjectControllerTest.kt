@@ -1,7 +1,6 @@
 package com.projectronin.clinical.trial.server.controller
 
 import com.projectronin.clinical.trial.models.Subject
-import com.projectronin.clinical.trial.server.kafka.ActivePatientService
 import com.projectronin.clinical.trial.server.kafka.DataLoadEventProducer
 import com.projectronin.clinical.trial.server.services.SubjectService
 import io.mockk.Runs
@@ -15,11 +14,10 @@ import org.springframework.http.HttpStatus
 
 class SubjectControllerTest {
     private var subjectService = mockk<SubjectService>()
-    private var activePatientService = mockk<ActivePatientService>()
     private var dataLoadEventProducer = mockk<DataLoadEventProducer> {
         every { producePatientResourceRequest(any(), any()) } just Runs
     }
-    private var subjectController = SubjectController(subjectService, activePatientService, dataLoadEventProducer)
+    private var subjectController = SubjectController(subjectService, dataLoadEventProducer)
 
     private val expectedPatientIds = listOf(
         "tenant-patientId1",
@@ -53,7 +51,7 @@ class SubjectControllerTest {
 
     @Test
     fun `get returns active subjects - list is empty`() {
-        every { activePatientService.getActivePatients() } returns emptyList()
+        every { subjectService.getActiveFhirIds() } returns emptySet()
         val response = subjectController.retrieve(true)
 
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
@@ -62,7 +60,7 @@ class SubjectControllerTest {
 
     @Test
     fun `get returns active subjects - list is populated`() {
-        every { activePatientService.getActivePatients() } returns expectedPatientIds
+        every { subjectService.getActiveFhirIds() } returns expectedPatientIds.toSet()
         val response = subjectController.retrieve(true)
 
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -84,7 +82,6 @@ class SubjectControllerTest {
     @Test
     fun `post returns created subject`() {
         every { subjectService.createSubject(subjectToCreate) } returns createdSubject
-        every { activePatientService.addActivePatient(subjectFhirID) } returns mockk()
         val response = subjectController.create(subjectToCreate)
 
         assertEquals(HttpStatus.CREATED, response.statusCode)

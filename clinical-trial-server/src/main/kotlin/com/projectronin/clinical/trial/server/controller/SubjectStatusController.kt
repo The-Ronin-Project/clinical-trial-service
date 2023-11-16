@@ -3,7 +3,6 @@ package com.projectronin.clinical.trial.server.controller
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.projectronin.clinical.trial.server.data.model.SubjectStatus
-import com.projectronin.clinical.trial.server.kafka.ActivePatientService
 import com.projectronin.clinical.trial.server.services.SubjectService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -25,8 +24,7 @@ data class StatusResponse(
 
 @RestController
 class SubjectStatusController(
-    val subjectService: SubjectService,
-    val activePatientService: ActivePatientService
+    val subjectService: SubjectService
 ) {
     // TODO: revisit scopes
     @GetMapping("studies/{studyId}/sites/{siteId}/subject/{subjectId}/status")
@@ -68,15 +66,6 @@ class SubjectStatusController(
             StatusResponse("No subject $subjectId found in study $studyId at site $siteId"),
             HttpStatus.NOT_FOUND
         )
-        val fhirId = subjectService.subjectDAO.getFhirIdBySubject(subjectId) ?: return ResponseEntity(
-            StatusResponse("No Ronin FHIR ID found for subject: $subjectId"),
-            HttpStatus.NOT_FOUND
-        )
-        if (status in listOf(SubjectStatus.ACTIVE, SubjectStatus.ENROLLED, SubjectStatus.NEW)) {
-            activePatientService.addActivePatient(fhirId)
-        } else {
-            activePatientService.removeActivePatient(fhirId)
-        }
         return ResponseEntity(StatusResponse("Enrollment status updated successfully."), HttpStatus.OK)
     }
 }

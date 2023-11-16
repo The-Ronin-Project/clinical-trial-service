@@ -1,7 +1,6 @@
 package com.projectronin.clinical.trial.server.controller
 
 import com.projectronin.clinical.trial.models.Subject
-import com.projectronin.clinical.trial.server.kafka.ActivePatientService
 import com.projectronin.clinical.trial.server.kafka.DataLoadEventProducer
 import com.projectronin.clinical.trial.server.services.SubjectService
 import org.springframework.http.HttpStatus
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("subjects")
 class SubjectController(
     val subjectService: SubjectService,
-    val activePatientService: ActivePatientService,
     val dataLoadEventProducer: DataLoadEventProducer
 ) {
     /**
@@ -34,7 +32,7 @@ class SubjectController(
         @RequestParam activeIdsOnly: Boolean = false
     ): ResponseEntity<List<Subject>> {
         val subjects = if (activeIdsOnly) {
-            activePatientService.getActivePatients().map {
+            subjectService.getActiveFhirIds().map {
                 Subject(roninFhirId = it)
             }
         } else {
@@ -54,7 +52,6 @@ class SubjectController(
         @RequestBody subject: Subject
     ): ResponseEntity<Subject> {
         subjectService.createSubject(subject)?.let {
-            activePatientService.addActivePatient(it.roninFhirId)
             dataLoadEventProducer.producePatientResourceRequest(it.roninFhirId, it.roninFhirId.split("-").first())
             return ResponseEntity(it, HttpStatus.CREATED)
         }

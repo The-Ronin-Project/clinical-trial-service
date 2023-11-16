@@ -1,89 +1,47 @@
 package com.projectronin.clinical.trial.server.kafka
 
+import com.projectronin.clinical.trial.server.dataauthority.ObservationDAO
 import com.projectronin.clinical.trial.server.services.SubjectService
+import com.projectronin.clinical.trial.server.transform.RCDMPatientToCTDMObservations
+import com.projectronin.interop.fhir.r4.resource.Observation
+import com.projectronin.interop.fhir.r4.resource.Patient
+import com.projectronin.kafka.data.RoninEvent
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 
 class EHRDAListenerTest {
 
-    // ActivePatientService class tests
-    private lateinit var activePatientService: ActivePatientService
     private var subjectService = mockk<SubjectService>()
-    private val patientId1 = "patientId1"
-    private val patientId2 = "patientId2"
-    private val activePatients = listOf(patientId1, patientId2)
+    private var patientTransformer = mockk<RCDMPatientToCTDMObservations>()
+    private var observationDAO = mockk<ObservationDAO> {
+        every { insert(any()) } returns "inserted"
+    }
+    private val listener = EHRDAListener(subjectService, patientTransformer, observationDAO)
 
-    @BeforeEach
-    fun setup() {
-        activePatientService = ActivePatientService(subjectService)
+    @Test
+    fun `patient listener works`() {
+        val message = mockk<RoninEvent<Patient>> {
+            every { data } returns mockk {
+                every { id?.value } returns "ronincer-patientId1"
+            }
+            every { tenantId } returns "ronincer"
+        }
+        every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId1")
+        every { patientTransformer.splitPatientDemographics(any()) } returns listOf(mockk())
+        assertDoesNotThrow { listener.consumePatient(message) }
     }
 
     @Test
-    fun `initializes with some patient data`() {
-        every { subjectService.getActiveFhirIds() } returns activePatients
-        activePatientService.initialize()
-
-        assertEquals(activePatients, activePatientService.getActivePatients())
-    }
-
-    @Test
-    fun `patient is added`() {
-        activePatientService.addActivePatient(patientId1)
-
-        assertEquals(listOf(patientId1), activePatientService.getActivePatients())
-    }
-
-    @Test
-    fun `patient is added with existing patient`() {
-        activePatientService.addActivePatient(patientId1)
-        activePatientService.addActivePatient(patientId2)
-
-        assertEquals(listOf(patientId1, patientId2), activePatientService.getActivePatients())
-    }
-
-    @Test
-    fun `patient is added as duplicate`() {
-        activePatientService.addActivePatient(patientId1)
-        activePatientService.addActivePatient(patientId1)
-
-        assertEquals(listOf(patientId1), activePatientService.getActivePatients())
-    }
-
-    @Test
-    fun `patient is removed when existing`() {
-        activePatientService.addActivePatient(patientId1)
-        activePatientService.removeActivePatient(patientId1)
-
-        assertEquals(emptyList<String>(), activePatientService.getActivePatients())
-    }
-
-    @Test
-    fun `removing patient without existing has no effect on existing`() {
-        activePatientService.addActivePatient(patientId1)
-        activePatientService.removeActivePatient(patientId2)
-
-        assertEquals(listOf(patientId1), activePatientService.getActivePatients())
-    }
-
-    @Test
-    fun `patient is not active when removed as only patient`() {
-        activePatientService.addActivePatient(patientId1)
-        activePatientService.removeActivePatient(patientId1)
-
-        assertFalse(activePatientService.isActivePatient(patientId1))
-    }
-
-    @Test
-    fun `patient is not active when removed with other patients active`() {
-        activePatientService.addActivePatient(patientId1)
-        activePatientService.removeActivePatient(patientId2)
-
-        assertTrue(activePatientService.isActivePatient(patientId1))
-        assertFalse(activePatientService.isActivePatient(patientId2))
+    fun `observation listener works`() {
+        val message = mockk<RoninEvent<Observation>> {
+            every { data } returns mockk {
+                every { subject?.decomposedId() } returns "ronincer-patientId1"
+            }
+            every { tenantId } returns "ronincer"
+        }
+        every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId1")
+        assertDoesNotThrow { listener.consumeObservation(message) }
     }
 }

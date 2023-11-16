@@ -54,4 +54,11 @@ internal class DataDictionaryServiceTest {
         assertEquals(test1!!.first, "10f8c49a-635b-4928-aee6-f6e47c2e7c50")
         assertEquals(test1.second, "1")
     }
+
+    @Test
+    fun `retry works`() {
+        every { ociClient.getObjectFromINFX("Registries/v1/data dictionary/prod/38efb390-497f-4b49-9619-a45d33048a3a") } throws Exception()
+        service.load(5)
+        every { ociClient.getObjectFromINFX("Registries/v1/data dictionary/prod/38efb390-497f-4b49-9619-a45d33048a3a") } returns registryCSV
+    }
 }

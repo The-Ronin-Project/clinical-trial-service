@@ -52,10 +52,10 @@ class SubjectService(
         }
     }
 
-    fun getFhirIdsByStatuses(status: List<SubjectStatus>): List<String> =
+    fun getFhirIdsByStatuses(status: List<SubjectStatus>): Set<String> =
         subjectDAO.getFhirIdsByStatus(status)
 
-    fun getActiveFhirIds(): List<String> =
+    fun getActiveFhirIds(): Set<String> =
         getFhirIdsByStatuses(listOf(SubjectStatus.ACTIVE, SubjectStatus.ENROLLED))
 
     fun insertSubjectStatus(subjectId: String, studySiteId: UUID, subjectStatus: SubjectStatus) {

@@ -172,20 +172,20 @@ class SubjectServiceTest {
         val statuses = SubjectStatus.values().toList()
         every {
             subjectDAO.getFhirIdsByStatus(statuses)
-        } returns listOf(roninFhirId)
+        } returns setOf(roninFhirId)
 
         val fhirIds = subjectService.getFhirIdsByStatuses(statuses)
-        assertEquals(listOf(roninFhirId), fhirIds)
+        assertEquals(setOf(roninFhirId), fhirIds)
     }
 
     @Test
     fun `get active fhir ids works`() {
         every {
             subjectDAO.getFhirIdsByStatus(listOf(SubjectStatus.ACTIVE, SubjectStatus.ENROLLED))
-        } returns listOf(roninFhirId)
+        } returns setOf(roninFhirId)
 
         val fhirIds = subjectService.getActiveFhirIds()
-        assertEquals(listOf(roninFhirId), fhirIds)
+        assertEquals(setOf(roninFhirId), fhirIds)
     }
 
     // Utility

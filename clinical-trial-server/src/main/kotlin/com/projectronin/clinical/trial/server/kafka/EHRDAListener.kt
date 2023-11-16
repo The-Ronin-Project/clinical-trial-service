@@ -7,19 +7,22 @@ import com.projectronin.interop.fhir.r4.resource.Observation
 import com.projectronin.interop.fhir.r4.resource.Patient
 import com.projectronin.kafka.data.RoninEvent
 import mu.KotlinLogging
-import org.springframework.context.annotation.DependsOn
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Service
-import javax.annotation.PostConstruct
 
 @Service
-class EHRDAListener(private val activePatientService: ActivePatientService, private val patientTransformer: RCDMPatientToCTDMObservations, private val observationDAO: ObservationDAO) {
+class EHRDAListener(
+    private val subjectService: SubjectService,
+    private val patientTransformer: RCDMPatientToCTDMObservations,
+    private val observationDAO: ObservationDAO
+) {
+
+    private val tenants = listOf("ronincer", "ggwadc8y") // TODO: swap this with a call to the tenant service
 
     @KafkaListener(topics = ["oci.us-phoenix-1.ehr-data-authority.observation.v1"], groupId = "clinical-trial-service")
     fun consumeObservation(message: RoninEvent<Observation>) {
         val observation = message.data
-        KotlinLogging.logger { }.warn { "Got Observation" }
-        if (activePatientService.isActivePatient(observation.subject?.decomposedId())) {
+        if (checkTenantAndPatient(observation.subject?.decomposedId())) {
             KotlinLogging.logger { }.warn { "Active observation" }
         }
     }
@@ -27,40 +30,20 @@ class EHRDAListener(private val activePatientService: ActivePatientService, priv
     @KafkaListener(topics = ["oci.us-phoenix-1.ehr-data-authority.patient.v1"], groupId = "clinical-trial-service")
     fun consumePatient(message: RoninEvent<Patient>) {
         val patient = message.data
-        if (activePatientService.isActivePatient(patient.id?.value)) {
+        KotlinLogging.logger { }.warn { "Patient: $patient" }
+        if (checkTenantAndPatient(patient.id?.value)) {
             val demographicObservations = patientTransformer.splitPatientDemographics(patient)
             demographicObservations.forEach {
                 observationDAO.insert(it)
+                KotlinLogging.logger { }.warn { "observation added" }
             }
         }
     }
-}
 
-@Service
-@DependsOn("liquibase")
-class ActivePatientService(
-    val subjectService: SubjectService
-) {
-    private val activePatients = mutableSetOf<String>()
-
-    @PostConstruct
-    fun initialize() {
-        subjectService.getActiveFhirIds().forEach(this::addActivePatient)
+    private fun checkTenantAndPatient(patientFHIRID: String?): Boolean {
+        if (patientFHIRID?.split("-")?.first() !in tenants) return false
+        val activePatients = subjectService.getActiveFhirIds()
+        KotlinLogging.logger { }.warn { "Active patients: $activePatients" }
+        return patientFHIRID in activePatients
     }
-
-    @Synchronized
-    fun addActivePatient(patientRoninFhirId: String) {
-        activePatients.add(patientRoninFhirId)
-    }
-
-    @Synchronized
-    fun removeActivePatient(patientRoninFhirId: String) {
-        activePatients.remove(patientRoninFhirId)
-    }
-
-    @Synchronized
-    fun isActivePatient(patientRoninFhirId: String?): Boolean = activePatients.contains(patientRoninFhirId)
-
-    @Synchronized
-    fun getActivePatients(): List<String> = activePatients.toList()
 }
