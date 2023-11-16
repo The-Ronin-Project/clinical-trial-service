@@ -54,7 +54,7 @@ dependencies {
     itImplementation(libs.ktorm.core)
     itImplementation(libs.ronin.test.data.generator)
     itImplementation(libs.interop.fhirGenerators)
-
+    itImplementation(libs.event.interop.resource.request)
     itImplementation(platform(libs.testcontainers.bom))
     itImplementation("org.testcontainers:mysql")
     itImplementation(project)

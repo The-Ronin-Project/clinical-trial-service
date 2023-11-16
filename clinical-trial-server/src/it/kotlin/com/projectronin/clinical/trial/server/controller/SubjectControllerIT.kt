@@ -8,6 +8,9 @@ import com.projectronin.clinical.trial.server.data.binding.StudySiteDOs
 import com.projectronin.clinical.trial.server.data.binding.SubjectDOs
 import com.projectronin.clinical.trial.server.data.binding.SubjectStatusDOs
 import com.projectronin.clinical.trial.server.data.model.SubjectStatus
+import com.projectronin.event.interop.resource.request.v1.InteropResourceRequestV1
+import com.projectronin.kafka.data.RoninEvent
+import com.projectronin.kafka.serde.RoninEventDeserializer
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -15,14 +18,19 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.coroutines.runBlocking
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.common.serialization.StringDeserializer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.ktorm.dsl.deleteAll
 import org.ktorm.dsl.insert
+import java.time.Duration
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
+import java.util.Properties
 import java.util.UUID
 
 class SubjectControllerIT : BaseIT() {
@@ -31,6 +39,19 @@ class SubjectControllerIT : BaseIT() {
 
     private val subjectId = "subjectId"
     private val studySiteID = UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770")
+
+    private val consumer: KafkaConsumer<String, RoninEvent<*>> by lazy {
+        val props = Properties().apply {
+            put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092") // Kafka broker address
+            put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer::class.java.name)
+            put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.springframework.kafka.support.serializer.ErrorHandlingDeserializer")
+            put("spring.deserializer.value.delegate.class", RoninEventDeserializer::class.java.name)
+            put("ronin.json.deserializer.topics", "oci.us-phoenix-1.interop-mirth.resource-request.v1:com.projectronin.event.interop.resource.request.v1.InteropResourceRequestV1")
+            put(ConsumerConfig.GROUP_ID_CONFIG, "clinical-trial-service-it") // Consumer group ID
+            put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest") // or "latest", based on your requirement
+        }
+        KafkaConsumer<String, RoninEvent<*>>(props)
+    }
 
     private fun seedDB() {
         database.insert(StudyDOs) {
@@ -122,7 +143,7 @@ class SubjectControllerIT : BaseIT() {
     @Test
     fun `create a subject`() {
         seedDB()
-
+        consumer.subscribe(listOf("oci.us-phoenix-1.interop-mirth.resource-request.v1"))
         val subject = Subject(
             roninFhirId = "tenant-fhirId",
             siteId = siteId,
@@ -138,5 +159,7 @@ class SubjectControllerIT : BaseIT() {
         assertEquals(subject.roninFhirId, response.roninFhirId)
         assertEquals(subject.siteId, response.siteId)
         assertEquals(subject.studyId, response.studyId)
+        val records = consumer.poll(Duration.ofSeconds(5)).map { it.value().data as InteropResourceRequestV1 }
+        assertTrue(records.any { it.resourceFHIRId == "tenant-fhirId" })
     }
 }

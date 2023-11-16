@@ -2,8 +2,11 @@ package com.projectronin.clinical.trial.server.controller
 
 import com.projectronin.clinical.trial.models.Subject
 import com.projectronin.clinical.trial.server.kafka.ActivePatientService
+import com.projectronin.clinical.trial.server.kafka.DataLoadEventProducer
 import com.projectronin.clinical.trial.server.services.SubjectService
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -13,7 +16,10 @@ import org.springframework.http.HttpStatus
 class SubjectControllerTest {
     private var subjectService = mockk<SubjectService>()
     private var activePatientService = mockk<ActivePatientService>()
-    private var subjectController = SubjectController(subjectService, activePatientService)
+    private var dataLoadEventProducer = mockk<DataLoadEventProducer> {
+        every { producePatientResourceRequest(any(), any()) } just Runs
+    }
+    private var subjectController = SubjectController(subjectService, activePatientService, dataLoadEventProducer)
 
     private val expectedPatientIds = listOf(
         "tenant-patientId1",

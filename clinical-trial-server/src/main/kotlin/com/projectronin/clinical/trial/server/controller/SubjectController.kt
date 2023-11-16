@@ -2,6 +2,7 @@ package com.projectronin.clinical.trial.server.controller
 
 import com.projectronin.clinical.trial.models.Subject
 import com.projectronin.clinical.trial.server.kafka.ActivePatientService
+import com.projectronin.clinical.trial.server.kafka.DataLoadEventProducer
 import com.projectronin.clinical.trial.server.services.SubjectService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -17,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("subjects")
 class SubjectController(
     val subjectService: SubjectService,
-    val activePatientService: ActivePatientService
+    val activePatientService: ActivePatientService,
+    val dataLoadEventProducer: DataLoadEventProducer
 ) {
     /**
      * Get Subjects from the clinical trial service.
@@ -53,6 +55,7 @@ class SubjectController(
     ): ResponseEntity<Subject> {
         subjectService.createSubject(subject)?.let {
             activePatientService.addActivePatient(it.roninFhirId)
+            dataLoadEventProducer.producePatientResourceRequest(it.roninFhirId, it.roninFhirId.split("-").first())
             return ResponseEntity(it, HttpStatus.CREATED)
         }
 
