@@ -6,6 +6,7 @@ import com.projectronin.clinical.trial.server.services.SubjectService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -48,6 +49,7 @@ class SubjectController(
 
     @PostMapping
     @PreAuthorize("hasAuthority('SCOPE_create:resources')")
+    @CrossOrigin(origins = ["\${cors.ronin.frontend}"], maxAge = 1800)
     fun create(
         @RequestBody subject: Subject
     ): ResponseEntity<Subject> {

@@ -18,6 +18,7 @@ services:
       - CLINICALONE_AUTH_URL=https://tenantqa2-hs-sso-uat.iams.hs.ocs.oraclecloud.com/ms_oauth/oauth2/endpoints/tenantqa2/tokens
       - CLINICALONE_CLIENT_ID=ficticious_client_id
       - CLINICALONE_CLIENT_SECRET=ficticious_client_secret
+      - CORS_RONIN_FRONTEND=*
       - OCI_CONCEPTMAP_BUCKET_NAME=infx-shared
       - OCI_FINGERPRINT=fingerprint
       - OCI_NAMESPACE=namespace
