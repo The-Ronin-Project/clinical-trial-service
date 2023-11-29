@@ -12,7 +12,7 @@ internal class DataLoadEventProducerTest {
     @Test
     fun `creates event`() {
         val template = mockk<KafkaTemplate<String, RoninEvent<*>>> {
-            every { send(any(), any()) } returns mockk()
+            every { send(any(), any(), any()) } returns mockk()
         }
         val producer = DataLoadEventProducer(template)
         assertDoesNotThrow { producer.producePatientResourceRequest("12345", "tenant") }

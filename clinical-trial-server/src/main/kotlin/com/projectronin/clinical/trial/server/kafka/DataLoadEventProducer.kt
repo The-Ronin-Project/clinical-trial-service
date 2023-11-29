@@ -15,6 +15,7 @@ class DataLoadEventProducer(private val template: KafkaTemplate<String, RoninEve
             resourceType = "Patient",
             requestingService = "clinical-trial-service"
         )
+        val subject = "ronin.interop-mirth.resource/$patientFhirID"
         val event = RoninEvent(
             specVersion = "1.0",
             dataSchema = "https://github.com/projectronin/contract-event-interop-resource-request/blob/main/v1/interop-resource-request-v1.schema.json",
@@ -22,8 +23,8 @@ class DataLoadEventProducer(private val template: KafkaTemplate<String, RoninEve
             source = "clinical-trial-service",
             type = "ronin.interop-mirth.resource.request",
             data = data,
-            subject = "ronin.interop-mirth.resource/$patientFhirID"
+            subject = subject
         )
-        template.send("oci.us-phoenix-1.interop-mirth.resource-request.v1", event)
+        template.send("oci.us-phoenix-1.interop-mirth.resource-request.v1", subject, event)
     }
 }
