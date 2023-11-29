@@ -2,7 +2,7 @@
   {
     "httpRequest": {
       "method": "GET",
-      "path": "/n/namespace/b/infx-shared/o/Registries%2Fv1%2Fdata%20dictionary%2Fprod%2F38efb390-497f-4b49-9619-a45d33048a3a"
+      "path": "/n/namespace/b/infx-shared/o/Registries%2Fv1%2Fdata%20dictionary%2Fprod%2F38efb390-497f-4b49-9619-a45d33048a3a%2F6.csv"
     },
     "httpResponse": {
       "statusCode": 200,
@@ -25,7 +25,7 @@
   {
     "httpRequest": {
       "method": "GET",
-      "path": "/n/.*/b/.*/o/ValueSets%2Fv2%2Fpublished%2F10f8c49a-635b-4928-aee6-f6e47c2e7c50"
+      "path": "/n/.*/b/.*/o/ValueSets%2Fv2%2Fpublished%2F10f8c49a-635b-4928-aee6-f6e47c2e7c50%2F1.json"
     },
     "httpResponse": {
       "statusCode": 200,
@@ -65,7 +65,7 @@
   {
     "httpRequest": {
       "method": "GET",
-      "path": "/n/.*/b/.*/o/ValueSets%2Fv2%2Fpublished%2Fdaf6a5fc-5705-400b-abd0-852e060c9325"
+      "path": "/n/.*/b/.*/o/ValueSets%2Fv2%2Fpublished%2Fdaf6a5fc-5705-400b-abd0-852e060c9325%2F1.json"
     },
     "httpResponse": {
       "statusCode": 200,

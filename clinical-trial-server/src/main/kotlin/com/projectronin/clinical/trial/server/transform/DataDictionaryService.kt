@@ -46,16 +46,16 @@ class DataDictionaryService(private val ociClient: OCIClient) {
                     return action()
                 } catch (e: Exception) {
                     lastError = e
-                    logger.error { "OCI Connection attempt $attempt failed, retrying..." }
+                    logger.warn { "OCI Connection attempt $attempt failed, retrying..." }
                     sleep(delayMillis)
                 }
             }
-            logger.error { "All attempts failed. Last error: ${lastError?.message}" }
+            logger.warn { "All attempts failed. Last error: ${lastError?.message}" }
             return null
         }
 
         val registryCSV = retry(3, delayMillis) {
-            ociClient.getObjectFromINFX("Registries/v1/data dictionary/prod/38efb390-497f-4b49-9619-a45d33048a3a")
+            ociClient.getObjectFromINFX("Registries/v1/data dictionary/prod/38efb390-497f-4b49-9619-a45d33048a3a/6.csv") // TODO: make this version configurable
         }
         registryCSV?.let { csv ->
             val reader: MappingIterator<DataDictionaryRow> =
@@ -63,14 +63,14 @@ class DataDictionaryService(private val ociClient: OCIClient) {
             val rows = reader.readAll()
             rows.forEach { dataDictionaryRow ->
                 val valueSet = retry(3, delayMillis) {
-                    ociClient.getObjectFromINFX("ValueSets/v2/published/${dataDictionaryRow.valueSetUuid}")
+                    ociClient.getObjectFromINFX("ValueSets/v2/published/${dataDictionaryRow.valueSetUuid}/${dataDictionaryRow.valueSetVersion}.json")
                 }?.let {
                     JacksonUtil.readJsonObject(it, ValueSet::class)
                 }
                 valueSet?.expansion?.contains?.forEach valueSetLoop@{ value ->
                     val key = SystemValue(value = value.code?.value, system = value.system?.value)
                     if (key.system == null || key.value == null) {
-                        logger.error { "Either code or system is null for value set item $value" }
+                        logger.warn { "Either code or system is null for value set item $value" }
                         return@valueSetLoop
                     }
                     tempMap.computeIfAbsent(key) { mutableListOf() }.add(dataDictionaryRow)
