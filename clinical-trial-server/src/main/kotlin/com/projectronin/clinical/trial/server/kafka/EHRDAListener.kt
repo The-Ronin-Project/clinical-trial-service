@@ -17,7 +17,7 @@ class EHRDAListener(
     private val observationDAO: ObservationDAO
 ) {
 
-    private val tenants = listOf("ronincer", "ggwadc8y") // TODO: swap this with a call to the tenant service
+    private val tenants = listOf("ronin", "ronincer", "ggwadc8y") // TODO: swap this with a call to the tenant service
 
     @KafkaListener(topics = ["oci.us-phoenix-1.ehr-data-authority.observation.v1"], groupId = "clinical-trial-service")
     fun consumeObservation(message: RoninEvent<Observation>) {
