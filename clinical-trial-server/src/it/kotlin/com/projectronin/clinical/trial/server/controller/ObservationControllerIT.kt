@@ -49,7 +49,7 @@ class ObservationControllerIT : BaseIT() {
     private val testObservations1 = (1..8).toList().map {
         observation {
             id of Id("observationID-$it")
-            subject of Reference(reference = FHIRString(roninFhirId))
+            subject of Reference(reference = FHIRString("Patient/$roninFhirId"))
             meta of Meta(tag = listOf(Coding(system = Uri("10f8c49a-635b-4928-aee6-f6e47c2e7c50"), display = FHIRString("Birth Date"))))
             effective of DynamicValue(DynamicValueType.DATE_TIME, DateTime("2023-12-01T00:00:00"))
         }
@@ -57,7 +57,7 @@ class ObservationControllerIT : BaseIT() {
     private val testObservations2 = (9..12).toList().map {
         observation {
             id of Id("observationID-$it")
-            subject of Reference(reference = FHIRString(roninFhirId))
+            subject of Reference(reference = FHIRString("Patient/$roninFhirId"))
             meta of Meta(tag = listOf(Coding(system = Uri("daf6a5fc-5705-400b-abd0-852e060c9325"), display = FHIRString("Sex"))))
             effective of DynamicValue(DynamicValueType.DATE_TIME, DateTime("2023-12-01T00:00:00"))
         }
@@ -127,7 +127,7 @@ class ObservationControllerIT : BaseIT() {
                 }
                 setBody(
                     mapOf(
-                        "observation_name" to listOf("Birth Date"),
+                        "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50"),
                         "date_range" to mapOf("start_date" to "2023-11-11T00:00:00", "end_date" to "2023-12-12"),
                         "offset" to 1,
                         "limit" to 10,
@@ -161,7 +161,7 @@ class ObservationControllerIT : BaseIT() {
                 }
                 setBody(
                     mapOf(
-                        "observation_name" to listOf("Birth Date", "Sex"),
+                        "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50", "daf6a5fc-5705-400b-abd0-852e060c9325"),
                         "date_range" to mapOf("start_date" to "2023-11-11T00:00:00", "end_date" to "2023-12-12"),
                         "offset" to 1,
                         "limit" to 10,
@@ -179,7 +179,7 @@ class ObservationControllerIT : BaseIT() {
                 }
                 setBody(
                     mapOf(
-                        "observation_name" to listOf("Birth Date", "Sex"),
+                        "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50", "daf6a5fc-5705-400b-abd0-852e060c9325"),
                         "date_range" to mapOf("start_date" to "2023-11-11T00:00:00", "end_date" to "2023-12-12"),
                         "offset" to 11,
                         "limit" to 10,
@@ -202,7 +202,7 @@ class ObservationControllerIT : BaseIT() {
                 }
                 setBody(
                     mapOf(
-                        "observation_name" to listOf("Birth Date"),
+                        "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50"),
                         "date_range" to mapOf("start_date" to "2023-11-11T00:00:00", "end_date" to "2023-12-12"),
                         "offset" to 1,
                         "limit" to 100,
@@ -216,29 +216,6 @@ class ObservationControllerIT : BaseIT() {
     }
 
     @Test
-    fun `get observations - 400 observation type not present`() {
-        runBlocking {
-            val response = httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/observations") {
-                contentType(ContentType.Application.Json)
-                headers {
-                    append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
-                }
-                setBody(
-                    mapOf(
-                        "observation_name" to listOf("Vital"),
-                        "date_range" to mapOf("start_date" to "2023-11-11T00:00:00", "end_date" to "2023-12-12"),
-                        "offset" to 1,
-                        "limit" to 10,
-                        "test_mode" to false
-                    )
-                )
-            }
-            assertEquals(HttpStatusCode.BadRequest, response.status)
-            assertEquals("{\"message\":\"Value set not found by name: Vital\"}", response.bodyAsText())
-        }
-    }
-
-    @Test
     fun `get observations - 400 invalid date range`() {
         runBlocking {
             val response = httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/observations") {
@@ -248,7 +225,7 @@ class ObservationControllerIT : BaseIT() {
                 }
                 setBody(
                     mapOf(
-                        "observation_name" to listOf("Birth Date"),
+                        "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50"),
                         "date_range" to mapOf("start_date" to "2023-11-1", "end_date" to "2023-12-"),
                         "offset" to 1,
                         "limit" to 100,
@@ -271,7 +248,7 @@ class ObservationControllerIT : BaseIT() {
                 }
                 setBody(
                     mapOf(
-                        "observation_name" to listOf("Birth Date"),
+                        "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50"),
                         "date_range" to mapOf("start_date" to "2023-11-11", "end_date" to "2023-12-12"),
                         "offset" to 0,
                         "limit" to 100,

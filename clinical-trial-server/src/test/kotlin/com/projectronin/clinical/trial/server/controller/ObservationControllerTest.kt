@@ -2,7 +2,6 @@ package com.projectronin.clinical.trial.server.controller
 
 import com.projectronin.clinical.trial.server.services.ObservationService
 import com.projectronin.clinical.trial.server.services.SubjectService
-import com.projectronin.clinical.trial.server.transform.DataDictionaryService
 import com.projectronin.interop.fhir.generators.resources.observation
 import com.projectronin.interop.fhir.r4.datatype.Coding
 import com.projectronin.interop.fhir.r4.datatype.Meta
@@ -24,8 +23,7 @@ internal class ObservationControllerTest {
 
     private var observationService = mockk<ObservationService>()
     private var subjectService = mockk<SubjectService>()
-    private var dataDictionaryService = mockk<DataDictionaryService>()
-    private var observationController = ObservationController(subjectService, observationService, dataDictionaryService)
+    private var observationController = ObservationController(subjectService, observationService)
 
     private val startTime = ZonedDateTime.of(2023, 11, 11, 0, 0, 0, 0, ZoneId.of("UTC"))
     private val endTime = ZonedDateTime.of(2023, 12, 12, 0, 0, 0, 0, ZoneId.of("UTC"))
@@ -34,7 +32,7 @@ internal class ObservationControllerTest {
     fun `request body - invalid params`() {
         assertThrows<IllegalArgumentException> {
             GetObservationsRequest(
-                listOf("lab"),
+                listOf("1"),
                 ObservationDateRange(startTime, endTime),
                 -1
             )
@@ -42,7 +40,7 @@ internal class ObservationControllerTest {
 
         assertThrows<IllegalArgumentException> {
             GetObservationsRequest(
-                listOf("lab"),
+                listOf("1"),
                 ObservationDateRange(startTime, endTime),
                 2,
                 1000
@@ -51,7 +49,7 @@ internal class ObservationControllerTest {
 
         assertThrows<IllegalArgumentException> {
             GetObservationsRequest(
-                listOf("lab"),
+                listOf("1"),
                 ObservationDateRange("2023-11-11", "2023-12-888")
             )
         }
@@ -60,7 +58,7 @@ internal class ObservationControllerTest {
     @Test
     fun `retrieve - empty response`() {
         val requestBody = GetObservationsRequest(
-            listOf("lab"),
+            listOf("1"),
             ObservationDateRange(startTime, endTime),
             1,
             10
@@ -73,8 +71,7 @@ internal class ObservationControllerTest {
         )
 
         every { subjectService.getFhirIdBySubjectId("subjectID") } returns "fhirID"
-        every { dataDictionaryService.getValueSetUuidVersionByDisplay("lab") } returns Pair("1", "version")
-        every { observationService.getObservations("fhirID", listOf("1"), startTime, endTime) } returns emptyList()
+        every { observationService.getObservations("Patient/fhirID", listOf("1"), startTime, endTime) } returns emptyList()
 
         val response = observationController.retrieve("studyID", "siteID", "subjectID", requestBody)
 
@@ -85,7 +82,7 @@ internal class ObservationControllerTest {
     @Test
     fun `retrieve - response has more`() {
         val requestBody = GetObservationsRequest(
-            listOf("lab"),
+            listOf("1"),
             ObservationDateRange(startTime, endTime),
             1,
             10
@@ -107,8 +104,7 @@ internal class ObservationControllerTest {
         )
 
         every { subjectService.getFhirIdBySubjectId("subjectID") } returns "fhirID"
-        every { dataDictionaryService.getValueSetUuidVersionByDisplay("lab") } returns Pair("1", "version")
-        every { observationService.getObservations("fhirID", listOf("1"), startTime, endTime) } returns observations
+        every { observationService.getObservations("Patient/fhirID", listOf("1"), startTime, endTime) } returns observations
 
         val response = observationController.retrieve("studyID", "siteID", "subjectID", requestBody)
 
@@ -119,7 +115,7 @@ internal class ObservationControllerTest {
     @Test
     fun `retrieve - response does not have more`() {
         val requestBody = GetObservationsRequest(
-            listOf("lab"),
+            listOf("1"),
             ObservationDateRange(startTime, endTime),
             18,
             10
@@ -141,8 +137,7 @@ internal class ObservationControllerTest {
         )
 
         every { subjectService.getFhirIdBySubjectId("subjectID") } returns "fhirID"
-        every { dataDictionaryService.getValueSetUuidVersionByDisplay("lab") } returns Pair("1", "version")
-        every { observationService.getObservations("fhirID", listOf("1"), startTime, endTime) } returns observations
+        every { observationService.getObservations("Patient/fhirID", listOf("1"), startTime, endTime) } returns observations
 
         val response = observationController.retrieve("studyID", "siteID", "subjectID", requestBody)
 

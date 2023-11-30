@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.projectronin.clinical.trial.server.services.ObservationService
 import com.projectronin.clinical.trial.server.services.SubjectService
-import com.projectronin.clinical.trial.server.transform.DataDictionaryService
 import com.projectronin.clinical.trial.server.util.parseFhirDateTime
 import com.projectronin.interop.fhir.r4.resource.Observation
 import org.springframework.http.HttpStatus
@@ -66,8 +65,7 @@ class SubjectNotFoundException(message: String) : Exception(message)
 @RestController
 class ObservationController(
     val subjectService: SubjectService,
-    val observationService: ObservationService,
-    val dataDictionaryService: DataDictionaryService
+    val observationService: ObservationService
 ) {
     @PostMapping("studies/{studyId}/sites/{siteId}/subject/{subjectId}/observations")
     @PreAuthorize("hasAuthority('SCOPE_read:resources')")
@@ -84,18 +82,12 @@ class ObservationController(
         val roninOffset = offset - 1 // 0 based indexing
         val limit = request.limit
 
-        // get ValueSet IDs
-        val valueSetIds = observationNames.map {
-            dataDictionaryService.getValueSetUuidVersionByDisplay(it)?.first
-                ?: throw IllegalArgumentException("Value set not found by name: $it")
-        }
-
         // get Fhir ID
         val patientId = subjectService.getFhirIdBySubjectId(subjectId)
             ?: throw SubjectNotFoundException("Subject ID not found: $subjectId")
 
         // get Observations
-        val observations = observationService.getObservations(patientId, valueSetIds, fromDate, toDate)
+        val observations = observationService.getObservations("Patient/$patientId", observationNames, fromDate, toDate)
 
         // pagination logic
         val page = observations.subList(roninOffset, observations.size).take(limit)
