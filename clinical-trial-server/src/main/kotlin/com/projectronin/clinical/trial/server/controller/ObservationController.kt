@@ -70,7 +70,7 @@ class ObservationController(
     val dataDictionaryService: DataDictionaryService
 ) {
     @PostMapping("studies/{studyId}/sites/{siteId}/subject/{subjectId}/observations")
-    @PreAuthorize("hasAuthority('SCOPE_read:subject_data')")
+    @PreAuthorize("hasAuthority('SCOPE_read:resources')")
     fun retrieve(
         @PathVariable studyId: String,
         @PathVariable siteId: String,
