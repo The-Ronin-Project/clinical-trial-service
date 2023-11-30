@@ -9,6 +9,8 @@ import com.projectronin.interop.fhir.generators.primitives.of
 import com.projectronin.interop.fhir.generators.resources.ObservationGenerator
 import com.projectronin.interop.fhir.generators.resources.observation
 import com.projectronin.interop.fhir.r4.CodeSystem
+import com.projectronin.interop.fhir.r4.datatype.Reference
+import com.projectronin.interop.fhir.r4.datatype.primitive.FHIRString
 import com.projectronin.interop.fhir.r4.datatype.primitive.Id
 import com.projectronin.interop.fhir.r4.datatype.primitive.Markdown
 import com.projectronin.interop.fhir.r4.datatype.primitive.Uri
@@ -29,8 +31,9 @@ class RCDMPatientToCTDMObservations(
         val obsList: MutableList<Observation> = ArrayList<Observation>()
 
         // get study patient info
-        val subject = rcdmPatient.id?.value?.let { subjectDAO.getSubjectByFhirId(it) }
-            ?: throw Exception("No subject found for Ronin FHIR Id: ${rcdmPatient.id?.value}")
+        val fhirId = rcdmPatient.id?.value
+        val subject = fhirId?.let { subjectDAO.getSubjectByFhirId(it) }
+            ?: throw Exception("No subject found for Ronin FHIR Id: $fhirId")
 
         // set birthDate
         rcdmPatient.birthDate?.let {
@@ -207,7 +210,7 @@ class RCDMPatientToCTDMObservations(
                     }
             }
         }
-        return obsList
+        return obsList.map { it.copy(subject = Reference(reference = FHIRString("Patient/$fhirId"))) }
     }
 
     fun rcdmPatientToDemographics(subjectId: String, block: ObservationGenerator.() -> Unit): Observation {
