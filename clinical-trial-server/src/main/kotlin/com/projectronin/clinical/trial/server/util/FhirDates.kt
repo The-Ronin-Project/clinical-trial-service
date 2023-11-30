@@ -2,7 +2,6 @@ package com.projectronin.clinical.trial.server.util
 
 import com.projectronin.interop.fhir.r4.datatype.Period
 import com.projectronin.interop.fhir.r4.datatype.primitive.DateTime
-import java.lang.Exception
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId

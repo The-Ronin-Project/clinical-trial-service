@@ -11,7 +11,7 @@
           "application/json"
         ]
       },
-      "body": "productGroupLabel,productItemLabel,sequence,valueSetUuid,valueSetDisplayTitle,valueSetCodeName,valueSetVersion\\nDemographics,Birth Date,1,10f8c49a-635b-4928-aee6-f6e47c2e7c50,Birth Date,birthdate,1\\nDemographics,Gender,2,daf6a5fc-5705-400b-abd0-852e060c9325,Sex,sex,1"
+      "body": "productGroupLabel,productItemLabel,sequence,valueSetUuid,valueSetDisplayTitle,valueSetCodeName,valueSetVersion\nDemographics,Birth Date,1,10f8c49a-635b-4928-aee6-f6e47c2e7c50,Birth Date,birthdate,1\nDemographics,Gender,2,daf6a5fc-5705-400b-abd0-852e060c9325,Sex,sex,1"
     },
     "id": "GetDataDictionary",
     "priority": 0,

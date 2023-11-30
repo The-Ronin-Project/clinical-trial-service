@@ -3,6 +3,8 @@ package com.projectronin.clinical.trial.server
 import com.fasterxml.jackson.databind.JsonNode
 import com.projectronin.clinical.trial.client.ClinicalTrialClient
 import com.projectronin.clinical.trial.client.auth.ClinicalTrialAuthenticationService
+import com.projectronin.clinical.trial.server.dataauthority.ClinicalTrialDataAuthorityDatabase
+import com.projectronin.clinical.trial.server.dataauthority.XDevConfig
 import com.projectronin.interop.common.auth.Authentication
 import com.projectronin.interop.common.http.spring.HttpSpringConfig
 import io.ktor.client.call.body
@@ -24,6 +26,16 @@ abstract class BaseIT {
     }
 
     protected val database = Database.connect(url = "jdbc:mysql://springuser:ThePassword@localhost:3306/clinical-trial-db")
+
+    protected val ctdaDatabase = ClinicalTrialDataAuthorityDatabase(
+        XDevConfig(
+            "localhost",
+            "33060",
+            "clinical-trial-db",
+            "springuser",
+            "ThePassword"
+        )
+    )
 
     protected val serverUrl = "http://localhost:8080"
     protected val httpClient = HttpSpringConfig().getHttpClient()

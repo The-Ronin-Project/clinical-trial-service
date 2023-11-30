@@ -69,13 +69,13 @@ class ObservationDAO(private val resourceDatabase: ClinicalTrialDataAuthorityDat
 
     fun search(
         subject: String? = null,
-        type: String? = null,
+        valueSetIds: List<String>? = null,
         fromDate: ZonedDateTime? = null,
         toDate: ZonedDateTime? = null
     ): List<Observation> {
         val queryFragments = mutableListOf<String>()
         subject?.let { queryFragments.add("('$it' = subject.reference)") }
-        type?.let { queryFragments.add("('$it' in meta.tag[*].display)") }
+        valueSetIds?.joinToString(" OR ") { ("('$it' in meta.tag[*].system)") }?.let { queryFragments.add("( $it )") }
 
         val query = queryFragments.joinToString(" AND ")
 

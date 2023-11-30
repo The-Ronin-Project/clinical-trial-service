@@ -25,6 +25,10 @@ class SubjectService(
         ).filter { it.studySiteId == studySiteId }.firstOrNull()
     }
 
+    fun getFhirIdBySubjectId(subjectId: String): String? {
+        return subjectDAO.getFhirIdBySubject(subjectId)
+    }
+
     fun createSubject(subject: Subject): Subject? =
         getStudySiteByStudyIdAndSiteId(
             subject.studyId,

@@ -13,6 +13,7 @@ import com.projectronin.interop.fhir.r4.datatype.Reference
 import com.projectronin.interop.fhir.r4.datatype.primitive.DateTime
 import com.projectronin.interop.fhir.r4.datatype.primitive.FHIRString
 import com.projectronin.interop.fhir.r4.datatype.primitive.Id
+import com.projectronin.interop.fhir.r4.datatype.primitive.Uri
 import com.projectronin.interop.fhir.r4.resource.Observation
 import io.mockk.every
 import io.mockk.mockk
@@ -153,7 +154,7 @@ internal class ObservationDAOTest : BaseMySQLTest() {
             id of "TestObservation1"
             subject of Reference(reference = FHIRString("subject1"))
             effective of DynamicValue(DynamicValueType.DATE_TIME, DateTime("2022-01-01"))
-            meta of Meta(tag = listOf(Coding(display = FHIRString("lab")), Coding(display = FHIRString("imaging"))))
+            meta of Meta(tag = listOf(Coding(system = Uri("1"), display = FHIRString("lab")), Coding(system = Uri("2"), display = FHIRString("imaging"))))
         }
         collection.add(JacksonUtil.writeJsonValue(testObs1)).execute()
 
@@ -164,7 +165,7 @@ internal class ObservationDAOTest : BaseMySQLTest() {
             id of "TestObservation3"
             subject of Reference(reference = FHIRString("subject1"))
             effective of DynamicValue(DynamicValueType.PERIOD, Period(start = DateTime("2022-01-01"), end = DateTime("2022-02-03")))
-            meta of Meta(tag = listOf(Coding(display = FHIRString("vital")), Coding(display = FHIRString("imaging"))))
+            meta of Meta(tag = listOf(Coding(system = Uri("3"), display = FHIRString("vital")), Coding(system = Uri("2"), display = FHIRString("imaging"))))
         }
         collection.add(JacksonUtil.writeJsonValue(testObs3)).execute()
 
@@ -172,24 +173,27 @@ internal class ObservationDAOTest : BaseMySQLTest() {
             id of "TestObservation4"
             subject of Reference(reference = FHIRString("subject2"))
             effective of DynamicValue(DynamicValueType.DATE_TIME, DateTime("2022-01-01"))
-            meta of Meta(tag = listOf(Coding(display = FHIRString("vital")), Coding(display = FHIRString("other"))))
+            meta of Meta(tag = listOf(Coding(system = Uri("3"), display = FHIRString("vital")), Coding(system = Uri("4"), display = FHIRString("other"))))
         }
         collection.add(JacksonUtil.writeJsonValue(testObs4)).execute()
+
+        val res = dao.search(subject = "subject1", valueSetIds = listOf("2", "3"))
+        assertEquals(2, res.size)
 
         val result = dao.search(subject = "subject1")
         assertEquals(2, result.size)
 
-        val result2 = dao.search(type = "lab")
+        val result2 = dao.search(valueSetIds = listOf("1"))
         assertEquals(1, result2.size)
 
-        val result3 = dao.search(type = "vital")
+        val result3 = dao.search(valueSetIds = listOf("3"))
         assertEquals(2, result3.size)
 
-        val result4 = dao.search(subject = "subject2", type = "lab")
+        val result4 = dao.search(subject = "subject2", valueSetIds = listOf("1"))
         assertEquals(0, result4.size)
 
         val feb1 = ZonedDateTime.of(2022, 2, 1, 0, 1, 1, 0, ZoneId.of("UTC"))
-        val result5 = dao.search(subject = "subject1", type = "imaging", toDate = feb1)
+        val result5 = dao.search(subject = "subject1", valueSetIds = listOf("2"), toDate = feb1)
         assertEquals(1, result5.size)
     }
 }

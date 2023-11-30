@@ -47,6 +47,7 @@ services:
       - MYSQL_PASSWORD=ThePassword
     ports:
       - "3306:3306"
+      - "33060:33060"
     healthcheck:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "springuser", "-pThePassword" ]
       timeout: 5s
