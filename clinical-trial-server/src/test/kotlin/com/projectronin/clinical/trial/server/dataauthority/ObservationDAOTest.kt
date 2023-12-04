@@ -1,6 +1,7 @@
 package com.projectronin.clinical.trial.server.dataauthority
 
 import com.mysql.cj.xdevapi.Collection
+import com.projectronin.clinical.trial.server.transform.setCTDMExtensions
 import com.projectronin.interop.common.jackson.JacksonUtil
 import com.projectronin.interop.fhir.generators.primitives.of
 import com.projectronin.interop.fhir.generators.resources.observation
@@ -9,7 +10,6 @@ import com.projectronin.interop.fhir.r4.datatype.DynamicValue
 import com.projectronin.interop.fhir.r4.datatype.DynamicValueType
 import com.projectronin.interop.fhir.r4.datatype.Meta
 import com.projectronin.interop.fhir.r4.datatype.Period
-import com.projectronin.interop.fhir.r4.datatype.Reference
 import com.projectronin.interop.fhir.r4.datatype.primitive.DateTime
 import com.projectronin.interop.fhir.r4.datatype.primitive.FHIRString
 import com.projectronin.interop.fhir.r4.datatype.primitive.Id
@@ -152,7 +152,7 @@ internal class ObservationDAOTest : BaseMySQLTest() {
     fun `search test`() {
         val testObs1 = observation {
             id of "TestObservation1"
-            subject of Reference(reference = FHIRString("subject1"))
+            extension of setCTDMExtensions(subjectId = "subject1")
             effective of DynamicValue(DynamicValueType.DATE_TIME, DateTime("2022-01-01"))
             meta of Meta(tag = listOf(Coding(system = Uri("1"), display = FHIRString("lab")), Coding(system = Uri("2"), display = FHIRString("imaging"))))
         }
@@ -163,7 +163,7 @@ internal class ObservationDAOTest : BaseMySQLTest() {
 
         val testObs3 = observation {
             id of "TestObservation3"
-            subject of Reference(reference = FHIRString("subject1"))
+            extension of setCTDMExtensions(subjectId = "subject1")
             effective of DynamicValue(DynamicValueType.PERIOD, Period(start = DateTime("2022-01-01"), end = DateTime("2022-02-03")))
             meta of Meta(tag = listOf(Coding(system = Uri("3"), display = FHIRString("vital")), Coding(system = Uri("2"), display = FHIRString("imaging"))))
         }
@@ -171,16 +171,16 @@ internal class ObservationDAOTest : BaseMySQLTest() {
 
         val testObs4 = observation {
             id of "TestObservation4"
-            subject of Reference(reference = FHIRString("subject2"))
+            extension of setCTDMExtensions(subjectId = "subject2")
             effective of DynamicValue(DynamicValueType.DATE_TIME, DateTime("2022-01-01"))
             meta of Meta(tag = listOf(Coding(system = Uri("3"), display = FHIRString("vital")), Coding(system = Uri("4"), display = FHIRString("other"))))
         }
         collection.add(JacksonUtil.writeJsonValue(testObs4)).execute()
 
-        val res = dao.search(subject = "subject1", valueSetIds = listOf("2", "3"))
+        val res = dao.search(subjectId = "subject1", valueSetIds = listOf("2", "3"))
         assertEquals(2, res.size)
 
-        val result = dao.search(subject = "subject1")
+        val result = dao.search(subjectId = "subject1")
         assertEquals(2, result.size)
 
         val result2 = dao.search(valueSetIds = listOf("1"))
@@ -189,11 +189,11 @@ internal class ObservationDAOTest : BaseMySQLTest() {
         val result3 = dao.search(valueSetIds = listOf("3"))
         assertEquals(2, result3.size)
 
-        val result4 = dao.search(subject = "subject2", valueSetIds = listOf("1"))
+        val result4 = dao.search(subjectId = "subject2", valueSetIds = listOf("1"))
         assertEquals(0, result4.size)
 
         val feb1 = ZonedDateTime.of(2022, 2, 1, 0, 1, 1, 0, ZoneId.of("UTC"))
-        val result5 = dao.search(subject = "subject1", valueSetIds = listOf("2"), toDate = feb1)
+        val result5 = dao.search(subjectId = "subject1", valueSetIds = listOf("2"), toDate = feb1)
         assertEquals(1, result5.size)
     }
 }

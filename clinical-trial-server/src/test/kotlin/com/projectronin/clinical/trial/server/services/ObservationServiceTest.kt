@@ -31,12 +31,12 @@ class ObservationServiceTest {
     }
 
     @Test
-    fun getAllObservationsByPatientId() {
+    fun getAllObservationsBySubjectId() {
         val expected = listOf(observation { id of Id("id1") }, observation { id of Id("id2") })
 
         every { observationDAO.search(subjectId) } returns expected
 
-        val actual = observationService.getAllObservationsByPatientId(subjectId)
+        val actual = observationService.getAllObservationsBySubjectId(subjectId)
         assertEquals(actual, expected)
     }
 }

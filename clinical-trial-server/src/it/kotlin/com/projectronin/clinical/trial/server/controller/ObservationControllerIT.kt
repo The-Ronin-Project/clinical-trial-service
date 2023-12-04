@@ -8,12 +8,12 @@ import com.projectronin.clinical.trial.server.data.binding.SubjectDOs
 import com.projectronin.clinical.trial.server.data.binding.SubjectStatusDOs
 import com.projectronin.clinical.trial.server.data.model.SubjectStatus
 import com.projectronin.clinical.trial.server.dataauthority.ObservationDAO
+import com.projectronin.clinical.trial.server.transform.setCTDMExtensions
 import com.projectronin.interop.fhir.generators.resources.observation
 import com.projectronin.interop.fhir.r4.datatype.Coding
 import com.projectronin.interop.fhir.r4.datatype.DynamicValue
 import com.projectronin.interop.fhir.r4.datatype.DynamicValueType
 import com.projectronin.interop.fhir.r4.datatype.Meta
-import com.projectronin.interop.fhir.r4.datatype.Reference
 import com.projectronin.interop.fhir.r4.datatype.primitive.DateTime
 import com.projectronin.interop.fhir.r4.datatype.primitive.FHIRString
 import com.projectronin.interop.fhir.r4.datatype.primitive.Id
@@ -22,7 +22,6 @@ import io.ktor.client.call.body
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
@@ -49,17 +48,17 @@ class ObservationControllerIT : BaseIT() {
     private val testObservations1 = (1..8).toList().map {
         observation {
             id of Id("observationID-$it")
-            subject of Reference(reference = FHIRString("Patient/$roninFhirId"))
             meta of Meta(tag = listOf(Coding(system = Uri("10f8c49a-635b-4928-aee6-f6e47c2e7c50"), display = FHIRString("Birth Date"))))
             effective of DynamicValue(DynamicValueType.DATE_TIME, DateTime("2023-12-01T00:00:00"))
+            extension of setCTDMExtensions(subjectId = subjectId)
         }
     }
     private val testObservations2 = (9..12).toList().map {
         observation {
             id of Id("observationID-$it")
-            subject of Reference(reference = FHIRString("Patient/$roninFhirId"))
             meta of Meta(tag = listOf(Coding(system = Uri("daf6a5fc-5705-400b-abd0-852e060c9325"), display = FHIRString("Sex"))))
             effective of DynamicValue(DynamicValueType.DATE_TIME, DateTime("2023-12-01T00:00:00"))
+            extension of setCTDMExtensions(subjectId = subjectId)
         }
     }
     private val allObservations = listOf(testObservations1, testObservations2).flatten()
@@ -211,7 +210,7 @@ class ObservationControllerIT : BaseIT() {
                 )
             }
             assertEquals(HttpStatusCode.NotFound, response.status)
-            assertEquals("{\"message\":\"Subject ID not found: anotherSubject\"}", response.bodyAsText())
+            assertEquals("Subject ID not found: anotherSubject", response.body<ErrorResponse>().message)
         }
     }
 
@@ -234,7 +233,7 @@ class ObservationControllerIT : BaseIT() {
                 )
             }
             assertEquals(HttpStatusCode.BadRequest, response.status)
-            assertEquals("{\"message\":\"Invalid start_date: 2023-11-1\"}", response.bodyAsText())
+            assertEquals("Invalid start_date: 2023-11-1", response.body<ErrorResponse>().message)
         }
     }
 
@@ -257,7 +256,7 @@ class ObservationControllerIT : BaseIT() {
                 )
             }
             assertEquals(HttpStatusCode.BadRequest, response.status)
-            assertEquals("{\"message\":\"offset must be at least 1.\"}", response.bodyAsText())
+            assertEquals("offset must be at least 1.", response.body<ErrorResponse>().message)
         }
     }
 }

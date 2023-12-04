@@ -29,6 +29,10 @@ class SubjectService(
         return subjectDAO.getFhirIdBySubject(subjectId)
     }
 
+    fun getSubjectIdByFhirId(fhirId: String): String? {
+        return subjectDAO.getSubjectByFhirId(fhirId)
+    }
+
     fun createSubject(subject: Subject): Subject? =
         getStudySiteByStudyIdAndSiteId(
             subject.studyId,

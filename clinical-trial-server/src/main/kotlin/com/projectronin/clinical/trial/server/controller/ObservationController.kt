@@ -83,14 +83,19 @@ class ObservationController(
         val limit = request.limit
 
         // get Fhir ID
-        val patientId = subjectService.getFhirIdBySubjectId(subjectId)
+        subjectService.getFhirIdBySubjectId(subjectId)
             ?: throw SubjectNotFoundException("Subject ID not found: $subjectId")
 
         // get Observations
-        val observations = observationService.getObservations("Patient/$patientId", observationNames, fromDate, toDate)
+        val observations = observationService.getObservations(subjectId, observationNames, fromDate, toDate)
 
         // pagination logic
-        val page = observations.subList(roninOffset, observations.size).take(limit)
+        val page = if (observations.size > roninOffset) {
+            observations.subList(roninOffset, observations.size).take(limit)
+        } else {
+            emptyList()
+        }
+
         val response = GetObservationsResponse(
             subjectId = subjectId,
             ctdmObservations = page,
@@ -104,7 +109,8 @@ class ObservationController(
     fun retrieveInternal(
         @RequestParam patientFhirId: String
     ): ResponseEntity<List<Observation>> {
-        val observations = observationService.getAllObservationsByPatientId("Patient/$patientFhirId")
+        val subjectId = subjectService.getSubjectIdByFhirId(patientFhirId) ?: throw SubjectNotFoundException("Subject ID not found for Fhir ID: $patientFhirId")
+        val observations = observationService.getAllObservationsBySubjectId(subjectId)
         return ResponseEntity(observations, HttpStatus.OK)
     }
 }

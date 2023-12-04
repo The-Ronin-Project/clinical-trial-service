@@ -188,6 +188,17 @@ class SubjectServiceTest {
         assertEquals(setOf(roninFhirId), fhirIds)
     }
 
+    @Test
+    fun `get subject ID by fhir ID`() {
+        val expected = "subjectID"
+        every {
+            subjectDAO.getSubjectByFhirId("Patient/fhirID")
+        } returns expected
+
+        val subjectId = subjectService.getSubjectIdByFhirId("Patient/fhirID")
+        assertEquals(expected, subjectId)
+    }
+
     // Utility
     private fun Subject.toSubjectDO(): SubjectDO {
         return SubjectDO {

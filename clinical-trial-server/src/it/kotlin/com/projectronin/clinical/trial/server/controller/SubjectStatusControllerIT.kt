@@ -7,6 +7,7 @@ import com.projectronin.clinical.trial.server.data.binding.StudySiteDOs
 import com.projectronin.clinical.trial.server.data.binding.SubjectDOs
 import com.projectronin.clinical.trial.server.data.binding.SubjectStatusDOs
 import com.projectronin.clinical.trial.server.data.model.SubjectStatus
+import io.ktor.client.call.body
 import io.ktor.client.request.accept
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -115,11 +116,11 @@ class SubjectStatusControllerIT : BaseIT() {
     }
 
     @Test
-    suspend fun `update subject status - 200`() {
+    fun `update subject status - 200`() {
         seedDB()
         val authentication = getAuth()
-        val response = runBlocking {
-            httpClient
+        runBlocking {
+            val response = httpClient
                 .post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/status") {
                     headers {
                         append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
@@ -128,9 +129,9 @@ class SubjectStatusControllerIT : BaseIT() {
                     contentType(ContentType.Application.Json)
                     setBody(UpdateStatusRequest("WITHDRAWN"))
                 }
+
+            assertEquals(200, response.status.value)
+            assertEquals("Enrollment status updated successfully.", response.body<StatusResponse>().message)
         }
-        assertEquals(200, response.status.value)
-        val expected = response as StatusResponse
-        assertEquals("Enrollment status was updated successfully.", expected.message)
     }
 }

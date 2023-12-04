@@ -9,11 +9,11 @@ import java.time.ZonedDateTime
 class ObservationService(
     val observationDAO: ObservationDAO
 ) {
-    fun getObservations(patientId: String, types: List<String>, fromDate: ZonedDateTime, toDate: ZonedDateTime): List<Observation> {
-        return observationDAO.search(patientId, types, fromDate, toDate)
+    fun getObservations(subjectId: String, types: List<String>, fromDate: ZonedDateTime, toDate: ZonedDateTime): List<Observation> {
+        return observationDAO.search(subjectId, types, fromDate, toDate)
     }
 
-    fun getAllObservationsByPatientId(patientId: String): List<Observation> {
-        return observationDAO.search(patientId)
+    fun getAllObservationsBySubjectId(subjectId: String): List<Observation> {
+        return observationDAO.search(subjectId)
     }
 }
