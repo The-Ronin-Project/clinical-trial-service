@@ -68,7 +68,7 @@ class ObservationController(
     val observationService: ObservationService
 ) {
     @PostMapping("studies/{studyId}/sites/{siteId}/subject/{subjectId}/observations")
-    @PreAuthorize("hasAuthority('SCOPE_read:resources')")
+    @PreAuthorize("hasAuthority('SCOPE_read:subject_data')")
     fun retrieve(
         @PathVariable studyId: String,
         @PathVariable siteId: String,
@@ -105,7 +105,7 @@ class ObservationController(
     }
 
     @GetMapping("internal/observations")
-    @PreAuthorize("hasAuthority('SCOPE_read:resources')")
+    @PreAuthorize("hasAuthority('SCOPE_read:subject_data')")
     fun retrieveInternal(
         @RequestParam patientFhirId: String
     ): ResponseEntity<List<Observation>> {

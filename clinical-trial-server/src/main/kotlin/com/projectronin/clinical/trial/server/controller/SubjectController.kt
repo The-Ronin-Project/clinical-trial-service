@@ -28,7 +28,7 @@ class SubjectController(
      * is intended for mirth to grab all active patient ids.
      */
     @GetMapping
-    @PreAuthorize("hasAuthority('SCOPE_read:resources')")
+    @PreAuthorize("hasAuthority('SCOPE_read:subject')")
     fun retrieve(
         @RequestParam activeIdsOnly: Boolean = false
     ): ResponseEntity<List<Subject>> {
@@ -48,7 +48,7 @@ class SubjectController(
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('SCOPE_create:resources')")
+    @PreAuthorize("hasAuthority('SCOPE_write:subject')")
     @CrossOrigin(origins = ["\${cors.ronin.frontend}"], maxAge = 1800)
     fun create(
         @RequestBody subject: Subject

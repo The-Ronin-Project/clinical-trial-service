@@ -13,7 +13,7 @@
             "sub": "clientId@clients",
             "aud": "https://clinical-trial-service.dev.projectronin.io",
             "iss": "http://mock-oauth2:8080/clinical-trial",
-            "scope": "update:resources read:resources create:resources read:subject_data"
+            "scope": "read:subject write:subject read:subject_status write:subject_status read:subject_data"
           }
         }
       ]

@@ -28,7 +28,7 @@ class SubjectStatusController(
 ) {
     // TODO: revisit scopes
     @GetMapping("studies/{studyId}/sites/{siteId}/subject/{subjectId}/status")
-    @PreAuthorize("hasAuthority('SCOPE_read:resources')")
+    @PreAuthorize("hasAuthority('SCOPE_read:subject_status')")
     fun retrieve(
         @PathVariable studyId: String,
         @PathVariable siteId: String,
@@ -45,7 +45,7 @@ class SubjectStatusController(
 
     // TODO: revisit scopes
     @PostMapping("studies/{studyId}/sites/{siteId}/subject/{subjectId}/status")
-    @PreAuthorize("hasAuthority('SCOPE_update:resources')")
+    @PreAuthorize("hasAuthority('SCOPE_write:subject_status')")
     fun update(
         @PathVariable studyId: String,
         @PathVariable siteId: String,
