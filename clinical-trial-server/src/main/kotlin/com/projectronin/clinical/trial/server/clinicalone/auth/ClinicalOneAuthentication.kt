@@ -1,17 +1,16 @@
 package com.projectronin.clinical.trial.server.clinicalone.auth
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.projectronin.interop.common.auth.Authentication
 import java.time.Instant
 
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 class ClinicalOneAuthentication(
     override val tokenType: String,
-    @JsonProperty("access_token")
     override val accessToken: String,
-    @JsonProperty("token type")
+    private val expiresIn: Long? = null,
     override val refreshToken: String? = null,
-    @JsonProperty("expires in")
-    private val expiresIn: Long?,
     override val scope: String? = null
 ) : Authentication {
     override val expiresAt: Instant? = expiresIn?.let { Instant.now().plusSeconds(expiresIn) }

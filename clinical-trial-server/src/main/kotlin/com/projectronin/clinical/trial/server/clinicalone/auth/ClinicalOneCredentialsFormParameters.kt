@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
-data class ClinicalOneCredentialsBody(
+data class ClinicalOneCredentialsFormParameters(
     @Value("\${clinicalone.client.scope}")
     val scope: String
 ) {

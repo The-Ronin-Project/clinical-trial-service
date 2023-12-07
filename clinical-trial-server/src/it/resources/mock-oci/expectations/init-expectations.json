@@ -101,5 +101,69 @@
     "times": {
       "unlimited": true
     }
+  },
+  {
+    "httpRequest": {
+      "method": "POST",
+      "path": "/ms_oauth/oauth2/endpoints/tenantqa2/tokens"
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "headers": {
+        "Content-Type": [
+          "application/json;charset=ISO-8859-1"
+        ]
+      },
+      "body": {
+        "access_token": "eyJ4NXQiOiJycXlZNmttWGVVVGh6QjV6MVVIUVQ0eVZmalkiLCJraWQiOiJvcmFrZXkiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJzdWIiOiJ0ZW5hbnRxYTIuUm9uaW5fY2xpZW50aWRfQ05FLUlUU1AyIiwidXNlci50ZW5hbnQubmFtZSI6InRlbmFudHFhMiIsIm9yYWNsZS5vYXV0aC5jbGllbnRfb3JpZ2luX2lkIjoidGVuYW50cWEyLlJvbmluX2NsaWVudGlkX0NORS1JVFNQMiIsIm9yYWNsZS5vYXV0aC5zY29wZSI6InRlbmFudHFhMi5lYy1kYy1zdmMuYWxsIiwiaXNzIjoiaHNnYnUtaWFtcy5vcmFjbGVpbmR1c3RyeS5jb20iLCJwcm4iOiJ0ZW5hbnRxYTIuUm9uaW5fY2xpZW50aWRfQ05FLUlUU1AyIiwib3JhY2xlLm9hdXRoLmlkX2RfaWQiOiIzMTJiZDQxOC1lYmU0LTQ0MmYtOWJkOS01NmNlZDZkMTRlOGUiLCJhdWQiOiJ0ZW5hbnRxYTIuZWMtZGMtc3ZjIiwib3JhY2xlLm9hdXRoLnN2Y19wX24iOiJ0ZW5hbnRxYTIuc2VydmljZXByb2ZpbGUiLCJvcmFjbGUub2F1dGgudGtfY29udGV4dCI6ImF6YyIsImV4cCI6MTcwMTM1OTQ3Niwib3JhY2xlLm9hdXRoLnBybi5pZF90eXBlIjoiQ2xpZW50SUQiLCJpYXQiOjE3MDEzNTg4NzYsImp0aSI6ImFmNzY0OTQyLWVjZTMtNGZhZS05ODY5LWEyNDc1OWNhYWQ0YyJ9.chFPBYXqyp0hExJZABg70r1CTMz8dVSphTFT_UjUiac0zj3dhKDFRe62H62xc-XYLVvBdXQpb4P9KLhpKJEMOLrAtmN53DYGJ0rt9ETIhxOt-9DL0iMA43NzzUUhjojJGG-fSQ6gGJHhWJHQ4mNe2exc7tt6lEFCSvWv3p4qXYk",
+        "token_type": "Bearer",
+        "expires_in": 600
+      }
+    }
+  },
+  {
+  "httpRequest":
+    {
+      "method": "POST",
+      "path": "/itsp2/ec-dc-svc/rest/v2.0/studies/.*/test/subjects"
+    },
+    "httpResponse":
+    {
+      "statusCode": 200,
+      "headers": {
+        "Content-Type": [
+          "application/json"
+        ]
+      },
+      "body" : {
+        "status": "success",
+        "result": {
+          "screeningDate": null,
+          "codeBreak": null,
+          "userId": "87093B66B62F43F193B4409D586A6F52",
+          "eventType": "New",
+          "subjectTransferId": null,
+          "objectVersionNumber": 1,
+          "id": "0CEE019CE0A9460BB9291A29EB67719B",
+          "versionStart": "2023-11-30T15:46:08.652Z",
+          "description": null,
+          "subjectNumber": "001-006",
+          "studyId": "009C2CB46A6F458F9BE7082193A75128",
+          "siteId": "F1AEC0AE8C6F44A6B0A4E50015D4ABED",
+          "dob": null,
+          "state": "New",
+          "stateDate": "2023-11-30T15:46:08.468Z",
+          "screeningFailure": null,
+          "enrollmentFailure": null,
+          "enrollmentOverride": null,
+          "informedConsentDate": null,
+          "gender": null,
+          "reason": null,
+          "comment": null,
+          "studyVersion": "1.0.0.1"
+        },
+        "errorData": null
+      }
+    }
   }
 ]

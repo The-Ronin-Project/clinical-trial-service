@@ -43,6 +43,7 @@ dependencies {
     testImplementation("org.testcontainers:mysql")
     testImplementation(libs.bundles.data.generators)
     testImplementation(libs.interop.ehr.fhir.roninGenerators)
+    testImplementation(libs.ktor.client.mock)
 
     itImplementation(project(":clinical-trial-models"))
     itImplementation(project(":clinical-trial-client"))

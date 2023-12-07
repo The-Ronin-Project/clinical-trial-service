@@ -27,8 +27,8 @@ import java.util.Properties
 import java.util.UUID
 
 class EHRDAListenerIT : BaseIT() {
-    private val studyId = "studyId"
-    private val siteId = "siteId"
+    private val studyId = "009C2CB46A6F458F9BE7082193A75128"
+    private val siteId = "F1AEC0AE8C6F44A6B0A4E50015D4ABED"
 
     private val subjectId = "subjectId"
     private val studySiteID = UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770")
