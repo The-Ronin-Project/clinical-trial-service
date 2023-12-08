@@ -12,6 +12,7 @@ import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
@@ -31,7 +32,7 @@ class ClinicalOneClient(
     private val logger = KotlinLogging.logger { }
 
     fun getSubjectId(siteId: String, studyId: String): String {
-        logger.debug { "Retrieving subject id from ClinicalOne based on site: $siteId and study: $studyId" }
+        logger.info { "Retrieving subject id from ClinicalOne based on site: $siteId and study: $studyId" }
 
         val authentication = authenticationBroker.getAuthentication()
         val clinicalOneSubjectUrl = "$clinicalOneBaseUrl/studies/$studyId/test/subjects"
@@ -41,27 +42,29 @@ class ClinicalOneClient(
                 studyId = studyId
             )
         )
-
+        logger.info { "Auth: ${authentication.tokenType} ${authentication.accessToken}" }
         return runBlocking {
             val response: HttpResponse =
                 httpClient.request("ClinicalOne", clinicalOneSubjectUrl) { url ->
                     post(url) {
                         headers {
-                            append(HttpHeaders.Authorization, "${authentication.tokenType} ${authentication.accessToken}")
+                            append(
+                                HttpHeaders.Authorization,
+                                "${authentication.tokenType} ${authentication.accessToken}"
+                            )
                         }
                         contentType(ContentType.Application.Json)
                         accept(ContentType.Application.Json)
                         setBody(JacksonManager.objectMapper.writeValueAsString(requestBody))
                     }
                 }
-
+            logger.info { response }
             response.let { res ->
                 if (res.status == HttpStatusCode.OK) {
                     val responseBody = res.body<ClinicalOneAddSubjectResponse>()
                     responseBody.result?.id ?: ""
                 } else {
-                    logger.debug { "Failed to create subject with Clinical One API. Status Code: ${res.status}. " }
-                    ""
+                    throw Exception("Failed to create subject with Clinical One API. Status Code: ${res.status}. ${res.bodyAsText()}")
                 }
             }
         }
