@@ -1,0 +1,145 @@
+{
+  "resourceType": "ValueSet",
+  "id": "c874065c-2ea4-464d-a0f2-fc94961ac5b4",
+  "meta": {
+    "profile": [
+      "http://projectronin.io/fhir/StructureDefinition/ronin-valueSet"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://projectronin.io/fhir/StructureDefinition/Extension/ronin-valueSetSchema",
+      "valueString": "2"
+    }
+  ],
+  "url": "http://projectronin.io/fhir/ValueSet/c874065c-2ea4-464d-a0f2-fc94961ac5b4",
+  "name": "Hemoglobinhgbinblood",
+  "title": "Hemoglobin (HGB) in Blood",
+  "description": "LOINC concepts that indicate measurement of HGB in blood Added \"Clinical Trials\" as secondary use case",
+  "useContext": [
+    {
+      "code": {
+        "system": "http://terminology.hl7.org/CodeSystem/usage-context-type",
+        "code": "workflow",
+        "display": "Workflow Setting"
+      },
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "code": "SMT Timeline"
+          },
+          {
+            "code": "Clinical Trials"
+          }
+        ]
+      }
+    }
+  ],
+  "experimental": false,
+  "purpose": "General product feature use",
+  "version": "5",
+  "expansion": {
+    "identifier": "urn:uuid:14909f80-78dc-11ee-baf5-42803399b038",
+    "total": 16,
+    "contains": [
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "30350-3",
+        "display": "Hemoglobin [Mass/volume] in Venous blood"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "97556-5",
+        "display": "Hemoglobin [Mass/volume] in Capillary blood by Oximetry"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "30313-1",
+        "display": "Hemoglobin [Mass/volume] in Arterial blood"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "97550-8",
+        "display": "Hemoglobin [Mass/volume] in Central venous blood by calculation"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "59260-0",
+        "display": "Hemoglobin [Moles/volume] in Blood"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "55782-7",
+        "display": "Hemoglobin [Mass/volume] in Blood by Oximetry"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "718-7",
+        "display": "Hemoglobin [Mass/volume] in Blood"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "30352-9",
+        "display": "Hemoglobin [Mass/volume] in Capillary blood"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "14775-1",
+        "display": "Hemoglobin [Mass/volume] in Arterial blood by Oximetry"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "75928-2",
+        "display": "Hemoglobin [Moles/volume] in Arterial blood"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "30351-1",
+        "display": "Hemoglobin [Mass/volume] in Mixed venous blood"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "97555-7",
+        "display": "Hemoglobin [Mass/volume] in Central venous blood by Oximetry"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "20509-6",
+        "display": "Hemoglobin [Mass/volume] in Blood by calculation"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "76769-9",
+        "display": "Hemoglobin [Mass/volume] in Venous blood by Oximetry"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "93846-4",
+        "display": "Hemoglobin [Moles/volume] in Venous blood"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "76768-1",
+        "display": "Hemoglobin [Mass/volume] in Mixed venous blood by Oximetry"
+      }
+    ],
+    "timestamp": "2023-11-01"
+  },
+  "date": "2023-11-01T17:28:56.299Z"
+}

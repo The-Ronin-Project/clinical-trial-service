@@ -37,6 +37,20 @@ class StudySiteDAO(private val database: Database) {
         return database.from(StudySiteDOs).select().map { StudySiteDOs.createEntity(it) }
     }
 
+    /**
+     * Retrieves one [StudySiteDO] based on studySite UUID String
+     */
+
+    fun getStudySite(studySiteId: UUID): StudySiteDO? {
+        return database.from(StudySiteDOs).select()
+            .where(StudySiteDOs.studySiteId eq studySiteId)
+            .map { StudySiteDOs.createEntity(it) }.firstOrNull()
+    }
+
+    /**
+     * Retrieves one [StudySiteDO] based on study and site Ids
+     */
+
     fun getStudySiteByStudyIdAndSiteId(studyId: String, siteId: String): StudySiteDO? {
         return database.from(StudySiteDOs)
             .select()

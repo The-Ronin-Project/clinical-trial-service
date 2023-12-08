@@ -1,0 +1,91 @@
+{
+  "resourceType": "ValueSet",
+  "id": "798f075e-a48d-49d2-8ace-66aff6f55478",
+  "meta": {
+    "profile": [
+      "http://projectronin.io/fhir/StructureDefinition/ronin-valueSet"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://projectronin.io/fhir/StructureDefinition/Extension/ronin-valueSetSchema",
+      "valueString": "2"
+    }
+  ],
+  "url": "http://projectronin.io/fhir/ValueSet/798f075e-a48d-49d2-8ace-66aff6f55478",
+  "name": "Bodytemperaturenoninvasive",
+  "title": "Body Temperature Noninvasive",
+  "description": "LOINC concepts that represent the noninvasive measurement of body temperature using the following systems: patient, mouth, ear (tympanic membrane), temporal artery,  axillary Updated secondary use case",
+  "useContext": [
+    {
+      "code": {
+        "system": "http://terminology.hl7.org/CodeSystem/usage-context-type",
+        "code": "workflow",
+        "display": "Workflow Setting"
+      },
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "code": "SMT Timeline"
+          },
+          {
+            "code": "Clinical Trials"
+          }
+        ]
+      }
+    }
+  ],
+  "experimental": false,
+  "purpose": "General product feature use",
+  "version": "5",
+  "expansion": {
+    "identifier": "urn:uuid:442d3604-7409-11ee-86a0-1230a6b8be52",
+    "total": 7,
+    "contains": [
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "11289-6",
+        "display": "Body temperature at First encounter"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "76011-6",
+        "display": "Ear temperature"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "75539-7",
+        "display": "Body temperature - Temporal artery"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8310-5",
+        "display": "Body temperature"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8333-7",
+        "display": "Tympanic membrane temperature"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8331-1",
+        "display": "Oral temperature"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8328-7",
+        "display": "Axillary temperature"
+      }
+    ],
+    "timestamp": "2023-10-26"
+  },
+  "date": "2023-10-26T14:10:24.118Z"
+}

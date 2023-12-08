@@ -1,0 +1,223 @@
+{
+  "resourceType": "ValueSet",
+  "id": "1502ca1d-b8f1-4b53-ba64-2e12a51ec896",
+  "meta": {
+    "profile": [
+      "http://projectronin.io/fhir/StructureDefinition/ronin-valueSet"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://projectronin.io/fhir/StructureDefinition/Extension/ronin-valueSetSchema",
+      "valueString": "2"
+    }
+  ],
+  "url": "http://projectronin.io/fhir/ValueSet/1502ca1d-b8f1-4b53-ba64-2e12a51ec896",
+  "name": "Bodyweight",
+  "title": "Body Weight",
+  "description": "LOINC concepts for the measurement of body weight Updated secondary use case",
+  "useContext": [
+    {
+      "code": {
+        "system": "http://terminology.hl7.org/CodeSystem/usage-context-type",
+        "code": "workflow",
+        "display": "Workflow Setting"
+      },
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "code": "Ingestion"
+          },
+          {
+            "code": "Clinical Trials"
+          }
+        ]
+      }
+    }
+  ],
+  "experimental": false,
+  "purpose": "Used as a binding for RCDM Observation Body Weight Profile",
+  "version": "3",
+  "expansion": {
+    "identifier": "urn:uuid:f8cd5124-750e-11ee-8cca-8a5e5c9e6647",
+    "total": 29,
+    "contains": [
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8343-6",
+        "display": "Lean body weight estimated by Skin fold method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "56092-0",
+        "display": "Birth weight GNWCH"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8346-9",
+        "display": "Body weight Measured --postoperative"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "3142-7",
+        "display": "Body weight Stated"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "69460-4",
+        "display": "Body weight Mother --pre current pregnancy"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8339-4",
+        "display": "Birth weight Measured"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "69461-2",
+        "display": "Mother's body weight --at delivery"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "56056-5",
+        "display": "Birth weight - Reported"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8351-9",
+        "display": "Body weight Measured --without clothes"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8344-4",
+        "display": "Body weight Measured --post dialysis"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "79348-9",
+        "display": "Body weight --used for drug calculation"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8335-2",
+        "display": "Body weight Estimated"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8348-5",
+        "display": "Body weight Measured --pre pregnancy"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8349-3",
+        "display": "Body weight Measured --preoperative"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8341-0",
+        "display": "Dry body weight Measured"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "58229-6",
+        "display": "Body weight Measured --when specimen taken"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "91557-9",
+        "display": "Lean body weight"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "29463-7",
+        "display": "Body weight"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8345-1",
+        "display": "Body weight Measured --post partum"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "50064-5",
+        "display": "Ideal body weight"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8340-2",
+        "display": "Dry body weight Estimated"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8338-6",
+        "display": "Body weight Measured --ante partum"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8350-1",
+        "display": "Body weight Measured --with clothes"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8342-8",
+        "display": "Lean body weight estimated by Immersion method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "56093-8",
+        "display": "Birth weight NVSS"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "88334-8",
+        "display": "Lean body weight Calculated"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "8347-7",
+        "display": "Body weight Measured --pre dialysis"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "3141-9",
+        "display": "Body weight Measured"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.76",
+        "code": "75292-3",
+        "display": "Body weight - Reported --usual"
+      }
+    ],
+    "timestamp": "2023-10-27"
+  },
+  "date": "2023-10-27T21:23:00.745Z"
+}

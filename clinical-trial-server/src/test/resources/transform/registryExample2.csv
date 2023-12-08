@@ -1,0 +1,11 @@
+productGroupLabel,productItemLabel,sequence,valueSetUuid,valueSetDisplayTitle,valueSetCodeName,valueSetVersion
+Vitals,Body Temperature Noninvasive,12,798f075e-a48d-49d2-8ace-66aff6f55478,Body Temperature Noninvasive,bodytemperaturenoninvasive,5
+Vitals,Heart Rate Noninvasive,13,809f547e-cb7e-438f-84af-8852d586c718,Heart Rate Noninvasive,heartratenoninvasive,5
+Vitals,Blood Pressure,14,64baa785-ba8a-448f-8714-93d57fd64db5,Blood Pressure Panel,bloodpressurepanel,3
+Vitals,Respiratory Rate,17,46b10973-c8e0-4086-9c71-ec464ef363e8,Respiratory Rate Without Provocation,respiratoryratewithoutprovocation,3
+Vitals,Oxygen Saturation by Pulse Oximetry,18,ad0f2555-e5ef-484d-9b55-1573d86863c1,Oxygen Saturation (SpO2) by Pulse Oximetry,OxygenSaturationSpO2byPulseOximetry,4
+Vitals,Height,20,370b5c79-71f1-4f00-ab3d-cd7d430f813b,Body Height,bodyheight,3
+Vitals,Weight,21,1502ca1d-b8f1-4b53-ba64-2e12a51ec896,Body Weight,bodyweight,3
+Vitals,Body Mass Index Ratio,22,0fd5b59f-a7db-4971-9af9-b597a5ffbfac,Body Mass Index Ratio (BMI),bodymassindexratiobmi,3
+Vitals,Body Surface Area,23,45354da4-30b4-433e-b5aa-d99a903d5dc9,Body Surface Area (BSA),bodysurfaceareabsa,4
+Labs,Hemoglobin,25,c874065c-2ea4-464d-a0f2-fc94961ac5b4,Hemoglobin (HGB) in Blood,hemoglobinhgbinblood,5
