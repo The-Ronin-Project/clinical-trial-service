@@ -2,6 +2,7 @@ package com.projectronin.clinical.trial.server.kafka
 
 import com.projectronin.clinical.trial.server.dataauthority.ObservationDAO
 import com.projectronin.clinical.trial.server.services.SubjectService
+import com.projectronin.clinical.trial.server.transform.RCDMObservationToCTDMObservation
 import com.projectronin.clinical.trial.server.transform.RCDMPatientToCTDMObservations
 import com.projectronin.interop.fhir.r4.resource.Observation
 import com.projectronin.interop.fhir.r4.resource.Patient
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service
 class EHRDAListener(
     private val subjectService: SubjectService,
     private val patientTransformer: RCDMPatientToCTDMObservations,
+    private val observationTransformer: RCDMObservationToCTDMObservation,
     private val observationDAO: ObservationDAO
 ) {
 
@@ -22,20 +24,27 @@ class EHRDAListener(
     @KafkaListener(topics = ["oci.us-phoenix-1.ehr-data-authority.observation.v1"], groupId = "clinical-trial-service")
     fun consumeObservation(message: RoninEvent<Observation>) {
         val observation = message.data
-        if (checkTenantAndPatient(observation.subject?.decomposedId())) {
-            KotlinLogging.logger { }.warn { "Active observation" }
+        observation.subject?.decomposedId()?.let { patientFhirId ->
+            if (checkTenantAndPatient(patientFhirId)) {
+                val ctdmObservation = observationTransformer.rcdmObservationToCTDMObservation(patientFhirId, observation)
+                if (ctdmObservation != null) {
+                    KotlinLogging.logger { }.info { "Observation ${observation.id?.value} added" }
+                    observationDAO.insert(ctdmObservation)
+                } else {
+                    KotlinLogging.logger { }.warn { "Observation ${observation.id?.value} not applicable" }
+                }
+            }
         }
     }
 
     @KafkaListener(topics = ["oci.us-phoenix-1.ehr-data-authority.patient.v1"], groupId = "clinical-trial-service")
     fun consumePatient(message: RoninEvent<Patient>) {
         val patient = message.data
-        KotlinLogging.logger { }.warn { "Patient: $patient" }
         if (checkTenantAndPatient(patient.id?.value)) {
             val demographicObservations = patientTransformer.splitPatientDemographics(patient)
             demographicObservations.forEach {
                 observationDAO.insert(it)
-                KotlinLogging.logger { }.warn { "observation added" }
+                KotlinLogging.logger { }.info { "Observation ${it.id?.value} added" }
             }
         }
     }
@@ -43,7 +52,6 @@ class EHRDAListener(
     private fun checkTenantAndPatient(patientFHIRID: String?): Boolean {
         if (patientFHIRID?.split("-")?.first() !in tenants) return false
         val activePatients = subjectService.getActiveFhirIds()
-        KotlinLogging.logger { }.warn { "Active patients: $activePatients" }
         return patientFHIRID in activePatients
     }
 }

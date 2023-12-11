@@ -11,7 +11,7 @@
           "application/json"
         ]
       },
-      "body": "productGroupLabel,productItemLabel,sequence,valueSetUuid,valueSetDisplayTitle,valueSetCodeName,valueSetVersion\nDemographics,Birth Date,1,10f8c49a-635b-4928-aee6-f6e47c2e7c50,Birth Date,birthdate,1\nDemographics,Gender,2,daf6a5fc-5705-400b-abd0-852e060c9325,Sex,sex,1"
+      "body": "productGroupLabel,productItemLabel,sequence,valueSetUuid,valueSetDisplayTitle,valueSetCodeName,valueSetVersion\nDemographics,Birth Date,1,10f8c49a-635b-4928-aee6-f6e47c2e7c50,Birth Date,birthdate,1\nDemographics,Gender,2,daf6a5fc-5705-400b-abd0-852e060c9325,Sex,sex,1\nVitals,Height,3,370b5c79-71f1-4f00-ab3d-cd7d430f813b,Body Height,bodyheight,1"
     },
     "id": "GetDataDictionary",
     "priority": 0,
@@ -119,6 +119,46 @@
         "token_type": "Bearer",
         "expires_in": 600
       }
+    }
+  },
+  {
+    "httpRequest": {
+      "method": "GET",
+      "path": "/n/.*/b/.*/o/ValueSets%2Fv2%2Fpublished%2F370b5c79-71f1-4f00-ab3d-cd7d430f813b%2F1.json"
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "headers": {
+        "Content-Type": [
+          "application/json"
+        ]
+      },
+      "body": {
+        "resourceType": "ValueSet",
+        "title": " ",
+        "id": "00741f04-67bd-4b40-8ae8-3f16c4ef01a2",
+        "version": 1,
+        "status": "draft",
+        "expansion": {
+          "timestamp": "2020-01-01 14:01:01",
+          "contains": [
+            {
+              "system": "http://loinc.org",
+              "version": "2.74",
+              "code": "8302-2",
+              "display": "Body Height"
+            },
+          ]
+        }
+      }
+    },
+    "id": "GetRoninObservationBHResultValueSet",
+    "priority": 0,
+    "timeToLive": {
+      "unlimited": true
+    },
+    "times": {
+      "unlimited": true
     }
   },
   {
