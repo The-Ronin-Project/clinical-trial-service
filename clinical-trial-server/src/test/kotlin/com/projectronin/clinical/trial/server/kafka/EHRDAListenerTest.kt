@@ -7,7 +7,9 @@ import com.projectronin.clinical.trial.server.transform.RCDMPatientToCTDMObserva
 import com.projectronin.interop.fhir.r4.resource.Observation
 import com.projectronin.interop.fhir.r4.resource.Patient
 import com.projectronin.kafka.data.RoninEvent
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -18,7 +20,7 @@ class EHRDAListenerTest {
     private var patientTransformer = mockk<RCDMPatientToCTDMObservations>()
     private var observationTransformer = mockk<RCDMObservationToCTDMObservation>()
     private var observationDAO = mockk<ObservationDAO> {
-        every { insert(any()) } returns "inserted"
+        every { update(any()) } just Runs
     }
     private val listener = EHRDAListener(subjectService, patientTransformer, observationTransformer, observationDAO)
 

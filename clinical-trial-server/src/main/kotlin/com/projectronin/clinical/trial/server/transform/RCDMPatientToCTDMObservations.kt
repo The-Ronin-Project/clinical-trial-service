@@ -2,8 +2,6 @@ package com.projectronin.clinical.trial.server.transform
 
 import com.projectronin.clinical.trial.server.data.SubjectDAO
 import com.projectronin.interop.fhir.generators.datatypes.DynamicValues
-import com.projectronin.interop.fhir.generators.datatypes.codeableConcept
-import com.projectronin.interop.fhir.generators.datatypes.coding
 import com.projectronin.interop.fhir.r4.CodeSystem
 import com.projectronin.interop.fhir.r4.datatype.Annotation
 import com.projectronin.interop.fhir.r4.datatype.CodeableConcept
@@ -18,9 +16,10 @@ import com.projectronin.interop.fhir.r4.datatype.primitive.asFHIR
 import com.projectronin.interop.fhir.r4.resource.Observation
 import com.projectronin.interop.fhir.r4.resource.Patient
 import org.springframework.stereotype.Component
+import java.security.MessageDigest
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
-import java.util.UUID
+import java.util.Base64
 
 @Component
 class RCDMPatientToCTDMObservations(
@@ -211,12 +210,21 @@ class RCDMPatientToCTDMObservations(
                     }
             }
         }
-        return obsList.map { it.copy(subject = Reference(reference = FHIRString("Patient/$fhirId"))) }
+        return obsList.map {
+            it.copy(
+                id = Id(
+                    value = createUniqueFHIRID(
+                        patientFHIRID = fhirId,
+                        dataDictionaryUUID = it.meta!!.tag[0].system!!.value!!
+                    )
+                ),
+                subject = Reference(reference = FHIRString("Patient/$fhirId"))
+            )
+        }
     }
 
     fun rcdmPatientToDemographics(subjectId: String): Observation {
         return Observation(
-            id = Id(UUID.randomUUID().toString()),
             extension = setCTDMExtensions(subjectId),
             status = Code("Final"),
             category = listOf(
@@ -263,5 +271,11 @@ class RCDMPatientToCTDMObservations(
                 )
             )
         )
+    }
+
+    fun createUniqueFHIRID(patientFHIRID: String, dataDictionaryUUID: String): String {
+        val input = "$patientFHIRID-$dataDictionaryUUID"
+        val bytes = MessageDigest.getInstance("SHA-256").digest(input.toByteArray())
+        return Base64.getEncoder().encodeToString(bytes)
     }
 }

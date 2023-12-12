@@ -29,7 +29,7 @@ class EHRDAListener(
                 val ctdmObservation = observationTransformer.rcdmObservationToCTDMObservation(patientFhirId, observation)
                 if (ctdmObservation != null) {
                     KotlinLogging.logger { }.info { "Observation ${observation.id?.value} added" }
-                    observationDAO.insert(ctdmObservation)
+                    observationDAO.update(ctdmObservation)
                 } else {
                     KotlinLogging.logger { }.warn { "Observation ${observation.id?.value} not applicable" }
                 }
@@ -43,7 +43,7 @@ class EHRDAListener(
         if (checkTenantAndPatient(patient.id?.value)) {
             val demographicObservations = patientTransformer.splitPatientDemographics(patient)
             demographicObservations.forEach {
-                observationDAO.insert(it)
+                observationDAO.update(it)
                 KotlinLogging.logger { }.info { "Observation ${it.id?.value} added" }
             }
         }

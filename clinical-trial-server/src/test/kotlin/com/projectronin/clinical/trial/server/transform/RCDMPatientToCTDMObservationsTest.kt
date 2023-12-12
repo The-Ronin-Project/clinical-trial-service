@@ -283,6 +283,23 @@ class RCDMPatientToCTDMObservationsTest {
         val rcdmPatient = rcdmPatient("test") {
             identifier of listOf(roninFhir2)
         }
-        assertThrows<Exception> { RCDMPatientToCTDMObservations(subjectDAO, rcdmHelper).splitPatientDemographics(rcdmPatient) }
+        assertThrows<Exception> {
+            RCDMPatientToCTDMObservations(subjectDAO, rcdmHelper).splitPatientDemographics(
+                rcdmPatient
+            )
+        }
+    }
+
+    @Test
+    fun `create unique fhir id test`() {
+        val id1 = RCDMPatientToCTDMObservations(subjectDAO, rcdmHelper).createUniqueFHIRID(
+            "ronin-12345",
+            "data-dictionary-12345"
+        )
+        val id2 = RCDMPatientToCTDMObservations(subjectDAO, rcdmHelper).createUniqueFHIRID(
+            "ronin-12345",
+            "data-dictionary-12345"
+        )
+        assertEquals(id1, id2)
     }
 }
