@@ -2,7 +2,7 @@
   {
     "httpRequest": {
       "method": "GET",
-      "path": "/n/namespace/b/infx-shared/o/Registries%2Fv1%2Fdata%20dictionary%2Fprod%2F38efb390-497f-4b49-9619-a45d33048a3a%2F6.csv"
+      "path": "/n/namespace/b/infx-shared/o/Registries%2Fv1%2Fdata%20dictionary%2Fprod%2F38efb390-497f-4b49-9619-a45d33048a3a%2F7.csv"
     },
     "httpResponse": {
       "statusCode": 200,

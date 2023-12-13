@@ -165,7 +165,7 @@ class RCDMObservationToCTDMObservationTest {
     private val valueSetHG =
         File(DataDictionaryServiceTest::class.java.getResource("/transform/valueSetHG.json")!!.file).readText()
     private val ociClient = mockk<OCIClient> {
-        every { getObjectFromINFX("Registries/v1/data dictionary/prod/38efb390-497f-4b49-9619-a45d33048a3a/6.csv") } returns registryCSV
+        every { getObjectFromINFX("Registries/v1/data dictionary/prod/38efb390-497f-4b49-9619-a45d33048a3a/7.csv") } returns registryCSV
         every { getObjectFromINFX("ValueSets/v2/published/798f075e-a48d-49d2-8ace-66aff6f55478/5.json") } returns valueSetTemp
         every { getObjectFromINFX("ValueSets/v2/published/809f547e-cb7e-438f-84af-8852d586c718/5.json") } returns valueSetHR
         every { getObjectFromINFX("ValueSets/v2/published/64baa785-ba8a-448f-8714-93d57fd64db5/3.json") } returns valueSetBP
@@ -177,7 +177,7 @@ class RCDMObservationToCTDMObservationTest {
         every { getObjectFromINFX("ValueSets/v2/published/45354da4-30b4-433e-b5aa-d99a903d5dc9/4.json") } returns valueSetBSA
         every { getObjectFromINFX("ValueSets/v2/published/c874065c-2ea4-464d-a0f2-fc94961ac5b4/5.json") } returns valueSetHG
     }
-    private val dataDictionaryService = DataDictionaryService(ociClient)
+    private val dataDictionaryService = DataDictionaryService(ociClient, "7")
 
     @BeforeEach
     fun setup() {

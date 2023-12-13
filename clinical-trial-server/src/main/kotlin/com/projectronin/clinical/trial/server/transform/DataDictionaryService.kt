@@ -9,6 +9,7 @@ import com.projectronin.interop.common.jackson.JacksonUtil
 import com.projectronin.interop.datalake.oci.client.OCIClient
 import com.projectronin.interop.fhir.r4.resource.ValueSet
 import mu.KotlinLogging
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.lang.Exception
@@ -17,7 +18,11 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.annotation.PostConstruct
 
 @Service
-class DataDictionaryService(private val ociClient: OCIClient) {
+class DataDictionaryService(
+    private val ociClient: OCIClient,
+    @Value("\${oci.data.dictionary.version}")
+    private val dataDictionaryVersion: String
+) {
     private val logger = KotlinLogging.logger { }
     private val mapper = CsvMapper().apply {
         registerKotlinModule()
@@ -35,7 +40,10 @@ class DataDictionaryService(private val ociClient: OCIClient) {
     }
 
     @Scheduled(fixedRate = 24 * 60 * 60 * 1000) // 24 hours in milliseconds
-    fun load(delayMillis: Long = 10000) {
+    fun load(
+        registryVersion: String? = dataDictionaryVersion,
+        delayMillis: Long = 10000
+    ) {
         val tempMap = mutableMapOf<SystemValue, MutableList<DataDictionaryRow>>()
 
         // This is basically here for integration tests in case mock server isn't running yet
@@ -55,7 +63,7 @@ class DataDictionaryService(private val ociClient: OCIClient) {
         }
 
         val registryCSV = retry(3, delayMillis) {
-            ociClient.getObjectFromINFX("Registries/v1/data dictionary/prod/38efb390-497f-4b49-9619-a45d33048a3a/6.csv") // TODO: make this version configurable
+            ociClient.getObjectFromINFX("Registries/v1/data dictionary/prod/38efb390-497f-4b49-9619-a45d33048a3a/$registryVersion.csv")
         }
         registryCSV?.let { csv ->
             val reader: MappingIterator<DataDictionaryRow> =
