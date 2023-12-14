@@ -26,7 +26,6 @@ data class StatusResponse(
 class SubjectStatusController(
     val subjectService: SubjectService,
 ) {
-    // TODO: revisit scopes
     @GetMapping("studies/{studyId}/sites/{siteId}/subject/{subjectId}/status")
     @PreAuthorize("hasAuthority('SCOPE_read:subject_status')")
     fun retrieve(
@@ -45,7 +44,6 @@ class SubjectStatusController(
         return ResponseEntity(subjectStatus.status, HttpStatus.OK)
     }
 
-    // TODO: revisit scopes
     @PostMapping("studies/{studyId}/sites/{siteId}/subject/{subjectId}/status")
     @PreAuthorize("hasAuthority('SCOPE_write:subject_status')")
     fun update(

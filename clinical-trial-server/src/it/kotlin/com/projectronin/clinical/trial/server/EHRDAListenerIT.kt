@@ -138,7 +138,6 @@ class EHRDAListenerIT : BaseIT() {
             Thread.sleep(5000)
         } while (observationDAO.search(valueSetIds = listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50")).isEmpty())
         val actual = observationDAO.search(valueSetIds = listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50")).first()
-        println(actual)
         assertEquals(DateTime("01-01-1999"), actual.value!!.value)
     }
 

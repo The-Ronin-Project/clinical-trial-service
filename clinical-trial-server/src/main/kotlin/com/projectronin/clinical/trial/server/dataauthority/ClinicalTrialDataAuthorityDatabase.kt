@@ -56,7 +56,7 @@ class ClinicalTrialDataAuthorityDatabase(private val config: XDevConfig) {
         try {
             collection.count()
         } catch (e: CJCommunicationsException) {
-            logger.info(e) { "Communication issue while accessing Collection, so resetting schema and collections" }
+            logger.warn(e) { "Communication issue while accessing Collection, so resetting schema and collections" }
             schema = newSchema()
             resetAllCollections()
         }

@@ -46,7 +46,7 @@ class ClinicalOneClient(
                     studyId = studyId,
                 ),
             )
-        logger.info { "Auth: ${authentication.tokenType} ${authentication.accessToken}" }
+        logger.debug { "Auth: ${authentication.tokenType} ${authentication.accessToken}" }
         return runBlocking {
             val response: HttpResponse =
                 httpClient.request("ClinicalOne", clinicalOneSubjectUrl) { url ->
@@ -62,7 +62,7 @@ class ClinicalOneClient(
                         setBody(JacksonManager.objectMapper.writeValueAsString(requestBody))
                     }
                 }
-            logger.info { response }
+            logger.debug { response }
             response.let { res ->
                 if (res.status == HttpStatusCode.OK) {
                     val responseBody = res.body<ClinicalOneAddSubjectResponse>()

@@ -46,7 +46,7 @@ class ClinicalOneAuthenticationService(
                         accept(ContentType.Application.Json)
                     }
                 }
-            logger.warn("Response body: ${httpResponse.bodyAsText()}")
+            logger.debug("Response body: ${httpResponse.bodyAsText()}")
             httpResponse.body<ClinicalOneAuthentication>()
         }
     }
