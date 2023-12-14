@@ -8,13 +8,13 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.projectronin.interop.common.jackson.JacksonUtil
 import com.projectronin.interop.datalake.oci.client.OCIClient
 import com.projectronin.interop.fhir.r4.resource.ValueSet
+import jakarta.annotation.PostConstruct
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.lang.Thread.sleep
 import java.util.concurrent.ConcurrentHashMap
-import javax.annotation.PostConstruct
 
 @Service
 class DataDictionaryService(

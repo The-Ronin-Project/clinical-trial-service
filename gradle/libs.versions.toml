@@ -1,31 +1,27 @@
 [versions]
-apache-kafka = "3.5.1"
 idea-ext = "1.1.7"
-interop-common = "3.12.2"
-interop-datalake = "8.4.2"
-interop-ehr = "12.0.0"
+interop-common = "4.1.0"
+interop-datalake = "9.0.0"
+interop-ehr = "13.1.0"
 interop-event-resource-request = "1.1.0"
-interop-fhir = "8.10.2"
-interop-gradle = "3.4.0"
-jackson = "2.15.2"
-# @pin until Spring Boot 3
-jakarta = "2.0.2"
-kotlinx-coroutines-core = "1.7.3"
+interop-fhir = "9.1.1"
+interop-gradle = "4.0.0"
+jackson = "2.16.0"
 kotlin-logging = "3.0.5"
-ktor = "2.3.4"
+kotlinx-coroutines-core = "1.7.3"
+ktor = "2.3.7"
 ktorm = "3.6.0"
-liquibase = "4.24.0"
-logstash = "7.3"
+liquibase = "4.25.0"
+logstash = "7.4"
 mockk = "1.13.8"
-mockwebserver = "4.11.0"
-mysql-connector-java = "8.1.0"
-protobuf-java = "3.24.4"
-ronin-kafka = "1.1.1"
+mockwebserver = "4.12.0"
+mysql-connector-java = "8.2.0"
+protobuf-java = "3.25.1"
+ronin-kafka = "1.1.2"
 ronin-test = "0.2.0"
-# @pin until JDK 17
-spring-boot = "2.7.13"
-springdoc = "1.7.0"
-testcontainers-bom = "1.19.1"
+spring-boot = "3.2.0"
+spring-kafka = "3.1.0"
+testcontainers-bom = "1.19.3"
 
 [libraries]
 event-interop-resource-request = { module = "com.projectronin.contract.event:event-interop-resource-request", version.ref = "interop-event-resource-request" }
@@ -35,7 +31,6 @@ interop-commonJackson = { module = "com.projectronin.interop:interop-common-jack
 interop-commonKtorm = { module = "com.projectronin.interop:interop-common-ktorm", version.ref = "interop-common" }
 interop-commonTestDb = { module = "com.projectronin.interop:interop-common-test-db", version.ref = "interop-common" }
 interop-datalake = { module = "com.projectronin.interop.publish:interop-datalake", version.ref = "interop-datalake" }
-interop-ehr-fhir-ronin = { module = "com.projectronin.interop.ehr:interop-fhir-ronin", version.ref = "interop-ehr" }
 interop-ehr-fhir-roninGenerators = { module = "com.projectronin.interop.ehr:interop-fhir-ronin-generators", version.ref = "interop-ehr" }
 interop-fhir = { module = "com.projectronin.interop.fhir:interop-fhir", version.ref = "interop-fhir" }
 interop-fhirGenerators = { module = "com.projectronin.interop.fhir:interop-fhir-generators", version.ref = "interop-fhir" }
@@ -43,17 +38,14 @@ jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-da
 jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
 jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
 jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
-jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api", version.ref = "jakarta" }
-kafka-clients = { module = "org.apache.kafka:kafka-clients", version.ref = "apache-kafka" }
 kotlin-logging = { module = "io.github.microutils:kotlin-logging", version.ref = "kotlin-logging" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
-ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 ktor-serialization-jackson = { module = "io.ktor:ktor-serialization-jackson", version.ref = "ktor" }
 ktorm-core = { module = "org.ktorm:ktorm-core", version.ref = "ktorm" }
-ktorm-support-mysql = { module = "org.ktorm:ktorm-support-mysql", version.ref = "ktorm" }
 liquibase-core = { module = "org.liquibase:liquibase-core", version.ref = "liquibase" }
 logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logstash" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
@@ -64,10 +56,8 @@ ronin-kafka = { module = "com.projectronin:ronin-kafka", version.ref = "ronin-ka
 ronin-test-data-generator = { module = "com.projectronin.test:ronin-test-data-generator", version.ref = "ronin-test" }
 spring-boot-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator", version.ref = "spring-boot" }
 spring-boot-parent = { module = "org.springframework.boot:spring-boot-parent", version.ref = "spring-boot" }
-spring-boot-kafka = { module = "org.springframework.kafka:spring-kafka", version.ref = "spring-boot" }
-springdoc-openapi-ui = { module = "org.springdoc:springdoc-openapi-ui", version.ref = "springdoc" }
+spring-kafka = { module = "org.springframework.kafka:spring-kafka", version.ref = "spring-kafka" }
 testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers-bom" }
-
 
 [bundles]
 data-generators = [
@@ -93,7 +83,7 @@ interop-docker-integration = { id = "com.projectronin.interop.gradle.docker-inte
 interop-junit = { id = "com.projectronin.interop.gradle.junit", version.ref = "interop-gradle" }
 interop-server-publish = { id = "com.projectronin.interop.gradle.server-publish", version.ref = "interop-gradle" }
 interop-server-version = { id = "com.projectronin.interop.gradle.server-version", version.ref = "interop-gradle" }
+interop-sonarqube = { id = "com.projectronin.interop.gradle.sonarqube", version.ref = "interop-gradle" }
 interop-spring-boot = { id = "com.projectronin.interop.gradle.spring-boot", version.ref = "interop-gradle" }
 interop-spring-framework = { id = "com.projectronin.interop.gradle.spring", version.ref = "interop-gradle" }
 interop-version-catalog = { id = "com.projectronin.interop.gradle.version-catalog-update", version.ref = "interop-gradle" }
-interop-sonarqube = { id = "com.projectronin.interop.gradle.sonarqube", version.ref = "interop-gradle" }

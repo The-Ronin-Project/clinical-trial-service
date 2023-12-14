@@ -28,7 +28,7 @@ dependencies {
     implementation(libs.interop.commonKtorm)
     implementation(libs.interop.datalake)
     implementation(libs.bundles.data.generators)
-    implementation(libs.spring.boot.kafka)
+    implementation(libs.spring.kafka)
     implementation(libs.ronin.kafka)
 
     runtimeOnly(project(":clinical-trial-liquibase"))
