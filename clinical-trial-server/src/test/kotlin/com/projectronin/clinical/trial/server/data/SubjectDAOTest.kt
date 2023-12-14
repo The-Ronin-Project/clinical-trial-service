@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test
 
 @LiquibaseTest(changeLog = "clinicaltrial/db/changelog/clinicaltrial.db.changelog-master.yaml")
 class SubjectDAOTest {
-
     @DBRiderConnection
     lateinit var connectionHolder: ConnectionHolder
 
@@ -27,7 +26,7 @@ class SubjectDAOTest {
             SubjectDO {
                 subjectId = "subjectId"
                 roninPatientId = "roninFhirId"
-            }
+            },
         )
     }
 

@@ -15,23 +15,25 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 
 class EHRDAListenerTest {
-
     private var subjectService = mockk<SubjectService>()
     private var patientTransformer = mockk<RCDMPatientToCTDMObservations>()
     private var observationTransformer = mockk<RCDMObservationToCTDMObservation>()
-    private var observationDAO = mockk<ObservationDAO> {
-        every { update(any()) } just Runs
-    }
+    private var observationDAO =
+        mockk<ObservationDAO> {
+            every { update(any()) } just Runs
+        }
     private val listener = EHRDAListener(subjectService, patientTransformer, observationTransformer, observationDAO)
 
     @Test
     fun `patient listener works`() {
-        val message = mockk<RoninEvent<Patient>> {
-            every { data } returns mockk {
-                every { id?.value } returns "ronincer-patientId1"
+        val message =
+            mockk<RoninEvent<Patient>> {
+                every { data } returns
+                    mockk {
+                        every { id?.value } returns "ronincer-patientId1"
+                    }
+                every { tenantId } returns "ronincer"
             }
-            every { tenantId } returns "ronincer"
-        }
         every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId1")
         every { patientTransformer.splitPatientDemographics(any()) } returns listOf(mockk())
         assertDoesNotThrow { listener.consumePatient(message) }
@@ -39,12 +41,14 @@ class EHRDAListenerTest {
 
     @Test
     fun `observation listener works`() {
-        val message = mockk<RoninEvent<Observation>> {
-            every { data } returns mockk {
-                every { subject?.decomposedId() } returns "ronincer-patientId1"
+        val message =
+            mockk<RoninEvent<Observation>> {
+                every { data } returns
+                    mockk {
+                        every { subject?.decomposedId() } returns "ronincer-patientId1"
+                    }
+                every { tenantId } returns "ronincer"
             }
-            every { tenantId } returns "ronincer"
-        }
         every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId1")
         every { observationTransformer.rcdmObservationToCTDMObservation("ronincer-patientId1", any()) } returns mockk()
         assertDoesNotThrow { listener.consumeObservation(message) }

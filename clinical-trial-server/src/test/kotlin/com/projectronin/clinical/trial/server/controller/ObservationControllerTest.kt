@@ -20,7 +20,6 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 internal class ObservationControllerTest {
-
     private var observationService = mockk<ObservationService>()
     private var subjectService = mockk<SubjectService>()
     private var observationController = ObservationController(subjectService, observationService)
@@ -36,7 +35,7 @@ internal class ObservationControllerTest {
             GetObservationsRequest(
                 listOf("1"),
                 ObservationDateRange(startTime, endTime),
-                -1
+                -1,
             )
         }
 
@@ -45,32 +44,34 @@ internal class ObservationControllerTest {
                 listOf("1"),
                 ObservationDateRange(startTime, endTime),
                 2,
-                1000
+                1000,
             )
         }
 
         assertThrows<IllegalArgumentException> {
             GetObservationsRequest(
                 listOf("1"),
-                ObservationDateRange("2023-11-11", "2023-12-888")
+                ObservationDateRange("2023-11-11", "2023-12-888"),
             )
         }
     }
 
     @Test
     fun `retrieve - empty response`() {
-        val requestBody = GetObservationsRequest(
-            listOf("1"),
-            ObservationDateRange(startTime, endTime),
-            1,
-            10
-        )
+        val requestBody =
+            GetObservationsRequest(
+                listOf("1"),
+                ObservationDateRange(startTime, endTime),
+                1,
+                10,
+            )
 
-        val expectedResponse = GetObservationsResponse(
-            subjectId,
-            emptyList(),
-            Pagination(1, 10, false, 0)
-        )
+        val expectedResponse =
+            GetObservationsResponse(
+                subjectId,
+                emptyList(),
+                Pagination(1, 10, false, 0),
+            )
 
         every { subjectService.getFhirIdBySubjectId(subjectId) } returns fhirId
         every { observationService.getObservations(subjectId, listOf("1"), startTime, endTime) } returns emptyList()
@@ -84,12 +85,13 @@ internal class ObservationControllerTest {
     @Test
     fun `retrieve - subject ID not found`() {
         every { subjectService.getFhirIdBySubjectId(subjectId) } returns null
-        val requestBody = GetObservationsRequest(
-            listOf("1"),
-            ObservationDateRange(startTime, endTime),
-            1,
-            10
-        )
+        val requestBody =
+            GetObservationsRequest(
+                listOf("1"),
+                ObservationDateRange(startTime, endTime),
+                1,
+                10,
+            )
 
         assertThrows<SubjectNotFoundException> {
             observationController.retrieve("studyId", "siteId", subjectId, requestBody)
@@ -98,27 +100,30 @@ internal class ObservationControllerTest {
 
     @Test
     fun `retrieve - response has more`() {
-        val requestBody = GetObservationsRequest(
-            listOf("1"),
-            ObservationDateRange(startTime, endTime),
-            1,
-            10
-        )
+        val requestBody =
+            GetObservationsRequest(
+                listOf("1"),
+                ObservationDateRange(startTime, endTime),
+                1,
+                10,
+            )
 
-        val observations = (1..20).toList().map {
-            observation {
-                id of Id("id-$it")
-                meta of Meta(tag = listOf(Coding(system = Uri("1"), display = FHIRString("lab"))))
+        val observations =
+            (1..20).toList().map {
+                observation {
+                    id of Id("id-$it")
+                    meta of Meta(tag = listOf(Coding(system = Uri("1"), display = FHIRString("lab"))))
+                }
             }
-        }
 
         val expectedObservations = observations.slice(0..9)
 
-        val expectedResponse = GetObservationsResponse(
-            subjectId,
-            expectedObservations,
-            Pagination(1, 10, true, 20)
-        )
+        val expectedResponse =
+            GetObservationsResponse(
+                subjectId,
+                expectedObservations,
+                Pagination(1, 10, true, 20),
+            )
 
         every { subjectService.getFhirIdBySubjectId(subjectId) } returns fhirId
         every { observationService.getObservations(subjectId, listOf("1"), startTime, endTime) } returns observations
@@ -131,27 +136,30 @@ internal class ObservationControllerTest {
 
     @Test
     fun `retrieve - response does not have more`() {
-        val requestBody = GetObservationsRequest(
-            listOf("1"),
-            ObservationDateRange(startTime, endTime),
-            18,
-            10
-        )
+        val requestBody =
+            GetObservationsRequest(
+                listOf("1"),
+                ObservationDateRange(startTime, endTime),
+                18,
+                10,
+            )
 
-        val observations = (1..20).toList().map {
-            observation {
-                id of Id("id-$it")
-                meta of Meta(tag = listOf(Coding(system = Uri("1"), display = FHIRString("lab"))))
+        val observations =
+            (1..20).toList().map {
+                observation {
+                    id of Id("id-$it")
+                    meta of Meta(tag = listOf(Coding(system = Uri("1"), display = FHIRString("lab"))))
+                }
             }
-        }
 
         val expectedObservations = observations.slice(17..19)
 
-        val expectedResponse = GetObservationsResponse(
-            subjectId,
-            expectedObservations,
-            Pagination(18, 10, false, 20)
-        )
+        val expectedResponse =
+            GetObservationsResponse(
+                subjectId,
+                expectedObservations,
+                Pagination(18, 10, false, 20),
+            )
 
         every { subjectService.getFhirIdBySubjectId(subjectId) } returns fhirId
         every { observationService.getObservations(subjectId, listOf("1"), startTime, endTime) } returns observations
@@ -164,26 +172,29 @@ internal class ObservationControllerTest {
 
     @Test
     fun `retrieve - offset greater than total count`() {
-        val requestBody = GetObservationsRequest(
-            listOf("1"),
-            ObservationDateRange(startTime, endTime),
-            100,
-            10
-        )
+        val requestBody =
+            GetObservationsRequest(
+                listOf("1"),
+                ObservationDateRange(startTime, endTime),
+                100,
+                10,
+            )
 
-        val observations = (1..10).toList().map {
-            observation {
-                id of Id("id-$it")
-                meta of Meta(tag = listOf(Coding(system = Uri("1"), display = FHIRString("lab"))))
-                extension of setCTDMExtensions(subjectId = subjectId)
+        val observations =
+            (1..10).toList().map {
+                observation {
+                    id of Id("id-$it")
+                    meta of Meta(tag = listOf(Coding(system = Uri("1"), display = FHIRString("lab"))))
+                    extension of setCTDMExtensions(subjectId = subjectId)
+                }
             }
-        }
 
-        val expectedResponse = GetObservationsResponse(
-            subjectId,
-            emptyList(),
-            Pagination(100, 10, false, 10)
-        )
+        val expectedResponse =
+            GetObservationsResponse(
+                subjectId,
+                emptyList(),
+                Pagination(100, 10, false, 10),
+            )
 
         every { subjectService.getFhirIdBySubjectId(subjectId) } returns fhirId
         every { observationService.getObservations(subjectId, listOf("1"), startTime, endTime) } returns observations
@@ -196,13 +207,14 @@ internal class ObservationControllerTest {
 
     @Test
     fun `retrieve all internal`() {
-        val expectedObservations = (1..20).toList().map {
-            observation {
-                id of Id("id-$it")
-                extension of setCTDMExtensions(subjectId = subjectId)
-                meta of Meta(tag = listOf(Coding(system = Uri("1"), display = FHIRString("lab"))))
+        val expectedObservations =
+            (1..20).toList().map {
+                observation {
+                    id of Id("id-$it")
+                    extension of setCTDMExtensions(subjectId = subjectId)
+                    meta of Meta(tag = listOf(Coding(system = Uri("1"), display = FHIRString("lab"))))
+                }
             }
-        }
 
         every { subjectService.getSubjectIdByFhirId(fhirId) } returns subjectId
         every { observationService.getAllObservationsBySubjectId(subjectId) } returns expectedObservations

@@ -17,9 +17,10 @@ class ConvertersTest {
 
     @Test
     fun `get tenant id from ronin fhir id fails`() {
-        val exception = assertThrows<IllegalStateException> {
-            badRoninFhirId.tenantIdFromRoninFhirId()
-        }
+        val exception =
+            assertThrows<IllegalStateException> {
+                badRoninFhirId.tenantIdFromRoninFhirId()
+            }
 
         assertEquals("Ronin FHIR Id is not of form \"tenant-fhirid\".", exception.message)
     }

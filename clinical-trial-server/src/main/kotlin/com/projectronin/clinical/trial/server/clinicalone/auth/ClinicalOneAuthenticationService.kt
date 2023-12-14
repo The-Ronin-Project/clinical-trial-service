@@ -24,27 +24,28 @@ class ClinicalOneAuthenticationService(
     @Value("\${clinicalone.auth.url}")
     private val clinicalOneAuthUrl: String,
     private val clinicalOneCredentialsHeader: ClinicalOneCredentialsHeader,
-    private val clinicalOneCredentialsFormParameters: ClinicalOneCredentialsFormParameters
+    private val clinicalOneCredentialsFormParameters: ClinicalOneCredentialsFormParameters,
 ) {
     private val logger = KotlinLogging.logger { }
 
     fun getAuthentication(): Authentication {
         return runBlocking {
             logger.debug { "Retrieving authorization from $clinicalOneAuthUrl" }
-            val httpResponse: HttpResponse = httpClient.request("ClinicalOne", clinicalOneAuthUrl) { url ->
-                post(url) {
-                    basicAuth(clinicalOneCredentialsHeader.clientId, clinicalOneCredentialsHeader.clientSecret)
-                    setBody(
-                        FormDataContent(
-                            Parameters.build {
-                                append("grant_type", clinicalOneCredentialsFormParameters.grantType)
-                                append("scope", clinicalOneCredentialsFormParameters.scope)
-                            }
+            val httpResponse: HttpResponse =
+                httpClient.request("ClinicalOne", clinicalOneAuthUrl) { url ->
+                    post(url) {
+                        basicAuth(clinicalOneCredentialsHeader.clientId, clinicalOneCredentialsHeader.clientSecret)
+                        setBody(
+                            FormDataContent(
+                                Parameters.build {
+                                    append("grant_type", clinicalOneCredentialsFormParameters.grantType)
+                                    append("scope", clinicalOneCredentialsFormParameters.scope)
+                                },
+                            ),
                         )
-                    )
-                    accept(ContentType.Application.Json)
+                        accept(ContentType.Application.Json)
+                    }
                 }
-            }
             logger.warn("Response body: ${httpResponse.bodyAsText()}")
             httpResponse.body<ClinicalOneAuthentication>()
         }

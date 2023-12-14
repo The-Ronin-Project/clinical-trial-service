@@ -14,7 +14,6 @@ import java.time.ZonedDateTime
 
 @Component
 class ObservationDAO(private val resourceDatabase: ClinicalTrialDataAuthorityDatabase) {
-
     val collection = resourceDatabase.createCollection(Observation::class.java)
 
     fun findByIdQuery(fhirId: String): DbDoc? {
@@ -57,7 +56,7 @@ class ObservationDAO(private val resourceDatabase: ClinicalTrialDataAuthorityDat
             resourceDatabase.run(collection) {
                 replaceOne(
                     it,
-                    JacksonUtil.writeJsonValue(observation)
+                    JacksonUtil.writeJsonValue(observation),
                 )
             }
         } ?: insert(observation) // add new resource if not found
@@ -71,23 +70,25 @@ class ObservationDAO(private val resourceDatabase: ClinicalTrialDataAuthorityDat
         subjectId: String? = null,
         valueSetIds: List<String>? = null,
         fromDate: ZonedDateTime? = null,
-        toDate: ZonedDateTime? = null
+        toDate: ZonedDateTime? = null,
     ): List<Observation> {
         val queryFragments = mutableListOf<String>()
         subjectId?.let {
+            @Suppress("ktlint:standard:max-line-length")
             queryFragments.add(
-                "JSON_CONTAINS(extension, '[{\"url\": \"https://projectronin.io/fhir/StructureDefinition/subjectId\", \"valueString\": \"$it\"}]')"
+                "JSON_CONTAINS(extension, '[{\"url\": \"https://projectronin.io/fhir/StructureDefinition/subjectId\", \"valueString\": \"$it\"}]')",
             )
         }
         valueSetIds?.joinToString(" OR ") { ("('$it' in meta.tag[*].system)") }?.let { queryFragments.add("( $it )") }
 
         val query = queryFragments.joinToString(" AND ")
 
-        val list = resourceDatabase.run(collection) {
-            find(query).execute().map {
-                JacksonUtil.readJsonObject(it.toString(), Observation::class)
+        val list =
+            resourceDatabase.run(collection) {
+                find(query).execute().map {
+                    JacksonUtil.readJsonObject(it.toString(), Observation::class)
+                }
             }
-        }
 
         // Filter on fromDate and toDate post-query due to XDev API
         return list.filter { observation ->
@@ -97,11 +98,13 @@ class ObservationDAO(private val resourceDatabase: ClinicalTrialDataAuthorityDat
                     (toDate?.let { date?.let { date -> date.isBefore(it) || date == it } } ?: true) &&
                         (fromDate?.let { date?.let { date -> date.isAfter(it) || date == it } } ?: true)
                 }
+
                 DynamicValueType.PERIOD -> {
                     val period = (observation.effective!!.value as Period).getEffectivePeriod()
                     (toDate?.let { period.second?.let { end -> end.isBefore(it) || end == it } } ?: true) &&
                         (fromDate?.let { period.first?.let { start -> start.isAfter(it) || start == it } } ?: true)
                 }
+
                 else -> false
             }
         }

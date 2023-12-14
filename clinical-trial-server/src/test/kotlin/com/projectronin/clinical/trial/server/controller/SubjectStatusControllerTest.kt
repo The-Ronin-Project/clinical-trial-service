@@ -13,11 +13,13 @@ import org.springframework.http.HttpStatus
 import java.util.UUID
 
 class SubjectStatusControllerTest {
-    private var subjectService = mockk<SubjectService> {
-        every { subjectDAO } returns mockk {
-            every { getFhirIdBySubject(any()) } returns "fhirId"
+    private var subjectService =
+        mockk<SubjectService> {
+            every { subjectDAO } returns
+                mockk {
+                    every { getFhirIdBySubject(any()) } returns "fhirId"
+                }
         }
-    }
     private var subjectStatusController = SubjectStatusController(subjectService)
 
     private val studySiteId1 = UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770")
@@ -55,11 +57,12 @@ class SubjectStatusControllerTest {
         studySite["studyId"] = "1"
         studySite["siteId"] = "2"
 
-        val expectedSubjectStatus = SubjectStatusDO {
-            studySiteId = studySiteId1
-            subjectId = "1"
-            status = SubjectStatus.ACTIVE
-        }
+        val expectedSubjectStatus =
+            SubjectStatusDO {
+                studySiteId = studySiteId1
+                subjectId = "1"
+                status = SubjectStatus.ACTIVE
+            }
 
         every { subjectService.getStudySiteByStudyIdAndSiteId("1", "2") } returns studySite
         every { subjectService.getSubjectStatus("1", studySiteId1) } returns expectedSubjectStatus
@@ -77,7 +80,7 @@ class SubjectStatusControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
         assertEquals(
             response.body!!.message,
-            "Status must be one of NEW, SCREENED, ACTIVE, ENROLLED, SCREEN_FAILED, WITHDRAWN, COMPLETE."
+            "Status must be one of NEW, SCREENED, ACTIVE, ENROLLED, SCREEN_FAILED, WITHDRAWN, COMPLETE.",
         )
     }
 
@@ -119,11 +122,12 @@ class SubjectStatusControllerTest {
         studySite["studyId"] = "1"
         studySite["siteId"] = "2"
 
-        val expectedSubjectStatus = SubjectStatusDO {
-            studySiteId = studySiteId1
-            subjectId = "1"
-            status = SubjectStatus.WITHDRAWN
-        }
+        val expectedSubjectStatus =
+            SubjectStatusDO {
+                studySiteId = studySiteId1
+                subjectId = "1"
+                status = SubjectStatus.WITHDRAWN
+            }
 
         every { subjectService.getStudySiteByStudyIdAndSiteId("1", "2") } returns studySite
         every { subjectService.updateSubjectStatus("1", studySiteId1, any()) } returns expectedSubjectStatus

@@ -28,27 +28,31 @@ class ClinicalOneClientTest {
         val siteId = "daffeda1f0084b358a355d4bdc7ae98b"
         val studyId = "dca7919d25b64416bbf58631aff66882"
         val subjectId = "47e71e98170d492fb54c2f93d8084860"
-        val responseBody = ClinicalOneAddSubjectResponse(
-            status = "success",
-            result = ClinicalOneAddSubjectResponse.ClinicalOneAddSubjectResponseResult(
-                state = "new",
-                studyId = studyId,
-                siteId = siteId,
-                id = subjectId
+        val responseBody =
+            ClinicalOneAddSubjectResponse(
+                status = "success",
+                result =
+                    ClinicalOneAddSubjectResponse.ClinicalOneAddSubjectResponseResult(
+                        state = "new",
+                        studyId = studyId,
+                        siteId = siteId,
+                        id = subjectId,
+                    ),
             )
-        )
         val response = JacksonManager.objectMapper.writeValueAsString(responseBody)
-        val body = ClinicalOneAddSubjectPayload(
-            ClinicalOneAddSubjectPayload.ClinicalOneAddSubjectInnerPayload(
-                siteId = siteId,
-                studyId = studyId
+        val body =
+            ClinicalOneAddSubjectPayload(
+                ClinicalOneAddSubjectPayload.ClinicalOneAddSubjectInnerPayload(
+                    siteId = siteId,
+                    studyId = studyId,
+                ),
             )
-        )
-        val client = createClient(
-            expectedUrl = "$subjectUrl/studies/$studyId/test/subjects",
-            expectedBody = JacksonManager.objectMapper.writeValueAsString(body),
-            responseBody = response
-        )
+        val client =
+            createClient(
+                expectedUrl = "$subjectUrl/studies/$studyId/test/subjects",
+                expectedBody = JacksonManager.objectMapper.writeValueAsString(body),
+                responseBody = response,
+            )
 
         val actual = client.getSubjectId(siteId, studyId)
         assertEquals(subjectId, actual)
@@ -59,36 +63,40 @@ class ClinicalOneClientTest {
         expectedUrl: String,
         baseUrl: String = subjectUrl,
         responseStatus: HttpStatusCode = HttpStatusCode.OK,
-        responseBody: String = ""
+        responseBody: String = "",
     ): ClinicalOneClient {
-        val authenticationBroker = mockk<ClinicalOneAuthenticationBroker> {
-            every { getAuthentication() } returns mockk {
-                every { tokenType } returns "Bearer"
-                every { accessToken } returns "Auth-String"
+        val authenticationBroker =
+            mockk<ClinicalOneAuthenticationBroker> {
+                every { getAuthentication() } returns
+                    mockk {
+                        every { tokenType } returns "Bearer"
+                        every { accessToken } returns "Auth-String"
+                    }
             }
-        }
 
-        val mockEngine = MockEngine { request ->
-            assertEquals(expectedUrl, request.url.toString())
-            if (expectedBody != "") {
-                assertEquals(expectedBody, String(request.body.toByteArray()))
+        val mockEngine =
+            MockEngine { request ->
+                assertEquals(expectedUrl, request.url.toString())
+                if (expectedBody != "") {
+                    assertEquals(expectedBody, String(request.body.toByteArray()))
+                }
+                assertEquals("Bearer Auth-String", request.headers["Authorization"])
+                respond(
+                    content = responseBody,
+                    status = responseStatus,
+                    headers = headersOf(HttpHeaders.ContentType, "application/json"),
+                )
             }
-            assertEquals("Bearer Auth-String", request.headers["Authorization"])
-            respond(
-                content = responseBody,
-                status = responseStatus,
-                headers = headersOf(HttpHeaders.ContentType, "application/json")
-            )
-        }
 
-        val httpClient = HttpClient(mockEngine) {
-            install(ContentNegotiation) {
-                jackson {
-                    disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                    setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
+        val httpClient =
+            HttpClient(mockEngine) {
+                install(ContentNegotiation) {
+                    jackson {
+                        disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                        setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
+                    }
                 }
             }
-        }
 
         return ClinicalOneClient(httpClient, baseUrl, authenticationBroker)
     }

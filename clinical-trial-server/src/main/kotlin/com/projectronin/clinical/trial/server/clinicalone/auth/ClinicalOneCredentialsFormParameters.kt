@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 @Component
 data class ClinicalOneCredentialsFormParameters(
     @Value("\${clinicalone.client.scope}")
-    val scope: String
+    val scope: String,
 ) {
     val grantType: String = "client_credentials"
 }

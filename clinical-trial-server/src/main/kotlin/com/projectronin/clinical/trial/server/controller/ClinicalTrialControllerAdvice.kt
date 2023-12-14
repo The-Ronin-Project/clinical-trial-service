@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 
 data class ErrorResponse(
-    val message: String?
+    val message: String?,
 )
 
 @ControllerAdvice

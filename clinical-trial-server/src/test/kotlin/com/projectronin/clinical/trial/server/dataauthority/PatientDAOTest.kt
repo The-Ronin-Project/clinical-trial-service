@@ -14,7 +14,6 @@ import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class PatientDAOTest : BaseMySQLTest() {
-
     private lateinit var collection: Collection
     private lateinit var dao: PatientDAO
 
@@ -22,10 +21,11 @@ internal class PatientDAOTest : BaseMySQLTest() {
     fun initTest() {
         collection = createCollection(Patient::class.simpleName!!)
         val database = mockk<ClinicalTrialDataAuthorityDatabase>()
-        every { database.createCollection(Patient::class.java) } returns ClinicalTrialDataAuthorityDatabase.SafeCollection(
-            "resource",
-            collection
-        )
+        every { database.createCollection(Patient::class.java) } returns
+            ClinicalTrialDataAuthorityDatabase.SafeCollection(
+                "resource",
+                collection,
+            )
         every { database.run(any(), captureLambda<Collection.() -> Any>()) } answers {
             val collection = firstArg<ClinicalTrialDataAuthorityDatabase.SafeCollection>()
             val lamdba = secondArg<Collection.() -> Any>()

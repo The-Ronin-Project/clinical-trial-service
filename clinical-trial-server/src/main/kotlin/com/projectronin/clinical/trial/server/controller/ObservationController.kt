@@ -21,13 +21,13 @@ import java.time.ZonedDateTime
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class ObservationDateRange(
     val startDate: ZonedDateTime,
-    val endDate: ZonedDateTime
+    val endDate: ZonedDateTime,
 ) {
     @JsonCreator
     constructor(startDate: String, endDate: String) :
         this(
             parseFhirDateTime(startDate) ?: throw IllegalArgumentException("Invalid start_date: $startDate"),
-            parseFhirDateTime(endDate) ?: throw IllegalArgumentException("Invalid end_date: $endDate")
+            parseFhirDateTime(endDate) ?: throw IllegalArgumentException("Invalid end_date: $endDate"),
         )
 }
 
@@ -37,7 +37,7 @@ data class GetObservationsRequest(
     val dateRange: ObservationDateRange,
     val offset: Int = 1,
     val limit: Int = 10,
-    val testMode: Boolean = false
+    val testMode: Boolean = false,
 ) {
     init {
         require(offset >= 1) { "offset must be at least 1." }
@@ -50,14 +50,14 @@ data class Pagination(
     val offset: Int,
     val limit: Int,
     val hasMore: Boolean,
-    val totalCount: Int
+    val totalCount: Int,
 )
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class GetObservationsResponse(
     val subjectId: String,
     val ctdmObservations: List<Observation>,
-    val pagination: Pagination
+    val pagination: Pagination,
 )
 
 class SubjectNotFoundException(message: String) : Exception(message)
@@ -65,7 +65,7 @@ class SubjectNotFoundException(message: String) : Exception(message)
 @RestController
 class ObservationController(
     val subjectService: SubjectService,
-    val observationService: ObservationService
+    val observationService: ObservationService,
 ) {
     @PostMapping("studies/{studyId}/sites/{siteId}/subject/{subjectId}/observations")
     @PreAuthorize("hasAuthority('SCOPE_read:subject_data')")
@@ -73,7 +73,7 @@ class ObservationController(
         @PathVariable studyId: String,
         @PathVariable siteId: String,
         @PathVariable subjectId: String,
-        @RequestBody request: GetObservationsRequest
+        @RequestBody request: GetObservationsRequest,
     ): ResponseEntity<GetObservationsResponse> {
         val fromDate: ZonedDateTime = request.dateRange.startDate
         val toDate: ZonedDateTime = request.dateRange.endDate
@@ -90,26 +90,30 @@ class ObservationController(
         val observations = observationService.getObservations(subjectId, observationNames, fromDate, toDate)
 
         // pagination logic
-        val page = if (observations.size > roninOffset) {
-            observations.subList(roninOffset, observations.size).take(limit)
-        } else {
-            emptyList()
-        }
+        val page =
+            if (observations.size > roninOffset) {
+                observations.subList(roninOffset, observations.size).take(limit)
+            } else {
+                emptyList()
+            }
 
-        val response = GetObservationsResponse(
-            subjectId = subjectId,
-            ctdmObservations = page,
-            pagination = Pagination(offset, limit, (offset + limit < observations.size), observations.size)
-        )
+        val response =
+            GetObservationsResponse(
+                subjectId = subjectId,
+                ctdmObservations = page,
+                pagination = Pagination(offset, limit, (offset + limit < observations.size), observations.size),
+            )
         return ResponseEntity(response, HttpStatus.OK)
     }
 
     @GetMapping("internal/observations")
     @PreAuthorize("hasAuthority('SCOPE_read:subject_data')")
     fun retrieveInternal(
-        @RequestParam patientFhirId: String
+        @RequestParam patientFhirId: String,
     ): ResponseEntity<List<Observation>> {
-        val subjectId = subjectService.getSubjectIdByFhirId(patientFhirId) ?: throw SubjectNotFoundException("Subject ID not found for Fhir ID: $patientFhirId")
+        val subjectId =
+            subjectService.getSubjectIdByFhirId(patientFhirId)
+                ?: throw SubjectNotFoundException("Subject ID not found for Fhir ID: $patientFhirId")
         val observations = observationService.getAllObservationsBySubjectId(subjectId)
         return ResponseEntity(observations, HttpStatus.OK)
     }

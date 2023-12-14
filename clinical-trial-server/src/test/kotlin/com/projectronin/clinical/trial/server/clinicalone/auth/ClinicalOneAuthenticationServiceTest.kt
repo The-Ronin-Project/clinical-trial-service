@@ -22,19 +22,21 @@ class ClinicalOneAuthenticationServiceTest {
     @Test
     fun `minimal authentication returned`() {
         val expectedBody = """grant_type=client_credentials&scope=scope"""
-        val responseContent = """{
+        val responseContent =
+            """{
             |  "token_type" : "Bearer",
             |  "access_token": "abcd1234"
             |}
-        """.trimMargin()
+            """.trimMargin()
 
         val httpClient = makeClient(expectedBody, responseContent, HttpStatusCode.OK)
-        val service = ClinicalOneAuthenticationService(
-            httpClient,
-            authUrl,
-            ClinicalOneCredentialsHeader("client-id", "client-secret"),
-            ClinicalOneCredentialsFormParameters("scope")
-        )
+        val service =
+            ClinicalOneAuthenticationService(
+                httpClient,
+                authUrl,
+                ClinicalOneCredentialsHeader("client-id", "client-secret"),
+                ClinicalOneCredentialsFormParameters("scope"),
+            )
         val authentication = service.getAuthentication()
         Assertions.assertEquals("Bearer", authentication.tokenType)
         Assertions.assertEquals("abcd1234", authentication.accessToken)
@@ -46,22 +48,24 @@ class ClinicalOneAuthenticationServiceTest {
     @Test
     fun `full authentication returned`() {
         val expectedBody = """grant_type=client_credentials&scope=scope"""
-        val responseContent = """{
+        val responseContent =
+            """{
             |  "token_type" : "Bearer",
             |  "access_token": "abcd1234",
             |  "expires_in": 3600,
             |  "scope": "local",
             |  "refresh_token": "efgh5678"
             |}
-        """.trimMargin()
+            """.trimMargin()
 
         val httpClient = makeClient(expectedBody, responseContent, HttpStatusCode.OK)
-        val service = ClinicalOneAuthenticationService(
-            httpClient,
-            authUrl,
-            ClinicalOneCredentialsHeader("client-id", "client-secret"),
-            ClinicalOneCredentialsFormParameters("scope")
-        )
+        val service =
+            ClinicalOneAuthenticationService(
+                httpClient,
+                authUrl,
+                ClinicalOneCredentialsHeader("client-id", "client-secret"),
+                ClinicalOneCredentialsFormParameters("scope"),
+            )
         val authentication = service.getAuthentication()
         Assertions.assertEquals("Bearer", authentication.tokenType)
         Assertions.assertEquals("abcd1234", authentication.accessToken)
@@ -75,18 +79,23 @@ class ClinicalOneAuthenticationServiceTest {
         val expectedBody = """grant_type=client_credentials&scope=scope"""
 
         val httpClient = makeClient(expectedBody, "", HttpStatusCode.ServiceUnavailable)
-        val service = ClinicalOneAuthenticationService(
-            httpClient,
-            authUrl,
-            ClinicalOneCredentialsHeader("client-id", "client-secret"),
-            ClinicalOneCredentialsFormParameters("scope")
-        )
+        val service =
+            ClinicalOneAuthenticationService(
+                httpClient,
+                authUrl,
+                ClinicalOneCredentialsHeader("client-id", "client-secret"),
+                ClinicalOneCredentialsFormParameters("scope"),
+            )
         assertThrows<ServiceUnavailableException> {
             service.getAuthentication()
         }
     }
 
-    private fun makeClient(expectedBody: String, responseContent: String, status: HttpStatusCode): HttpClient =
+    private fun makeClient(
+        expectedBody: String,
+        responseContent: String,
+        status: HttpStatusCode,
+    ): HttpClient =
         HttpClient(
             MockEngine { request ->
                 Assertions.assertEquals(authUrl, request.url.toString())
@@ -94,9 +103,9 @@ class ClinicalOneAuthenticationServiceTest {
                 respond(
                     content = responseContent,
                     status = status,
-                    headers = headersOf(HttpHeaders.ContentType, "application/json")
+                    headers = headersOf(HttpHeaders.ContentType, "application/json"),
                 )
-            }
+            },
         ) {
             install(ContentNegotiation) {
                 jackson {

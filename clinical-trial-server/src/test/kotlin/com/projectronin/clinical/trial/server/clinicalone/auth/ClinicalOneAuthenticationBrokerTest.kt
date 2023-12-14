@@ -16,7 +16,8 @@ class ClinicalOneAuthenticationBrokerTest {
     private lateinit var broker: ClinicalOneAuthenticationBroker
 
     private val cachedAuthorizationProperty =
-        ClinicalOneAuthenticationBroker::class.memberProperties.first { it.name == "cachedAuthentication" } as KMutableProperty<Authentication>
+        ClinicalOneAuthenticationBroker::class.memberProperties
+            .first { it.name == "cachedAuthentication" } as KMutableProperty<Authentication>
 
     init {
         cachedAuthorizationProperty.isAccessible = true
@@ -42,13 +43,14 @@ class ClinicalOneAuthenticationBrokerTest {
 
     @Test
     fun `loads fully specified authentication when not cached`() {
-        every { authenticationService.getAuthentication() } returns ClinicalOneAuthentication(
-            "Bearer",
-            "token",
-            360,
-            "refresh",
-            "scope"
-        )
+        every { authenticationService.getAuthentication() } returns
+            ClinicalOneAuthentication(
+                "Bearer",
+                "token",
+                360,
+                "refresh",
+                "scope",
+            )
 
         val authentication = broker.getAuthentication()
         Assertions.assertEquals("Bearer", authentication.tokenType)
@@ -88,9 +90,10 @@ class ClinicalOneAuthenticationBrokerTest {
 
     @Test
     fun `loads authentication when cached has no expiration`() {
-        val cachedAuthentication = mockk<Authentication> {
-            every { expiresAt } returns null
-        }
+        val cachedAuthentication =
+            mockk<Authentication> {
+                every { expiresAt } returns null
+            }
         setCachedAuthentication(cachedAuthentication)
 
         every { authenticationService.getAuthentication() } returns ClinicalOneAuthentication("Bearer", "token")
@@ -105,9 +108,10 @@ class ClinicalOneAuthenticationBrokerTest {
 
     @Test
     fun `loads authentication when cached has expired`() {
-        val cachedAuthentication = mockk<Authentication> {
-            every { expiresAt } returns Instant.now().minusSeconds(600)
-        }
+        val cachedAuthentication =
+            mockk<Authentication> {
+                every { expiresAt } returns Instant.now().minusSeconds(600)
+            }
         setCachedAuthentication(cachedAuthentication)
 
         every { authenticationService.getAuthentication() } returns ClinicalOneAuthentication("Bearer", "token")
@@ -122,9 +126,10 @@ class ClinicalOneAuthenticationBrokerTest {
 
     @Test
     fun `loads authentication when cached expires within buffer`() {
-        val cachedAuthentication = mockk<Authentication> {
-            every { expiresAt } returns Instant.now().plusSeconds(25)
-        }
+        val cachedAuthentication =
+            mockk<Authentication> {
+                every { expiresAt } returns Instant.now().plusSeconds(25)
+            }
         setCachedAuthentication(cachedAuthentication)
 
         every { authenticationService.getAuthentication() } returns ClinicalOneAuthentication("Bearer", "token")
@@ -139,13 +144,14 @@ class ClinicalOneAuthenticationBrokerTest {
 
     @Test
     fun `returns cached authentication when still valid`() {
-        val cachedAuthentication = mockk<Authentication> {
-            every { expiresAt } returns Instant.now().plusSeconds(600)
-            every { tokenType } returns "Basic"
-            every { accessToken } returns "cached_token"
-            every { scope } returns null
-            every { refreshToken } returns null
-        }
+        val cachedAuthentication =
+            mockk<Authentication> {
+                every { expiresAt } returns Instant.now().plusSeconds(600)
+                every { tokenType } returns "Basic"
+                every { accessToken } returns "cached_token"
+                every { scope } returns null
+                every { refreshToken } returns null
+            }
         setCachedAuthentication(cachedAuthentication)
 
         val authentication = broker.getAuthentication()
@@ -157,6 +163,6 @@ class ClinicalOneAuthenticationBrokerTest {
     }
 
     private fun getCachedAuthentication() = cachedAuthorizationProperty.getter.call(broker)
-    private fun setCachedAuthentication(authentication: Authentication?) =
-        cachedAuthorizationProperty.setter.call(broker, authentication)
+
+    private fun setCachedAuthentication(authentication: Authentication?) = cachedAuthorizationProperty.setter.call(broker, authentication)
 }

@@ -12,9 +12,10 @@ import java.time.ZonedDateTime
 
 class ObservationServiceTest {
     private var observationDAO = mockk<ObservationDAO>()
-    private var observationService = ObservationService(
-        observationDAO
-    )
+    private var observationService =
+        ObservationService(
+            observationDAO,
+        )
 
     private val subjectId = "subjectId"
     private val fromDate = ZonedDateTime.of(2023, 11, 11, 0, 0, 0, 0, ZoneId.of("UTC"))

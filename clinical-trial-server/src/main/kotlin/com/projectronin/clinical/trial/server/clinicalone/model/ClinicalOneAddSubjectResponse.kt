@@ -3,8 +3,7 @@ package com.projectronin.clinical.trial.server.clinicalone.model
 data class ClinicalOneAddSubjectResponse(
     val status: String? = null,
     val result: ClinicalOneAddSubjectResponseResult? = null,
-    val errorData: String? = null
-
+    val errorData: String? = null,
 ) {
     data class ClinicalOneAddSubjectResponseResult(
         val screeningDate: String? = null,
@@ -29,6 +28,6 @@ data class ClinicalOneAddSubjectResponse(
         val gender: String? = null,
         val reason: String? = null,
         val comment: String? = null,
-        val studyVersion: String? = null
+        val studyVersion: String? = null,
     )
 }

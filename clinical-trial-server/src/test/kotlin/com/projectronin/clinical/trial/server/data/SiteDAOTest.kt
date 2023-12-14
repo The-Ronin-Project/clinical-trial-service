@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test
 
 @LiquibaseTest(changeLog = "clinicaltrial/db/changelog/clinicaltrial.db.changelog-master.yaml")
 class SiteDAOTest {
-
     @DBRiderConnection
     lateinit var connectionHolder: ConnectionHolder
 
@@ -26,7 +25,7 @@ class SiteDAOTest {
             SiteDO {
                 siteId = "siteId"
                 roninTenantMnemonic = "ronincer"
-            }
+            },
         )
     }
 

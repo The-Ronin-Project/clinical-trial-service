@@ -27,21 +27,25 @@ class ClinicalOneClient(
     private val httpClient: HttpClient,
     @Value("\${clinicalone.base.url}")
     private val clinicalOneBaseUrl: String,
-    private val authenticationBroker: ClinicalOneAuthenticationBroker
+    private val authenticationBroker: ClinicalOneAuthenticationBroker,
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getSubjectId(siteId: String, studyId: String): String {
+    fun getSubjectId(
+        siteId: String,
+        studyId: String,
+    ): String {
         logger.info { "Retrieving subject id from ClinicalOne based on site: $siteId and study: $studyId" }
 
         val authentication = authenticationBroker.getAuthentication()
         val clinicalOneSubjectUrl = "$clinicalOneBaseUrl/studies/$studyId/test/subjects"
-        val requestBody = ClinicalOneAddSubjectPayload(
-            ClinicalOneAddSubjectPayload.ClinicalOneAddSubjectInnerPayload(
-                siteId = siteId,
-                studyId = studyId
+        val requestBody =
+            ClinicalOneAddSubjectPayload(
+                ClinicalOneAddSubjectPayload.ClinicalOneAddSubjectInnerPayload(
+                    siteId = siteId,
+                    studyId = studyId,
+                ),
             )
-        )
         logger.info { "Auth: ${authentication.tokenType} ${authentication.accessToken}" }
         return runBlocking {
             val response: HttpResponse =
@@ -50,7 +54,7 @@ class ClinicalOneClient(
                         headers {
                             append(
                                 HttpHeaders.Authorization,
-                                "${authentication.tokenType} ${authentication.accessToken}"
+                                "${authentication.tokenType} ${authentication.accessToken}",
                             )
                         }
                         contentType(ContentType.Application.Json)

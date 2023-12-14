@@ -19,7 +19,6 @@ import java.util.UUID
 
 @Repository
 class SubjectStatusDAO(private val database: Database) {
-
     /**
      * Retrieves list of all [SubjectStatusDO]s
      */
@@ -52,7 +51,10 @@ class SubjectStatusDAO(private val database: Database) {
     /**
      * Retrieves list of [SubjectStatusDO]s for a StudySite [UUID] and a list of SubjectStatus values
      */
-    fun getSubjectStatusByStudySiteAndStatus(studySiteId: UUID, statuses: List<SubjectStatus>): List<SubjectStatusDO> {
+    fun getSubjectStatusByStudySiteAndStatus(
+        studySiteId: UUID,
+        statuses: List<SubjectStatus>,
+    ): List<SubjectStatusDO> {
         return database.from(SubjectStatusDOs).select()
             .where {
                 (SubjectStatusDOs.status inList statuses) and (SubjectStatusDOs.studySiteId eq studySiteId)
@@ -76,11 +78,16 @@ class SubjectStatusDAO(private val database: Database) {
     /**
      * Update Subject Status, automatically update the updatedDateTime on the record
      */
-    fun updateSubjectStatus(studySiteId: UUID, subjectId: String, updateFunction: (SubjectStatusDO) -> Unit): SubjectStatusDO? {
-        val subjectStatus = database.from(SubjectStatusDOs)
-            .select()
-            .where { (SubjectStatusDOs.subjectId eq subjectId) and (SubjectStatusDOs.studySiteId eq studySiteId) }
-            .map { SubjectStatusDOs.createEntity(it) }.singleOrNull()
+    fun updateSubjectStatus(
+        studySiteId: UUID,
+        subjectId: String,
+        updateFunction: (SubjectStatusDO) -> Unit,
+    ): SubjectStatusDO? {
+        val subjectStatus =
+            database.from(SubjectStatusDOs)
+                .select()
+                .where { (SubjectStatusDOs.subjectId eq subjectId) and (SubjectStatusDOs.studySiteId eq studySiteId) }
+                .map { SubjectStatusDOs.createEntity(it) }.singleOrNull()
 
         subjectStatus?.let {
             updateFunction(subjectStatus)

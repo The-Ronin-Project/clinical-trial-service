@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class PatientDAO(private val resourceDatabase: ClinicalTrialDataAuthorityDatabase) {
-
     val collection = resourceDatabase.createCollection(Patient::class.java)
 
     fun getAll(): List<Patient> {

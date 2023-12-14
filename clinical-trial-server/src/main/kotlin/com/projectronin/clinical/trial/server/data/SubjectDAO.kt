@@ -17,7 +17,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 class SubjectDAO(private val database: Database) {
-
     /**
      * get all subjects
      */

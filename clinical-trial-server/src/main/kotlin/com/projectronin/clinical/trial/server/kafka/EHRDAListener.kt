@@ -16,9 +16,8 @@ class EHRDAListener(
     private val subjectService: SubjectService,
     private val patientTransformer: RCDMPatientToCTDMObservations,
     private val observationTransformer: RCDMObservationToCTDMObservation,
-    private val observationDAO: ObservationDAO
+    private val observationDAO: ObservationDAO,
 ) {
-
     private val tenants = listOf("ronin", "ronincer", "ggwadc8y") // TODO: swap this with a call to the tenant service
 
     @KafkaListener(topics = ["oci.us-phoenix-1.ehr-data-authority.observation.v1"], groupId = "clinical-trial-service")
@@ -26,7 +25,8 @@ class EHRDAListener(
         val observation = message.data
         observation.subject?.decomposedId()?.let { patientFhirId ->
             if (checkTenantAndPatient(patientFhirId)) {
-                val ctdmObservation = observationTransformer.rcdmObservationToCTDMObservation(patientFhirId, observation)
+                val ctdmObservation =
+                    observationTransformer.rcdmObservationToCTDMObservation(patientFhirId, observation)
                 if (ctdmObservation != null) {
                     KotlinLogging.logger { }.info { "Observation ${observation.id?.value} added" }
                     observationDAO.update(ctdmObservation)

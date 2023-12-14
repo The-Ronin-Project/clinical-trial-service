@@ -23,50 +23,57 @@ import org.junit.jupiter.api.assertThrows
 
 class ClinicalTrialClientTest {
     private val authenticationToken = "12345678"
-    private val authenticationService = mockk<ClinicalTrialAuthenticationService> {
-        every { getAuthentication() } returns mockk {
-            every { accessToken } returns authenticationToken
+    private val authenticationService =
+        mockk<ClinicalTrialAuthenticationService> {
+            every { getAuthentication() } returns
+                mockk {
+                    every { accessToken } returns authenticationToken
+                }
         }
-    }
-    private val client: HttpClient = HttpClient(OkHttp) {
-        install(ContentNegotiation) {
-            jackson {
-                JacksonManager.setUpMapper(this)
+    private val client: HttpClient =
+        HttpClient(OkHttp) {
+            install(ContentNegotiation) {
+                jackson {
+                    JacksonManager.setUpMapper(this)
+                }
             }
+            install(ContentLengthSupplier)
         }
-        install(ContentLengthSupplier)
-    }
 
     @Test
     fun `createSubject works`() {
-        val subject = Subject(
-            roninFhirId = "tenant-fhirid",
-            siteId = "siteid",
-            studyId = "studyId"
-        )
+        val subject =
+            Subject(
+                roninFhirId = "tenant-fhirid",
+                siteId = "siteid",
+                studyId = "studyId",
+            )
 
-        val subjectReturned = Subject(
-            id = "newid",
-            roninFhirId = "tenant-fhirid",
-            siteId = "siteid",
-            status = "ACTIVE",
-            studyId = "studyId"
-        )
+        val subjectReturned =
+            Subject(
+                id = "newid",
+                roninFhirId = "tenant-fhirid",
+                siteId = "siteid",
+                status = "ACTIVE",
+                studyId = "studyId",
+            )
 
         val mockWebServer = MockWebServer()
         mockWebServer.enqueue(
             MockResponse()
                 .setResponseCode(HttpStatusCode.OK.value)
                 .setBody(JacksonManager.objectMapper.writeValueAsString(subjectReturned))
-                .setHeader("Content-Type", "application/json")
+                .setHeader("Content-Type", "application/json"),
         )
 
         val url = mockWebServer.url("/test")
-        val response = runBlocking {
-            val subjectToReturn = ClinicalTrialClient(url.toString(), client, authenticationService)
-                .createSubject(subject)
-            subjectToReturn
-        }
+        val response =
+            runBlocking {
+                val subjectToReturn =
+                    ClinicalTrialClient(url.toString(), client, authenticationService)
+                        .createSubject(subject)
+                subjectToReturn
+            }
 
         assertEquals(subjectReturned.id, response.id)
         assertEquals(subjectReturned.roninFhirId, response.roninFhirId)
@@ -81,26 +88,28 @@ class ClinicalTrialClientTest {
 
     @Test
     fun `createSubject fails`() {
-        val subject = Subject(
-            roninFhirId = "tenant-fhirid",
-            siteId = "siteid",
-            studyId = "studyId"
-        )
+        val subject =
+            Subject(
+                roninFhirId = "tenant-fhirid",
+                siteId = "siteid",
+                studyId = "studyId",
+            )
 
         val mockWebServer = MockWebServer()
         mockWebServer.enqueue(
             MockResponse()
                 .setResponseCode(HttpStatusCode.BadRequest.value)
-                .setHeader("Content-Type", "application/json")
+                .setHeader("Content-Type", "application/json"),
         )
 
         val url = mockWebServer.url("/test")
-        val exception = assertThrows<ClientFailureException> {
-            runBlocking {
-                ClinicalTrialClient(url.toString(), client, authenticationService)
-                    .createSubject(subject)
+        val exception =
+            assertThrows<ClientFailureException> {
+                runBlocking {
+                    ClinicalTrialClient(url.toString(), client, authenticationService)
+                        .createSubject(subject)
+                }
             }
-        }
 
         assertNotNull(exception.message)
         exception.message?.let { Assertions.assertTrue(it.contains("400")) }
@@ -112,28 +121,31 @@ class ClinicalTrialClientTest {
 
     @Test
     fun `getSubjects works with default or false activeIdsOnly`() {
-        val subjectReturned = Subject(
-            id = "newid",
-            roninFhirId = "tenant-fhirid",
-            siteId = "siteid",
-            status = "ACTIVE",
-            studyId = "studyId"
-        )
+        val subjectReturned =
+            Subject(
+                id = "newid",
+                roninFhirId = "tenant-fhirid",
+                siteId = "siteid",
+                status = "ACTIVE",
+                studyId = "studyId",
+            )
 
         val mockWebServer = MockWebServer()
         mockWebServer.enqueue(
             MockResponse()
                 .setResponseCode(HttpStatusCode.OK.value)
                 .setBody(JacksonManager.objectMapper.writeValueAsString(listOf(subjectReturned)))
-                .setHeader("Content-Type", "application/json")
+                .setHeader("Content-Type", "application/json"),
         )
 
         val url = mockWebServer.url("/test")
-        val response = runBlocking {
-            val subjectsToReturn = ClinicalTrialClient(url.toString(), client, authenticationService)
-                .getSubjects()
-            subjectsToReturn
-        }
+        val response =
+            runBlocking {
+                val subjectsToReturn =
+                    ClinicalTrialClient(url.toString(), client, authenticationService)
+                        .getSubjects()
+                subjectsToReturn
+            }
         val returnedSubjects = response as List<Subject>
         assertEquals(1, returnedSubjects.size)
         assertEquals(subjectReturned.id, returnedSubjects[0].id)
@@ -149,28 +161,31 @@ class ClinicalTrialClientTest {
 
     @Test
     fun `getSubjects works with true activeIdsOnly`() {
-        val subjectReturned = Subject(
-            id = "newid",
-            roninFhirId = "tenant-fhirid",
-            siteId = "siteid",
-            status = "ACTIVE",
-            studyId = "studyId"
-        )
+        val subjectReturned =
+            Subject(
+                id = "newid",
+                roninFhirId = "tenant-fhirid",
+                siteId = "siteid",
+                status = "ACTIVE",
+                studyId = "studyId",
+            )
 
         val mockWebServer = MockWebServer()
         mockWebServer.enqueue(
             MockResponse()
                 .setResponseCode(HttpStatusCode.OK.value)
                 .setBody(JacksonManager.objectMapper.writeValueAsString(listOf(subjectReturned)))
-                .setHeader("Content-Type", "application/json")
+                .setHeader("Content-Type", "application/json"),
         )
 
         val url = mockWebServer.url("/test")
-        val response = runBlocking {
-            val subjectsToReturn = ClinicalTrialClient(url.toString(), client, authenticationService)
-                .getSubjects(true)
-            subjectsToReturn
-        }
+        val response =
+            runBlocking {
+                val subjectsToReturn =
+                    ClinicalTrialClient(url.toString(), client, authenticationService)
+                        .getSubjects(true)
+                subjectsToReturn
+            }
         val returnedSubjects = response as List<Subject>
         assertEquals(1, returnedSubjects.size)
         assertEquals(subjectReturned.id, returnedSubjects[0].id)
@@ -190,16 +205,17 @@ class ClinicalTrialClientTest {
         mockWebServer.enqueue(
             MockResponse()
                 .setResponseCode(HttpStatusCode.BadRequest.value)
-                .setHeader("Content-Type", "application/json")
+                .setHeader("Content-Type", "application/json"),
         )
 
         val url = mockWebServer.url("/test")
-        val exception = assertThrows<ClientFailureException> {
-            runBlocking {
-                ClinicalTrialClient(url.toString(), client, authenticationService)
-                    .getSubjects()
+        val exception =
+            assertThrows<ClientFailureException> {
+                runBlocking {
+                    ClinicalTrialClient(url.toString(), client, authenticationService)
+                        .getSubjects()
+                }
             }
-        }
 
         assertNotNull(exception.message)
         exception.message?.let { Assertions.assertTrue(it.contains("400")) }
@@ -215,16 +231,17 @@ class ClinicalTrialClientTest {
         mockWebServer.enqueue(
             MockResponse()
                 .setResponseCode(HttpStatusCode.BadRequest.value)
-                .setHeader("Content-Type", "application/json")
+                .setHeader("Content-Type", "application/json"),
         )
 
         val url = mockWebServer.url("/test")
-        val exception = assertThrows<ClientFailureException> {
-            runBlocking {
-                ClinicalTrialClient(url.toString(), client, authenticationService)
-                    .getSubjects(true)
+        val exception =
+            assertThrows<ClientFailureException> {
+                runBlocking {
+                    ClinicalTrialClient(url.toString(), client, authenticationService)
+                        .getSubjects(true)
+                }
             }
-        }
 
         assertNotNull(exception.message)
         exception.message?.let { Assertions.assertTrue(it.contains("400")) }

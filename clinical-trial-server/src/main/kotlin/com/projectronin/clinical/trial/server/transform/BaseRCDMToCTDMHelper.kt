@@ -1,7 +1,6 @@
 package com.projectronin.clinical.trial.server.transform
 
 import com.projectronin.interop.fhir.generators.datatypes.DynamicValues
-import com.projectronin.interop.fhir.generators.datatypes.coding
 import com.projectronin.interop.fhir.r4.CodeSystem
 import com.projectronin.interop.fhir.r4.datatype.CodeableConcept
 import com.projectronin.interop.fhir.r4.datatype.Coding
@@ -17,46 +16,52 @@ import java.time.ZoneOffset
 
 @Component
 class BaseRCDMToCTDMHelper(
-    private val dataDictionaryService: DataDictionaryService
+    private val dataDictionaryService: DataDictionaryService,
 ) {
     fun setProfileMeta(displayValue: String): Meta? {
         dataDictionaryService.getValueSetUuidVersionByDisplay(displayValue)?.let {
             return Meta(
                 profile = listOf(Canonical("https://projectronin.io/fhir/StructureDefinition/CTDM-Observation")),
-                tag = listOf(
-                    Coding(
-                        system = Uri(it.first),
-                        display = displayValue.asFHIR(),
-                        version = it.second.asFHIR()
-                    )
-                )
+                tag =
+                    listOf(
+                        Coding(
+                            system = Uri(it.first),
+                            display = displayValue.asFHIR(),
+                            version = it.second.asFHIR(),
+                        ),
+                    ),
             )
         }
         return null
     }
 }
+
 fun setCTDMExtensions(subjectId: String): List<Extension> {
     return listOf(
         Extension(
             url = Uri("https://projectronin.io/fhir/StructureDefinition/subjectId"),
-            value = DynamicValues.string(subjectId)
+            value = DynamicValues.string(subjectId),
         ),
         Extension(
             url = Uri("https://projectronin.io/fhir/StructureDefinition/DataTransformTimestamp"),
-            value = DynamicValues.dateTime(OffsetDateTime.now(ZoneOffset.UTC).toString())
-        )
+            value = DynamicValues.dateTime(OffsetDateTime.now(ZoneOffset.UTC).toString()),
+        ),
     )
 }
 
-fun setMetaCode(codeString: String, displayString: String): CodeableConcept {
+fun setMetaCode(
+    codeString: String,
+    displayString: String,
+): CodeableConcept {
     return CodeableConcept(
-        coding = listOf(
-            Coding(
-                system = CodeSystem.LOINC.uri,
-                version = "2.76".asFHIR(),
-                code = Code(codeString),
-                display = displayString.asFHIR()
-            )
-        )
+        coding =
+            listOf(
+                Coding(
+                    system = CodeSystem.LOINC.uri,
+                    version = "2.76".asFHIR(),
+                    code = Code(codeString),
+                    display = displayString.asFHIR(),
+                ),
+            ),
     )
 }

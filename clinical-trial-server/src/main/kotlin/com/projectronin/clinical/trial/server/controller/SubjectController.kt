@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("subjects")
 class SubjectController(
     val subjectService: SubjectService,
-    val dataLoadEventProducer: DataLoadEventProducer
+    val dataLoadEventProducer: DataLoadEventProducer,
 ) {
     /**
      * Get Subjects from the clinical trial service.
@@ -30,15 +30,16 @@ class SubjectController(
     @GetMapping
     @PreAuthorize("hasAuthority('SCOPE_read:subject')")
     fun retrieve(
-        @RequestParam activeIdsOnly: Boolean = false
+        @RequestParam activeIdsOnly: Boolean = false,
     ): ResponseEntity<List<Subject>> {
-        val subjects = if (activeIdsOnly) {
-            subjectService.getActiveFhirIds().map {
-                Subject(roninFhirId = it)
+        val subjects =
+            if (activeIdsOnly) {
+                subjectService.getActiveFhirIds().map {
+                    Subject(roninFhirId = it)
+                }
+            } else {
+                emptyList()
             }
-        } else {
-            emptyList()
-        }
 
         return if (subjects.isNotEmpty()) {
             ResponseEntity.ok(subjects)
@@ -51,7 +52,7 @@ class SubjectController(
     @PreAuthorize("hasAuthority('SCOPE_write:subject')")
     @CrossOrigin(origins = ["\${cors.ronin.frontend}"], maxAge = 1800)
     fun create(
-        @RequestBody subject: Subject
+        @RequestBody subject: Subject,
     ): ResponseEntity<Subject> {
         subjectService.createSubject(subject)?.let {
             dataLoadEventProducer.producePatientResourceRequest(it.roninFhirId, it.roninFhirId.split("-").first())

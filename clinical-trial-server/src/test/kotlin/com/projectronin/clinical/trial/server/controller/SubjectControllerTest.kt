@@ -14,40 +14,45 @@ import org.springframework.http.HttpStatus
 
 class SubjectControllerTest {
     private var subjectService = mockk<SubjectService>()
-    private var dataLoadEventProducer = mockk<DataLoadEventProducer> {
-        every { producePatientResourceRequest(any(), any()) } just Runs
-    }
+    private var dataLoadEventProducer =
+        mockk<DataLoadEventProducer> {
+            every { producePatientResourceRequest(any(), any()) } just Runs
+        }
     private var subjectController = SubjectController(subjectService, dataLoadEventProducer)
 
-    private val expectedPatientIds = listOf(
-        "tenant-patientId1",
-        "tenant-patientId2",
-        "tenant-patientId3"
-    )
+    private val expectedPatientIds =
+        listOf(
+            "tenant-patientId1",
+            "tenant-patientId2",
+            "tenant-patientId3",
+        )
     private val subjectStatuses = listOf("ACTIVE", "WITHDRAWN")
 
-    private val expectedActiveSubjects = listOf(
-        Subject(roninFhirId = "${expectedPatientIds[0]}"),
-        Subject(roninFhirId = "${expectedPatientIds[1]}"),
-        Subject(roninFhirId = "${expectedPatientIds[2]}")
-    )
+    private val expectedActiveSubjects =
+        listOf(
+            Subject(roninFhirId = "${expectedPatientIds[0]}"),
+            Subject(roninFhirId = "${expectedPatientIds[1]}"),
+            Subject(roninFhirId = "${expectedPatientIds[2]}"),
+        )
 
     private val subjectFhirID = "tenant-patientFhirId"
-    private val subjectToCreate = Subject(
-        id = "",
-        roninFhirId = "$subjectFhirID",
-        siteId = "siteId",
-        status = "ACTIVE",
-        studyId = "UUID"
-    )
+    private val subjectToCreate =
+        Subject(
+            id = "",
+            roninFhirId = "$subjectFhirID",
+            siteId = "siteId",
+            status = "ACTIVE",
+            studyId = "UUID",
+        )
 
-    private val createdSubject = Subject(
-        id = "subjectId",
-        roninFhirId = "tenant-patientFhirId",
-        siteId = "siteId",
-        status = "ACTIVE",
-        studyId = "UUID"
-    )
+    private val createdSubject =
+        Subject(
+            id = "subjectId",
+            roninFhirId = "tenant-patientFhirId",
+            siteId = "siteId",
+            status = "ACTIVE",
+            studyId = "UUID",
+        )
 
     @Test
     fun `get returns active subjects - list is empty`() {

@@ -13,7 +13,6 @@ import javax.sql.DataSource
 @Configuration
 @Import(HttpSpringConfig::class, OCIClient::class)
 class ClinicalTrialServerConfig {
-
     /**
      * The database!
      */
@@ -26,7 +25,6 @@ class ClinicalTrialServerConfig {
         @Value("#{environment.CONEDA_DB_PORT}") port: String,
         @Value("#{environment.CONEDA_DB_NAME}") name: String,
         @Value("#{environment.CONEDA_DB_USER}") user: String,
-        @Value("#{environment.CONEDA_DB_PASS}") pass: String
-    ): XDevConfig =
-        XDevConfig(host, port, name, user, pass)
+        @Value("#{environment.CONEDA_DB_PASS}") pass: String,
+    ): XDevConfig = XDevConfig(host, port, name, user, pass)
 }

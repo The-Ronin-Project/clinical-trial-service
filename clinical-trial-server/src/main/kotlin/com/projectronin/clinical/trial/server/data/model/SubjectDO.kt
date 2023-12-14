@@ -4,6 +4,7 @@ import org.ktorm.entity.Entity
 
 interface SubjectDO : Entity<SubjectDO> {
     companion object : Entity.Factory<SubjectDO>()
+
     var subjectId: String
     var roninPatientId: String
 }

@@ -17,11 +17,14 @@ class SubjectService(
     val clinicalOneClient: ClinicalOneClient,
     val studySiteDAO: StudySiteDAO,
     val subjectDAO: SubjectDAO,
-    val subjectStatusDAO: SubjectStatusDAO
+    val subjectStatusDAO: SubjectStatusDAO,
 ) {
-    fun getSubjectStatus(subjectId: String, studySiteId: UUID): SubjectStatusDO? {
+    fun getSubjectStatus(
+        subjectId: String,
+        studySiteId: UUID,
+    ): SubjectStatusDO? {
         return subjectStatusDAO.getSubjectStatusBySubjectId(
-            subjectId
+            subjectId,
         ).filter { it.studySiteId == studySiteId }.firstOrNull()
     }
 
@@ -36,7 +39,7 @@ class SubjectService(
     fun createSubject(subject: Subject): Subject? =
         getStudySiteByStudyIdAndSiteId(
             subject.studyId,
-            subject.siteId
+            subject.siteId,
         )?.let { studySite ->
             subjectDAO.getSubjectByFhirId(subject.roninFhirId)?.let {
                 updateSubjectStatus(it, studySite.studySiteId, SubjectStatus.ACTIVE)
@@ -51,41 +54,54 @@ class SubjectService(
             newSubject
         }
 
-    fun updateSubjectStatus(subject: Subject, studySiteId: UUID, subjectStatus: SubjectStatus) {
+    fun updateSubjectStatus(
+        subject: Subject,
+        studySiteId: UUID,
+        subjectStatus: SubjectStatus,
+    ) {
         subjectStatusDAO.updateSubjectStatus(
             studySiteId,
-            subject.id
+            subject.id,
         ) {
             it.status = subjectStatus
         }
     }
 
-    fun getFhirIdsByStatuses(status: List<SubjectStatus>): Set<String> =
-        subjectDAO.getFhirIdsByStatus(status)
+    fun getFhirIdsByStatuses(status: List<SubjectStatus>): Set<String> = subjectDAO.getFhirIdsByStatus(status)
 
-    fun getActiveFhirIds(): Set<String> =
-        getFhirIdsByStatuses(listOf(SubjectStatus.ACTIVE, SubjectStatus.ENROLLED))
+    fun getActiveFhirIds(): Set<String> = getFhirIdsByStatuses(listOf(SubjectStatus.ACTIVE, SubjectStatus.ENROLLED))
 
-    fun insertSubjectStatus(subjectId: String, studySiteId: UUID, subjectStatus: SubjectStatus) {
+    fun insertSubjectStatus(
+        subjectId: String,
+        studySiteId: UUID,
+        subjectStatus: SubjectStatus,
+    ) {
         val subjectStatusDO = SubjectStatusDO()
         subjectStatusDO["studySiteId"] = studySiteId
         subjectStatusDO["subjectId"] = subjectId
         subjectStatusDO["status"] = subjectStatus
         subjectStatusDAO.insertSubjectStatus(
-            subjectStatusDO
+            subjectStatusDO,
         )
     }
 
-    fun updateSubjectStatus(subjectId: String, studySiteId: UUID, subjectStatus: SubjectStatus): SubjectStatusDO? {
+    fun updateSubjectStatus(
+        subjectId: String,
+        studySiteId: UUID,
+        subjectStatus: SubjectStatus,
+    ): SubjectStatusDO? {
         return subjectStatusDAO.updateSubjectStatus(
             studySiteId,
-            subjectId
+            subjectId,
         ) {
             it.status = subjectStatus
         }
     }
 
-    fun getStudySiteByStudyIdAndSiteId(studyId: String, siteId: String): StudySiteDO? {
+    fun getStudySiteByStudyIdAndSiteId(
+        studyId: String,
+        siteId: String,
+    ): StudySiteDO? {
         return studySiteDAO.getStudySiteByStudyIdAndSiteId(studyId, siteId)
     }
 

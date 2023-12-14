@@ -16,7 +16,6 @@ import java.util.UUID
 
 @Repository
 class StudySiteDAO(private val database: Database) {
-
     /**
      * Insert a [StudySiteDO], returns generated [UUID]
      */
@@ -51,7 +50,10 @@ class StudySiteDAO(private val database: Database) {
      * Retrieves one [StudySiteDO] based on study and site Ids
      */
 
-    fun getStudySiteByStudyIdAndSiteId(studyId: String, siteId: String): StudySiteDO? {
+    fun getStudySiteByStudyIdAndSiteId(
+        studyId: String,
+        siteId: String,
+    ): StudySiteDO? {
         return database.from(StudySiteDOs)
             .select()
             .where(StudySiteDOs.siteId eq siteId)

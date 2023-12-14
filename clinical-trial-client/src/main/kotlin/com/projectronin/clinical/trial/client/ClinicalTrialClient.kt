@@ -24,7 +24,7 @@ class ClinicalTrialClient(
     @Value("\${clinicaltrial.url}")
     private val hostUrl: String,
     private val client: HttpClient,
-    private val authenticationService: ClinicalTrialAuthenticationService
+    private val authenticationService: ClinicalTrialAuthenticationService,
 ) {
     private val serverName = "Clinical Trial Service"
 
@@ -33,16 +33,17 @@ class ClinicalTrialClient(
             val subjectUrl = "$hostUrl/subjects"
             val authentication = authenticationService.getAuthentication()
 
-            val response: HttpResponse = client.request(serverName, subjectUrl) { url ->
-                get(url) {
-                    headers {
-                        append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+            val response: HttpResponse =
+                client.request(serverName, subjectUrl) { url ->
+                    get(url) {
+                        headers {
+                            append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                        }
+                        accept(ContentType.Application.Json)
+                        contentType(ContentType.Application.Json)
+                        url { parameters.append("activeIdsOnly", activeIdsOnly.toString()) }
                     }
-                    accept(ContentType.Application.Json)
-                    contentType(ContentType.Application.Json)
-                    url { parameters.append("activeIdsOnly", activeIdsOnly.toString()) }
                 }
-            }
 
             response.body()
         }.fold(
@@ -53,7 +54,7 @@ class ClinicalTrialClient(
                 } else {
                     throw it
                 }
-            }
+            },
         )
     }
 
@@ -62,22 +63,23 @@ class ClinicalTrialClient(
             val subjectUrl = "$hostUrl/subjects"
             val authentication = authenticationService.getAuthentication()
 
-            val response: HttpResponse = client.request(serverName, subjectUrl) { url ->
-                post(url) {
-                    headers {
-                        append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+            val response: HttpResponse =
+                client.request(serverName, subjectUrl) { url ->
+                    post(url) {
+                        headers {
+                            append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                        }
+                        accept(ContentType.Application.Json)
+                        contentType(ContentType.Application.Json)
+                        setBody(subject)
                     }
-                    accept(ContentType.Application.Json)
-                    contentType(ContentType.Application.Json)
-                    setBody(subject)
                 }
-            }
             response.body()
         }.fold(
             onSuccess = { it },
             onFailure = {
                 throw it
-            }
+            },
         )
     }
 }

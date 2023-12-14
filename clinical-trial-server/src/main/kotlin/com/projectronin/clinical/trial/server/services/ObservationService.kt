@@ -7,9 +7,14 @@ import java.time.ZonedDateTime
 
 @Service
 class ObservationService(
-    val observationDAO: ObservationDAO
+    val observationDAO: ObservationDAO,
 ) {
-    fun getObservations(subjectId: String, types: List<String>, fromDate: ZonedDateTime, toDate: ZonedDateTime): List<Observation> {
+    fun getObservations(
+        subjectId: String,
+        types: List<String>,
+        fromDate: ZonedDateTime,
+        toDate: ZonedDateTime,
+    ): List<Observation> {
         return observationDAO.search(subjectId, types, fromDate, toDate)
     }
 

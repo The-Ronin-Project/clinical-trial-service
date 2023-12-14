@@ -11,23 +11,26 @@ import java.time.format.DateTimeFormatterBuilder
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoField
 
-val possibleFormats = listOf(
-    "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
-    "yyyy-MM-dd'T'HH:mm:ss.SSSX",
-    "yyyy-MM-dd'T'HH:mm:ssXXX",
-    "yyyy-MM-dd'T'HH:mm:ssX",
-    "yyyy-MM-dd'T'HH:mm:ss",
-    "yyyy-MM-dd'T'HH:mm",
-    "yyyy-MM-dd",
-    "yyyy-MM",
-    "yyyy"
-)
+val possibleFormats =
+    listOf(
+        "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+        "yyyy-MM-dd'T'HH:mm:ss.SSSX",
+        "yyyy-MM-dd'T'HH:mm:ssXXX",
+        "yyyy-MM-dd'T'HH:mm:ssX",
+        "yyyy-MM-dd'T'HH:mm:ss",
+        "yyyy-MM-dd'T'HH:mm",
+        "yyyy-MM-dd",
+        "yyyy-MM",
+        "yyyy",
+    )
 
-val formatter = DateTimeFormatterBuilder()
-    .append(DateTimeFormatter.ofPattern(possibleFormats.joinToString(separator = "") { "[$it]" }))
-    .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
-    .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
-    .toFormatter()
+val formatter =
+    DateTimeFormatterBuilder()
+        .append(DateTimeFormatter.ofPattern(possibleFormats.joinToString(separator = "") { "[$it]" }))
+        .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+        .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+        .toFormatter()
+
 fun parseFhirDateTime(fhirDateTime: String): ZonedDateTime? {
     return try {
         ZonedDateTime.parse(fhirDateTime, formatter)

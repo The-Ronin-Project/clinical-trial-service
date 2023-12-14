@@ -21,12 +21,13 @@ class SubjectServiceTest {
     private var subjectDAO = mockk<SubjectDAO>()
     private var subjectStatusDAO = mockk<SubjectStatusDAO>()
     private var studySiteDAO = mockk<StudySiteDAO>()
-    private var subjectService = SubjectService(
-        clinicalOneClient,
-        studySiteDAO,
-        subjectDAO,
-        subjectStatusDAO
-    )
+    private var subjectService =
+        SubjectService(
+            clinicalOneClient,
+            studySiteDAO,
+            subjectDAO,
+            subjectStatusDAO,
+        )
 
     private val subjectId = "subjectId"
     private val siteId = "siteId"
@@ -37,26 +38,29 @@ class SubjectServiceTest {
     private val studySiteId2 = UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5771")
     private val studySiteId = UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770")
 
-    private val subject = Subject(
-        roninFhirId = roninFhirId,
-        siteId = siteId,
-        status = status,
-        studyId = studyId
-    )
+    private val subject =
+        Subject(
+            roninFhirId = roninFhirId,
+            siteId = siteId,
+            status = status,
+            studyId = studyId,
+        )
 
     private val expectedSubjectId = "subjectId"
-    private val expectedSubject = Subject(
-        id = expectedSubjectId,
-        roninFhirId = roninFhirId,
-        siteId = siteId,
-        status = status,
-        studyId = studyId
-    )
+    private val expectedSubject =
+        Subject(
+            id = expectedSubjectId,
+            roninFhirId = roninFhirId,
+            siteId = siteId,
+            status = status,
+            studyId = studyId,
+        )
 
-    private val studySiteDO: StudySiteDO = StudySiteDO {
-        siteId = this@SubjectServiceTest.siteId
-        studyId = this@SubjectServiceTest.studyId
-    }
+    private val studySiteDO: StudySiteDO =
+        StudySiteDO {
+            siteId = this@SubjectServiceTest.siteId
+            studyId = this@SubjectServiceTest.studyId
+        }
 
     @Test
     fun `get - SubjectStatus does exist`() {
@@ -136,7 +140,7 @@ class SubjectServiceTest {
                     studySiteId = studySiteDO.studySiteId
                     subjectId = expectedSubjectId
                     status = SubjectStatus.ACTIVE
-                }
+                },
             )
         } returns Pair(studySiteId, "")
         val actualSubject = subjectService.createSubject(subject)

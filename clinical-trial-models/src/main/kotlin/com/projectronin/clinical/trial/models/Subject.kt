@@ -5,5 +5,5 @@ data class Subject(
     val roninFhirId: String,
     val siteId: String = "",
     val status: String = "",
-    val studyId: String = ""
+    val studyId: String = "",
 )

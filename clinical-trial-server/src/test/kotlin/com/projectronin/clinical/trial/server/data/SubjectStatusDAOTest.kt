@@ -16,7 +16,6 @@ import java.util.UUID
 
 @LiquibaseTest(changeLog = "clinicaltrial/db/changelog/clinicaltrial.db.changelog-master.yaml")
 class SubjectStatusDAOTest {
-
     @DBRiderConnection
     lateinit var connectionHolder: ConnectionHolder
 
@@ -32,7 +31,7 @@ class SubjectStatusDAOTest {
                 studySiteId = UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770")
                 subjectId = "subjectId"
                 status = SubjectStatus.ACTIVE
-            }
+            },
         )
     }
 
@@ -41,9 +40,10 @@ class SubjectStatusDAOTest {
     @Test
     fun `update Subject Status`() {
         val studysite = UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770")
-        val updated = subjectStatusDAO.updateSubjectStatus(studysite, "subjectId") {
-            it.status = SubjectStatus.WITHDRAWN
-        }
+        val updated =
+            subjectStatusDAO.updateSubjectStatus(studysite, "subjectId") {
+                it.status = SubjectStatus.WITHDRAWN
+            }
         assertEquals(updated!!.studySiteId, studysite)
         assertEquals(updated.status, SubjectStatus.WITHDRAWN)
     }
@@ -60,7 +60,15 @@ class SubjectStatusDAOTest {
     fun `get Subject Status by Subject ID`() {
         val subjectStatus = subjectStatusDAO.getSubjectStatusBySubjectId("subjectId6")
         assertEquals(subjectStatus.size, 2)
-        assertEquals(listOf(UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770"), UUID.fromString("9691d550-90f5-4fb8-83f9-e4a3840e37eb")), subjectStatus.map { it.studySiteId })
+        assertEquals(
+            listOf(
+                UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770"),
+                UUID.fromString("9691d550-90f5-4fb8-83f9-e4a3840e37eb"),
+            ),
+            subjectStatus.map {
+                it.studySiteId
+            },
+        )
     }
 
     @DataSet(value = ["/dbunit/subjectstatus/MultipleSubjectStatuses.yaml"], cleanAfter = true)
@@ -75,7 +83,11 @@ class SubjectStatusDAOTest {
     @Test
     fun `get Subject Status by study site and status`() {
         val status = listOf(SubjectStatus.ACTIVE, SubjectStatus.NEW, SubjectStatus.ENROLLED)
-        val subjectStatus = subjectStatusDAO.getSubjectStatusByStudySiteAndStatus(UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770"), status)
+        val subjectStatus =
+            subjectStatusDAO.getSubjectStatusByStudySiteAndStatus(
+                UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770"),
+                status,
+            )
         assertEquals(subjectStatus.size, 3)
     }
 
@@ -88,7 +100,7 @@ class SubjectStatusDAOTest {
                     studySiteId = UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770")
                     subjectId = "subjectId"
                     status = SubjectStatus.NEW
-                }
+                },
             )
         }
     }

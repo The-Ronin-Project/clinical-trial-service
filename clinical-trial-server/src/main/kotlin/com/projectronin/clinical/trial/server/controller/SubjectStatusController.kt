@@ -15,16 +15,16 @@ import org.springframework.web.bind.annotation.RestController
 
 @JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy::class)
 data class UpdateStatusRequest(
-    val status: String
+    val status: String,
 )
 
 data class StatusResponse(
-    val message: String
+    val message: String,
 )
 
 @RestController
 class SubjectStatusController(
-    val subjectService: SubjectService
+    val subjectService: SubjectService,
 ) {
     // TODO: revisit scopes
     @GetMapping("studies/{studyId}/sites/{siteId}/subject/{subjectId}/status")
@@ -32,14 +32,16 @@ class SubjectStatusController(
     fun retrieve(
         @PathVariable studyId: String,
         @PathVariable siteId: String,
-        @PathVariable subjectId: String
+        @PathVariable subjectId: String,
     ): ResponseEntity<SubjectStatus> {
-        val studySite = subjectService.getStudySiteByStudyIdAndSiteId(studyId, siteId) ?: return ResponseEntity(
-            HttpStatus.NOT_FOUND
-        )
-        val subjectStatus = subjectService.getSubjectStatus(subjectId, studySite.studySiteId) ?: return ResponseEntity(
-            HttpStatus.NOT_FOUND
-        )
+        val studySite =
+            subjectService.getStudySiteByStudyIdAndSiteId(studyId, siteId) ?: return ResponseEntity(
+                HttpStatus.NOT_FOUND,
+            )
+        val subjectStatus =
+            subjectService.getSubjectStatus(subjectId, studySite.studySiteId) ?: return ResponseEntity(
+                HttpStatus.NOT_FOUND,
+            )
         return ResponseEntity(subjectStatus.status, HttpStatus.OK)
     }
 
@@ -50,21 +52,23 @@ class SubjectStatusController(
         @PathVariable studyId: String,
         @PathVariable siteId: String,
         @PathVariable subjectId: String,
-        @RequestBody request: UpdateStatusRequest
+        @RequestBody request: UpdateStatusRequest,
     ): ResponseEntity<StatusResponse> {
-        val status = request.status.let {
-            runCatching { SubjectStatus.valueOf(it) }.getOrNull()
-        } ?: return ResponseEntity(
-            StatusResponse("Status must be one of ${SubjectStatus.values().joinToString()}."),
-            HttpStatus.BAD_REQUEST
-        )
-        val studySite = subjectService.getStudySiteByStudyIdAndSiteId(studyId, siteId) ?: return ResponseEntity(
-            StatusResponse("No study found for ID $studyId at Site $siteId."),
-            HttpStatus.NOT_FOUND
-        )
+        val status =
+            request.status.let {
+                runCatching { SubjectStatus.valueOf(it) }.getOrNull()
+            } ?: return ResponseEntity(
+                StatusResponse("Status must be one of ${SubjectStatus.values().joinToString()}."),
+                HttpStatus.BAD_REQUEST,
+            )
+        val studySite =
+            subjectService.getStudySiteByStudyIdAndSiteId(studyId, siteId) ?: return ResponseEntity(
+                StatusResponse("No study found for ID $studyId at Site $siteId."),
+                HttpStatus.NOT_FOUND,
+            )
         subjectService.updateSubjectStatus(subjectId, studySite.studySiteId, status) ?: return ResponseEntity(
             StatusResponse("No subject $subjectId found in study $studyId at site $siteId"),
-            HttpStatus.NOT_FOUND
+            HttpStatus.NOT_FOUND,
         )
         return ResponseEntity(StatusResponse("Enrollment status updated successfully."), HttpStatus.OK)
     }
