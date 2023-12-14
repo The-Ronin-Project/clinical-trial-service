@@ -34,6 +34,7 @@ dependencies {
     runtimeOnly(project(":clinical-trial-liquibase"))
     runtimeOnly(libs.liquibase.core)
     runtimeOnly(libs.mysql.connector.java)
+    runtimeOnly(libs.logstash.logback.encoder)
 
     testImplementation(libs.interop.commonTestDb)
     testImplementation(libs.mockk)
