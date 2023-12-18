@@ -574,4 +574,29 @@ class RCDMObservationToCTDMObservationTest {
             }
         assertEquals("No subject found for Ronin FHIR Id: test-notfhirId", exception.message)
     }
+
+    @Test
+    fun `no subject reference`() {
+        val rcdmObservation =
+            rcdmObservationLaboratoryResult("test") {
+                code of
+                    codeableConcept {
+                        coding of
+                            listOf(
+                                coding {
+                                    system of "http://loinc.org"
+                                    code of Code("30313-1")
+                                    display of "Hemoglobin [Mass/volume] in Arterial blood"
+                                },
+                            )
+                    }
+            }
+        val observation =
+            RCDMObservationToCTDMObservation(
+                subjectDAO,
+                dataDictionaryService,
+                rcdmHelper,
+            ).rcdmObservationToCTDMObservation("test-fhirId", rcdmObservation.copy(subject = null))
+        assertNull(observation)
+    }
 }

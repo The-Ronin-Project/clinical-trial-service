@@ -1,6 +1,7 @@
 package com.projectronin.clinical.trial.server.transform
 
 import com.projectronin.clinical.trial.server.data.SubjectDAO
+import com.projectronin.interop.fhir.r4.datatype.Reference
 import com.projectronin.interop.fhir.r4.resource.Observation
 import org.springframework.stereotype.Component
 
@@ -35,6 +36,10 @@ class RCDMObservationToCTDMObservation(
                 contained = listOf(),
                 extension = setCTDMExtensions(ctdmSubject),
                 modifierExtension = listOf(),
+                subject =
+                    Reference(
+                        reference = rcdmObservation.subject!!.reference,
+                    ),
                 identifier = listOf(),
                 basedOn = listOf(),
                 partOf = listOf(),
