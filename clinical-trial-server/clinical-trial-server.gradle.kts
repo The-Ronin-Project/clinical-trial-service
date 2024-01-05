@@ -43,14 +43,14 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.testcontainers:mysql")
     testImplementation(libs.bundles.data.generators)
-    testImplementation(libs.interop.ehr.fhir.roninGenerators)
+    testImplementation(libs.interop.rcdm.fhir.roninGenerators)
     testImplementation(libs.ktor.client.mock)
 
     itImplementation(project(":clinical-trial-models"))
     itImplementation(project(":clinical-trial-client"))
     itImplementation(libs.interop.commonHttp)
     itImplementation(libs.interop.fhir)
-    itImplementation(libs.interop.ehr.fhir.roninGenerators)
+    itImplementation(libs.interop.rcdm.fhir.roninGenerators)
 
     itImplementation(libs.ronin.kafka)
     itImplementation(libs.ktorm.core)
