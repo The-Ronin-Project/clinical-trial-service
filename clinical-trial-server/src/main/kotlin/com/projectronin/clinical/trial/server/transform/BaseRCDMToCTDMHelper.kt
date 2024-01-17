@@ -1,13 +1,15 @@
 package com.projectronin.clinical.trial.server.transform
 
-import com.projectronin.interop.fhir.generators.datatypes.DynamicValues
 import com.projectronin.interop.fhir.r4.CodeSystem
 import com.projectronin.interop.fhir.r4.datatype.CodeableConcept
 import com.projectronin.interop.fhir.r4.datatype.Coding
+import com.projectronin.interop.fhir.r4.datatype.DynamicValue
+import com.projectronin.interop.fhir.r4.datatype.DynamicValueType
 import com.projectronin.interop.fhir.r4.datatype.Extension
 import com.projectronin.interop.fhir.r4.datatype.Meta
 import com.projectronin.interop.fhir.r4.datatype.primitive.Canonical
 import com.projectronin.interop.fhir.r4.datatype.primitive.Code
+import com.projectronin.interop.fhir.r4.datatype.primitive.DateTime
 import com.projectronin.interop.fhir.r4.datatype.primitive.Uri
 import com.projectronin.interop.fhir.r4.datatype.primitive.asFHIR
 import org.springframework.stereotype.Component
@@ -40,11 +42,11 @@ fun setCTDMExtensions(subjectId: String): List<Extension> {
     return listOf(
         Extension(
             url = Uri("https://projectronin.io/fhir/StructureDefinition/subjectId"),
-            value = DynamicValues.string(subjectId),
+            value = DynamicValue(DynamicValueType.STRING, subjectId.asFHIR()),
         ),
         Extension(
             url = Uri("https://projectronin.io/fhir/StructureDefinition/DataTransformTimestamp"),
-            value = DynamicValues.dateTime(OffsetDateTime.now(ZoneOffset.UTC).toString()),
+            value = DynamicValue(DynamicValueType.DATE_TIME, DateTime(OffsetDateTime.now(ZoneOffset.UTC).toString())),
         ),
     )
 }

@@ -19,7 +19,6 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.bundles.ktor)
     implementation(libs.interop.fhir)
-    implementation(libs.interop.fhirGenerators)
     implementation(libs.protobuf.java)
     implementation(libs.interop.common)
     implementation(libs.event.interop.resource.request)
@@ -43,6 +42,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.testcontainers:mysql")
     testImplementation(libs.bundles.data.generators)
+    testImplementation(libs.interop.fhirGenerators)
     testImplementation(libs.interop.rcdm.fhir.roninGenerators)
     testImplementation(libs.ktor.client.mock)
 

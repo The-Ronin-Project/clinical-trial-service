@@ -1,13 +1,15 @@
 package com.projectronin.clinical.trial.server.transform
 
 import com.projectronin.clinical.trial.server.data.SubjectDAO
-import com.projectronin.interop.fhir.generators.datatypes.DynamicValues
 import com.projectronin.interop.fhir.r4.CodeSystem
 import com.projectronin.interop.fhir.r4.datatype.Annotation
 import com.projectronin.interop.fhir.r4.datatype.CodeableConcept
 import com.projectronin.interop.fhir.r4.datatype.Coding
+import com.projectronin.interop.fhir.r4.datatype.DynamicValue
+import com.projectronin.interop.fhir.r4.datatype.DynamicValueType
 import com.projectronin.interop.fhir.r4.datatype.Reference
 import com.projectronin.interop.fhir.r4.datatype.primitive.Code
+import com.projectronin.interop.fhir.r4.datatype.primitive.DateTime
 import com.projectronin.interop.fhir.r4.datatype.primitive.FHIRString
 import com.projectronin.interop.fhir.r4.datatype.primitive.Id
 import com.projectronin.interop.fhir.r4.datatype.primitive.Markdown
@@ -41,7 +43,7 @@ class RCDMPatientToCTDMObservations(
                 rcdmPatientToDemographics(subject).copy(
                     meta = rcdmHelper.setProfileMeta("Birth Date"),
                     code = setMetaCode("21112-8", "Birth date"),
-                    value = DynamicValues.dateTime(it.value!!),
+                    value = DynamicValue(DynamicValueType.DATE_TIME, DateTime(it.value!!)),
                 ),
             )
         }
@@ -51,7 +53,7 @@ class RCDMPatientToCTDMObservations(
                 rcdmPatientToDemographics(subject).copy(
                     meta = rcdmHelper.setProfileMeta("Sex"),
                     code = setMetaCode("46098-0", "Sex"),
-                    value = DynamicValues.dateTime(it.value!!),
+                    value = DynamicValue(DynamicValueType.STRING, it.value!!.asFHIR()),
                 ),
             )
         }
@@ -61,7 +63,7 @@ class RCDMPatientToCTDMObservations(
                 rcdmPatientToDemographics(subject).copy(
                     meta = rcdmHelper.setProfileMeta("Marital Status"),
                     code = setMetaCode("45404-10", "Marital Status"),
-                    value = DynamicValues.codeableConcept(it),
+                    value = DynamicValue(DynamicValueType.CODEABLE_CONCEPT, it),
                 ),
             )
         }
@@ -93,7 +95,7 @@ class RCDMPatientToCTDMObservations(
                                         ),
                                     ),
                             ),
-                        value = DynamicValues.codeableConcept(it),
+                        value = DynamicValue(DynamicValueType.CODEABLE_CONCEPT, it),
                     ),
                 )
             }
@@ -149,7 +151,7 @@ class RCDMPatientToCTDMObservations(
                                         note =
                                             listOf(
                                                 Annotation(
-                                                    author = DynamicValues.string("Ronin"),
+                                                    author = DynamicValue(DynamicValueType.STRING, "Ronin".asFHIR()),
                                                     text = Markdown("OMB Race Category"),
                                                 ),
                                             ),
@@ -163,7 +165,7 @@ class RCDMPatientToCTDMObservations(
                                         note =
                                             listOf(
                                                 Annotation(
-                                                    author = DynamicValues.string("Ronin"),
+                                                    author = DynamicValue(DynamicValueType.STRING, "Ronin".asFHIR()),
                                                     text = Markdown("Detailed CDC Race"),
                                                 ),
                                             ),
@@ -177,7 +179,7 @@ class RCDMPatientToCTDMObservations(
                                         note =
                                             listOf(
                                                 Annotation(
-                                                    author = DynamicValues.string("Ronin"),
+                                                    author = DynamicValue(DynamicValueType.STRING, "Ronin".asFHIR()),
                                                     text = Markdown("Free-text Race"),
                                                 ),
                                             ),
@@ -196,7 +198,7 @@ class RCDMPatientToCTDMObservations(
                                         note =
                                             listOf(
                                                 Annotation(
-                                                    author = DynamicValues.string("Ronin"),
+                                                    author = DynamicValue(DynamicValueType.STRING, "Ronin".asFHIR()),
                                                     text = Markdown("OMB Ethnicity Category"),
                                                 ),
                                             ),
@@ -210,7 +212,7 @@ class RCDMPatientToCTDMObservations(
                                         note =
                                             listOf(
                                                 Annotation(
-                                                    author = DynamicValues.string("Ronin"),
+                                                    author = DynamicValue(DynamicValueType.STRING, "Ronin".asFHIR()),
                                                     text = Markdown("Detailed CDC Ethnicity"),
                                                 ),
                                             ),
@@ -224,7 +226,7 @@ class RCDMPatientToCTDMObservations(
                                         note =
                                             listOf(
                                                 Annotation(
-                                                    author = DynamicValues.string("Ronin"),
+                                                    author = DynamicValue(DynamicValueType.STRING, "Ronin".asFHIR()),
                                                     text = Markdown("Free-text Ethnicity"),
                                                 ),
                                             ),
@@ -265,7 +267,7 @@ class RCDMPatientToCTDMObservations(
                     ),
                 ),
             code = null,
-            effective = DynamicValues.dateTime(OffsetDateTime.now(ZoneOffset.UTC).toString()),
+            effective = DynamicValue(DynamicValueType.DATE_TIME, DateTime(OffsetDateTime.now(ZoneOffset.UTC).toString())),
         )
     }
 
