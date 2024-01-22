@@ -246,7 +246,6 @@ class RCDMPatientToCTDMObservations(
                                 dataDictionaryUUID = it.meta!!.tag[0].system!!.value!!,
                             ),
                     ),
-                subject = Reference(reference = FHIRString("Patient/$fhirId")),
             )
         }
     }
