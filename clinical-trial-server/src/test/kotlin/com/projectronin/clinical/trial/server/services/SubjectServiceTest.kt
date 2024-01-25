@@ -30,6 +30,7 @@ class SubjectServiceTest {
         )
 
     private val subjectId = "subjectId"
+    private val subjectNumber = "001-001"
     private val siteId = "siteId"
     private val studyId = "studyId"
     private val roninFhirId = "tenant-id"
@@ -44,6 +45,7 @@ class SubjectServiceTest {
             siteId = siteId,
             status = status,
             studyId = studyId,
+            number = subjectNumber,
         )
 
     private val expectedSubjectId = "subjectId"
@@ -54,6 +56,7 @@ class SubjectServiceTest {
             siteId = siteId,
             status = status,
             studyId = studyId,
+            number = subjectNumber,
         )
 
     private val studySiteDO: StudySiteDO =
@@ -128,11 +131,15 @@ class SubjectServiceTest {
 
     @Test
     fun `create subject which doesn't exist`() {
-        every { subjectDAO.getSubjectByFhirId(subject.roninFhirId) } returns null
+        every { subjectDAO.getFullSubjectByFhirId(subject.roninFhirId) } returns null
         studySiteDO["studySiteId"] = studySiteId
         every { studySiteDAO.getStudySiteByStudyIdAndSiteId(subject.studyId, subject.siteId) } returns
             studySiteDO
-        every { clinicalOneClient.getSubjectId(subject.siteId, subject.studyId) } returns expectedSubjectId
+        every { clinicalOneClient.getSubjectIdAndSubjectNumber(subject.siteId, subject.studyId) } returns
+            Pair(
+                expectedSubjectId,
+                subjectNumber,
+            )
         every { subjectDAO.insertSubject(expectedSubject.toSubjectDO()) } returns ""
         every {
             subjectStatusDAO.insertSubjectStatus(
@@ -152,7 +159,7 @@ class SubjectServiceTest {
         studySiteDO["studySiteId"] = studySiteId
         every { studySiteDAO.getStudySiteByStudyIdAndSiteId(subject.studyId, subject.siteId) } returns
             studySiteDO
-        every { subjectDAO.getSubjectByFhirId(roninFhirId) } returns subjectId
+        every { subjectDAO.getFullSubjectByFhirId(roninFhirId) } returns expectedSubject.toSubjectDO()
         every {
             subjectStatusDAO.updateSubjectStatus(any(), any(), any())
         } returns mockk()
@@ -208,6 +215,7 @@ class SubjectServiceTest {
         return SubjectDO {
             subjectId = this@toSubjectDO.id
             roninPatientId = this@toSubjectDO.roninFhirId
+            subjectNumber = this@toSubjectDO.number
         }
     }
 }

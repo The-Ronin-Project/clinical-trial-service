@@ -28,6 +28,7 @@ class ClinicalOneClientTest {
         val siteId = "daffeda1f0084b358a355d4bdc7ae98b"
         val studyId = "dca7919d25b64416bbf58631aff66882"
         val subjectId = "47e71e98170d492fb54c2f93d8084860"
+        val subjectNumber = "001-001"
         val responseBody =
             ClinicalOneAddSubjectResponse(
                 status = "success",
@@ -37,6 +38,7 @@ class ClinicalOneClientTest {
                         studyId = studyId,
                         siteId = siteId,
                         id = subjectId,
+                        subjectNumber = subjectNumber,
                     ),
             )
         val response = JacksonManager.objectMapper.writeValueAsString(responseBody)
@@ -54,8 +56,9 @@ class ClinicalOneClientTest {
                 responseBody = response,
             )
 
-        val actual = client.getSubjectId(siteId, studyId)
-        assertEquals(subjectId, actual)
+        val (id, number) = client.getSubjectIdAndSubjectNumber(siteId, studyId)
+        assertEquals(subjectId, id)
+        assertEquals(subjectNumber, number)
     }
 
     private fun createClient(

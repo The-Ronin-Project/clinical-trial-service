@@ -41,13 +41,27 @@ class SubjectService(
             subject.studyId,
             subject.siteId,
         )?.let { studySite ->
-            subjectDAO.getSubjectByFhirId(subject.roninFhirId)?.let {
-                updateSubjectStatus(it, studySite.studySiteId, SubjectStatus.ACTIVE)
-                return subject.copy(id = it, status = SubjectStatus.ACTIVE.toString())
+            subjectDAO.getFullSubjectByFhirId(subject.roninFhirId)?.let {
+                updateSubjectStatus(it.subjectId, studySite.studySiteId, SubjectStatus.ACTIVE)
+                return subject.copy(
+                    id = it.subjectId,
+                    status = SubjectStatus.ACTIVE.toString(),
+                    number = it.subjectNumber,
+                )
             }
 
-            val newSubjectId = clinicalOneClient.getSubjectId(subject.siteId, subject.studyId)
-            val newSubject = subject.copy(id = newSubjectId, status = SubjectStatus.ACTIVE.toString())
+            val (newSubjectId, newSubjectNumber) =
+                clinicalOneClient.getSubjectIdAndSubjectNumber(
+                    subject.siteId,
+                    subject.studyId,
+                )
+
+            val newSubject =
+                subject.copy(
+                    id = newSubjectId,
+                    status = SubjectStatus.ACTIVE.toString(),
+                    number = newSubjectNumber,
+                )
 
             subjectDAO.insertSubject(newSubject.toSubjectDO())
             insertSubjectStatus(newSubjectId, studySite.studySiteId, SubjectStatus.ACTIVE)
@@ -109,5 +123,6 @@ class SubjectService(
         SubjectDO {
             subjectId = this@toSubjectDO.id
             roninPatientId = this@toSubjectDO.roninFhirId
+            subjectNumber = this@toSubjectDO.number
         }
 }

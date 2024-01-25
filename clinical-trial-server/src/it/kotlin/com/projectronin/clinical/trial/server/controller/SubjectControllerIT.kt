@@ -38,6 +38,7 @@ class SubjectControllerIT : BaseIT() {
     private val siteId = "F1AEC0AE8C6F44A6B0A4E50015D4ABED"
 
     private val subjectId = "subjectId"
+    private val subjectNumber = "001-001"
     private val studySiteID = UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770")
 
     private val consumer: KafkaConsumer<String, RoninEvent<*>> by lazy {
@@ -72,6 +73,7 @@ class SubjectControllerIT : BaseIT() {
         database.insert(SubjectDOs) {
             set(it.subjectId, subjectId)
             set(it.roninPatientId, "roninPatientId")
+            set(it.subjectNumber, subjectNumber)
         }
 
         database.insert(SubjectStatusDOs) {
@@ -107,7 +109,8 @@ class SubjectControllerIT : BaseIT() {
         val subject = Subject(
             roninFhirId = "tenant-fhirId",
             siteId = "siteId",
-            studyId = "studyId"
+            studyId = "studyId",
+            number = "subjectNumber"
         )
         val response = runBlocking {
             httpClient.post("$serverUrl/subjects") {
@@ -126,7 +129,8 @@ class SubjectControllerIT : BaseIT() {
         val subject = Subject(
             roninFhirId = "tenant-fhirId",
             siteId = siteId,
-            studyId = studyId
+            studyId = studyId,
+            number = subjectNumber
         )
 
         runBlocking {
@@ -157,6 +161,7 @@ class SubjectControllerIT : BaseIT() {
         }
 
         assertTrue(response.id.isNotEmpty())
+        assertTrue(response.number.isNotEmpty())
         assertEquals(SubjectStatus.ACTIVE.toString(), response.status)
         assertEquals(subject.roninFhirId, response.roninFhirId)
         assertEquals(subject.siteId, response.siteId)

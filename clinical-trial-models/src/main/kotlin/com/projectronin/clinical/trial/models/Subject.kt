@@ -6,4 +6,5 @@ data class Subject(
     val siteId: String = "",
     val status: String = "",
     val studyId: String = "",
+    val number: String = "",
 )

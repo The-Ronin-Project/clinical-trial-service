@@ -7,4 +7,5 @@ interface SubjectDO : Entity<SubjectDO> {
 
     var subjectId: String
     var roninPatientId: String
+    var subjectNumber: String
 }

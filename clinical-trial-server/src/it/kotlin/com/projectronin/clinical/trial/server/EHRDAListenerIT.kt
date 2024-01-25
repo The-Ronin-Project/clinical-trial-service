@@ -46,6 +46,7 @@ class EHRDAListenerIT : BaseIT() {
     private val siteId = "F1AEC0AE8C6F44A6B0A4E50015D4ABED"
 
     private val subjectId = "subjectId"
+    private val subjectNumber = "001-001"
     private val studySiteID = UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770")
     private val observationDAO = ObservationDAO(ctdaDatabase)
 
@@ -68,6 +69,7 @@ class EHRDAListenerIT : BaseIT() {
         database.insert(SubjectDOs) {
             set(it.subjectId, subjectId)
             set(it.roninPatientId, "ronincer-PatientId1")
+            set(it.subjectNumber, subjectNumber)
         }
 
         database.insert(SubjectStatusDOs) {
@@ -106,7 +108,8 @@ class EHRDAListenerIT : BaseIT() {
         val subject = Subject(
             roninFhirId = "ronincer-PatientId2",
             siteId = siteId,
-            studyId = studyId
+            studyId = studyId,
+            number = subjectNumber
         )
 
         runBlocking {
@@ -147,7 +150,8 @@ class EHRDAListenerIT : BaseIT() {
         val testSubject = Subject(
             roninFhirId = "ronincer-PatientId3",
             siteId = siteId,
-            studyId = studyId
+            studyId = studyId,
+            number = subjectNumber
         )
 
         runBlocking {

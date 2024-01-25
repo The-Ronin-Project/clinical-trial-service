@@ -1,3 +1,4 @@
 subject:
   - subject_id: "subjectId"
     ronin_patient_id: "roninFhirId"
+    subject_number: "001-001"

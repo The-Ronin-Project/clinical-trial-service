@@ -1,0 +1,3 @@
+databaseChangeLog:
+  - include:
+      file: clinicaltrial/db/changelog/subject/subject-02.yaml

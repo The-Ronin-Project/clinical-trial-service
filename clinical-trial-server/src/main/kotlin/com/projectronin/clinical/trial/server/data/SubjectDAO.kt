@@ -52,12 +52,21 @@ class SubjectDAO(private val database: Database) {
     }
 
     /**
+     * get subject id and number for Ronin FHIR Id
+     */
+    fun getFullSubjectByFhirId(fhirId: String): SubjectDO? {
+        return database.from(SubjectDOs).select()
+            .where(SubjectDOs.roninPatientId eq fhirId).map { SubjectDOs.createEntity(it) }.firstOrNull()
+    }
+
+    /**
      * Insert subject
      */
     fun insertSubject(subjectDO: SubjectDO): String {
         database.insert(SubjectDOs) {
             set(it.subjectId, subjectDO.subjectId)
             set(it.roninPatientId, subjectDO.roninPatientId)
+            set(it.subjectNumber, subjectDO.subjectNumber)
         }
         return subjectDO.subjectId
     }

@@ -26,6 +26,7 @@ class SubjectDAOTest {
             SubjectDO {
                 subjectId = "subjectId"
                 roninPatientId = "roninFhirId"
+                subjectNumber = "001-001"
             },
         )
     }
@@ -60,5 +61,14 @@ class SubjectDAOTest {
         assertEquals(subjects.size, 6)
         assertEquals(subjects.first(), "roninFhirId1")
         assertEquals(subjects.last(), "roninFhirId7")
+    }
+
+    @DataSet(value = ["/dbunit/subject/OneSubject.yaml"], cleanAfter = true)
+    @Test
+    fun `get full subject by Ronin FHIR id`() {
+        val subject = subjectDAO.getFullSubjectByFhirId("roninFhirId")
+        assertEquals("subjectId", subject?.subjectId)
+        assertEquals("roninFhirId", subject?.roninPatientId)
+        assertEquals("001-001", subject?.subjectNumber)
     }
 }

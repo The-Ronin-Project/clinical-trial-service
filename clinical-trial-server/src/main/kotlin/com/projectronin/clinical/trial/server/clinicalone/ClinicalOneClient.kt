@@ -31,10 +31,10 @@ class ClinicalOneClient(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getSubjectId(
+    fun getSubjectIdAndSubjectNumber(
         siteId: String,
         studyId: String,
-    ): String {
+    ): Pair<String, String> {
         logger.info { "Retrieving subject id from ClinicalOne based on site: $siteId and study: $studyId" }
 
         val authentication = authenticationBroker.getAuthentication()
@@ -66,7 +66,7 @@ class ClinicalOneClient(
             response.let { res ->
                 if (res.status == HttpStatusCode.OK) {
                     val responseBody = res.body<ClinicalOneAddSubjectResponse>()
-                    responseBody.result?.id ?: ""
+                    Pair(responseBody.result?.id ?: "", responseBody.result?.subjectNumber ?: "")
                 } else {
                     throw Exception("Failed to create subject with Clinical One API. Status Code: ${res.status}. ${res.bodyAsText()}")
                 }

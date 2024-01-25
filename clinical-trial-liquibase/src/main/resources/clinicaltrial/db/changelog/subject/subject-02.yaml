@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: subject-add-number
+      author: Douglas Doughty
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - columnExists:
+                tableName: subject
+                columnName: subject_number
+      changes:
+        - addColumn:
+            tableName: subject
+            columns:
+              - column:
+                  name: subject_number
+                  type: VARCHAR(32)
