@@ -167,7 +167,6 @@ internal class ObservationDAOTest : BaseMySQLTest() {
                         tag =
                             listOf(
                                 Coding(system = Uri("1"), display = FHIRString("lab")),
-                                Coding(system = Uri("2"), display = FHIRString("imaging")),
                             ),
                     )
             }
@@ -189,7 +188,6 @@ internal class ObservationDAOTest : BaseMySQLTest() {
                     Meta(
                         tag =
                             listOf(
-                                Coding(system = Uri("3"), display = FHIRString("vital")),
                                 Coding(system = Uri("2"), display = FHIRString("imaging")),
                             ),
                     )
@@ -199,36 +197,102 @@ internal class ObservationDAOTest : BaseMySQLTest() {
         val testObs4 =
             observation {
                 id of "TestObservation4"
-                extension of setCTDMExtensions(subjectId = "subject2")
+                extension of setCTDMExtensions(subjectId = "subject1")
                 effective of DynamicValue(DynamicValueType.DATE_TIME, DateTime("2022-01-01"))
                 meta of
                     Meta(
                         tag =
                             listOf(
                                 Coding(system = Uri("3"), display = FHIRString("vital")),
-                                Coding(system = Uri("4"), display = FHIRString("other")),
                             ),
                     )
             }
         collection.add(JacksonUtil.writeJsonValue(testObs4)).execute()
 
+        val testObs5 =
+            observation {
+                id of "TestObservation5"
+                extension of setCTDMExtensions(subjectId = "subject2")
+                effective of DynamicValue(DynamicValueType.DATE_TIME, DateTime("2022-03-01"))
+                meta of
+                    Meta(
+                        tag =
+                            listOf(
+                                Coding(system = Uri("4"), display = FHIRString("other")),
+                            ),
+                    )
+            }
+        collection.add(JacksonUtil.writeJsonValue(testObs5)).execute()
+
         val res = dao.search(subjectId = "subject1", valueSetIds = listOf("2", "3"))
         assertEquals(2, res.size)
 
         val result = dao.search(subjectId = "subject1")
-        assertEquals(2, result.size)
+        assertEquals(3, result.size)
+
+        val result1 = dao.search(subjectId = "subject2")
+        assertEquals(1, result1.size)
 
         val result2 = dao.search(valueSetIds = listOf("1"))
         assertEquals(1, result2.size)
 
         val result3 = dao.search(valueSetIds = listOf("3"))
-        assertEquals(2, result3.size)
+        assertEquals(1, result3.size)
 
         val result4 = dao.search(subjectId = "subject2", valueSetIds = listOf("1"))
         assertEquals(0, result4.size)
 
-        val feb1 = ZonedDateTime.of(2022, 2, 1, 0, 1, 1, 0, ZoneId.of("UTC"))
-        val result5 = dao.search(subjectId = "subject1", valueSetIds = listOf("2"), toDate = feb1)
+        val feb5 = ZonedDateTime.of(2022, 2, 5, 0, 1, 1, 0, ZoneId.of("UTC"))
+        val result5 = dao.search(subjectId = "subject1", valueSetIds = listOf("2"), toDate = feb5)
         assertEquals(1, result5.size)
+    }
+
+    @Test
+    fun `search test - large valueset values`() {
+        val idSet = (1..60).toList().map { it.toString() }
+        val testObs1 =
+            observation {
+                id of "TestObservation1"
+                extension of setCTDMExtensions(subjectId = "subject1")
+                effective of DynamicValue(DynamicValueType.DATE_TIME, DateTime("2022-01-01"))
+                meta of
+                    Meta(
+                        tag =
+                            listOf(
+                                Coding(system = Uri("1"), display = FHIRString("lab")),
+                            ),
+                    )
+            }
+        collection.add(JacksonUtil.writeJsonValue(testObs1)).execute()
+        val testObs2 =
+            observation {
+                id of "TestObservation2"
+                extension of setCTDMExtensions(subjectId = "subject1")
+                effective of DynamicValue(DynamicValueType.DATE_TIME, DateTime("2022-01-01"))
+                meta of
+                    Meta(
+                        tag =
+                            listOf(
+                                Coding(system = Uri("55"), display = FHIRString("lab")),
+                            ),
+                    )
+            }
+        collection.add(JacksonUtil.writeJsonValue(testObs2)).execute()
+        val testObs3 =
+            observation {
+                id of "TestObservation3"
+                extension of setCTDMExtensions(subjectId = "subject1")
+                effective of DynamicValue(DynamicValueType.DATE_TIME, DateTime("2022-01-01"))
+                meta of
+                    Meta(
+                        tag =
+                            listOf(
+                                Coding(system = Uri("75"), display = FHIRString("lab")),
+                            ),
+                    )
+            }
+        collection.add(JacksonUtil.writeJsonValue(testObs3)).execute()
+        val result = dao.search(valueSetIds = idSet)
+        assertEquals(2, result.size)
     }
 }

@@ -72,26 +72,31 @@ class ObservationDAO(private val resourceDatabase: ClinicalTrialDataAuthorityDat
         fromDate: ZonedDateTime? = null,
         toDate: ZonedDateTime? = null,
     ): List<Observation> {
-        val queryFragments = mutableListOf<String>()
-        subjectId?.let {
-            @Suppress("ktlint:standard:max-line-length")
-            queryFragments.add(
-                "JSON_CONTAINS(extension, '[{\"url\": \"https://projectronin.io/fhir/StructureDefinition/subjectId\", \"valueString\": \"$it\"}]')",
+        val list = mutableListOf(listOf<Observation>())
+
+        if (subjectId == null && valueSetIds.isNullOrEmpty()) {
+            list.add(
+                resourceDatabase.run(collection) {
+                    find().execute().map {
+                        JacksonUtil.readJsonObject(it.toString(), Observation::class)
+                    }
+                },
             )
-        }
-        valueSetIds?.joinToString(" OR ") { ("('$it' in meta.tag[*].system)") }?.let { queryFragments.add("( $it )") }
-
-        val query = queryFragments.joinToString(" AND ")
-
-        val list =
-            resourceDatabase.run(collection) {
-                find(query).execute().map {
-                    JacksonUtil.readJsonObject(it.toString(), Observation::class)
-                }
+        } else {
+            val querySet = chunkQuery(subjectId, valueSetIds)
+            querySet.forEach { query ->
+                list.add(
+                    resourceDatabase.run(collection) {
+                        find(query).execute().map {
+                            JacksonUtil.readJsonObject(it.toString(), Observation::class)
+                        }
+                    },
+                )
             }
+        }
 
         // Filter on fromDate and toDate post-query due to XDev API
-        return list.filter { observation ->
+        return list.flatten().filter { observation ->
             when (observation.effective?.type) {
                 DynamicValueType.DATE_TIME -> {
                     val date = (observation.effective!!.value as DateTime).getEffectiveDateTime()
@@ -108,5 +113,29 @@ class ObservationDAO(private val resourceDatabase: ClinicalTrialDataAuthorityDat
                 else -> false
             }
         }
+    }
+
+    private fun chunkQuery(
+        subjectId: String? = null,
+        valueSetIds: List<String>? = null,
+    ): List<String> {
+        val querySet = mutableListOf<String>()
+
+        @Suppress("ktlint:standard:max-line-length")
+        val subjectFragment =
+            subjectId?.let {
+                "JSON_CONTAINS(extension, '[{\"url\": \"https://projectronin.io/fhir/StructureDefinition/subjectId\", \"valueString\": \"$it\"}]')"
+            }
+        valueSetIds?.let {
+            val valueSetChunky = valueSetIds.chunked(50)
+            valueSetChunky.forEach { valueSet ->
+                @Suppress("ktlint:standard:max-line-length")
+                val query = (subjectFragment?.let { "$it AND " } ?: "") + "( meta.tag[0].system in" + valueSet.joinToString("','", "('", "') )")
+                querySet.add(query)
+            }
+            // subjectId and valueSetIds can't both be respectively null or empty, so if valueSetIds is empty then the subject query must be set
+        } ?: querySet.add(subjectFragment!!)
+
+        return querySet
     }
 }
