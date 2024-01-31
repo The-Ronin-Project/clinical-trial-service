@@ -10,6 +10,7 @@ import com.projectronin.interop.common.test.database.ktorm.KtormHelper
 import com.projectronin.interop.common.test.database.liquibase.LiquibaseTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import java.util.UUID
 
 @LiquibaseTest(changeLog = "clinicaltrial/db/changelog/clinicaltrial.db.changelog-master.yaml")
 class SubjectDAOTest {
@@ -61,6 +62,22 @@ class SubjectDAOTest {
         assertEquals(subjects.size, 6)
         assertEquals(subjects.first(), "roninFhirId1")
         assertEquals(subjects.last(), "roninFhirId7")
+    }
+
+    @DataSet(value = ["/dbunit/subjectstatus/OneSubjectStatus.yaml"], cleanAfter = true)
+    @Test
+    fun `get Subject by Ronin FHIR id`() {
+        val subject = subjectDAO.getSubjectByRoninFhirId(fhirId = "roninFhirId")
+        assertEquals(subject?.first?.roninPatientId, "roninFhirId")
+        assertEquals(subject?.second?.studySiteId, UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770"))
+        assertEquals(subject?.third?.studyId, "studyId")
+    }
+
+    @DataSet(value = ["/dbunit/subjectstatus/NoSubjectStatus.yaml"], cleanAfter = true)
+    @Test
+    fun `get Subject by Ronin FHIR id returns empty when unassigned`() {
+        val subject = subjectDAO.getSubjectByRoninFhirId(fhirId = "roninFhirId")
+        assertEquals(subject, null)
     }
 
     @DataSet(value = ["/dbunit/subject/OneSubject.yaml"], cleanAfter = true)

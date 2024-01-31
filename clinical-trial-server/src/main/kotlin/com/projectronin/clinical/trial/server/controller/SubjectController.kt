@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -43,6 +44,20 @@ class SubjectController(
 
         return if (subjects.isNotEmpty()) {
             ResponseEntity.ok(subjects)
+        } else {
+            ResponseEntity.notFound().build()
+        }
+    }
+
+    @GetMapping("/{roninFhirId}")
+    @CrossOrigin(origins = ["\${cors.ronin.frontend}"], maxAge = 1800)
+    @PreAuthorize("hasAuthority('SCOPE_read:subject')")
+    fun retrieveByRoninFhirId(
+        @PathVariable roninFhirId: String,
+    ): ResponseEntity<Subject> {
+        val subject = subjectService.getSubjectsByRoninFhirId(roninFhirId)
+        return if (subject != null) {
+            ResponseEntity.ok(subject)
         } else {
             ResponseEntity.notFound().build()
         }

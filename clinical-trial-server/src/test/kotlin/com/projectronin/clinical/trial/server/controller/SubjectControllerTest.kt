@@ -85,6 +85,24 @@ class SubjectControllerTest {
     }
 
     @Test
+    fun `get by roninfhirid with invalid fhirId returns null`() {
+        every { subjectService.getSubjectsByRoninFhirId(any()) } returns null
+        val response = subjectController.retrieveByRoninFhirId("invalid-fhirId")
+
+        assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
+        assertNull(response.body)
+    }
+
+    @Test
+    fun `get by roninfhirid with valid fhirId returns subject`() {
+        every { subjectService.getSubjectsByRoninFhirId(any()) } returns createdSubject
+        val response = subjectController.retrieveByRoninFhirId(createdSubject.roninFhirId)
+
+        assertEquals(HttpStatus.OK, response.statusCode)
+        assertEquals(response.body?.roninFhirId, createdSubject.roninFhirId)
+    }
+
+    @Test
     fun `post returns created subject`() {
         every { subjectService.createSubject(subjectToCreate) } returns createdSubject
         val response = subjectController.create(subjectToCreate)

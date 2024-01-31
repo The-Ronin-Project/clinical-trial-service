@@ -36,6 +36,19 @@ class SubjectService(
         return subjectDAO.getSubjectByFhirId(fhirId)
     }
 
+    fun getSubjectsByRoninFhirId(fhirId: String): Subject? {
+        return subjectDAO.getSubjectByRoninFhirId(fhirId)?.let {
+            Subject(
+                id = it.first.subjectId,
+                roninFhirId = it.first.roninPatientId,
+                siteId = it.third.siteId,
+                status = it.second.status.toString(),
+                studyId = it.third.studyId,
+                number = it.first.subjectNumber,
+            )
+        }
+    }
+
     fun createSubject(subject: Subject): Subject? =
         getStudySiteByStudyIdAndSiteId(
             subject.studyId,

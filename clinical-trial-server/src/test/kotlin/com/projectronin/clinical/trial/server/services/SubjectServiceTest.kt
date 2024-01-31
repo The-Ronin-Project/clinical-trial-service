@@ -210,6 +210,38 @@ class SubjectServiceTest {
         assertEquals(expected, subjectId)
     }
 
+    @Test
+    fun `get subject by fhir ID`() {
+        val expected = subject
+        val subjectDO = subject.toSubjectDO()
+        val subjectStatusDO =
+            SubjectStatusDO {
+                studySiteId = studySiteId1
+                subjectId = subject.id
+            }
+        val studySiteDO =
+            StudySiteDO {
+                siteId = subject.siteId
+                studyId = subject.studyId
+            }
+        every {
+            subjectDAO.getSubjectByRoninFhirId("Patient/fhirID")
+        } returns Triple(subjectDO, subjectStatusDO, studySiteDO)
+
+        val res = subjectService.getSubjectsByRoninFhirId("Patient/fhirID")
+        assertEquals(expected.roninFhirId, res?.roninFhirId)
+    }
+
+    @Test
+    fun `get subject by fhir ID returns empty array when no records found`() {
+        every {
+            subjectDAO.getSubjectByRoninFhirId("Patient/fhirID")
+        } returns null
+
+        val res = subjectService.getSubjectsByRoninFhirId("Patient/fhirID")
+        assertEquals(res, null)
+    }
+
     // Utility
     private fun Subject.toSubjectDO(): SubjectDO {
         return SubjectDO {

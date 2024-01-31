@@ -1,10 +1,14 @@
 package com.projectronin.clinical.trial.server.data
 
+import com.projectronin.clinical.trial.server.data.binding.StudySiteDOs
 import com.projectronin.clinical.trial.server.data.binding.SubjectDOs
 import com.projectronin.clinical.trial.server.data.binding.SubjectStatusDOs
+import com.projectronin.clinical.trial.server.data.model.StudySiteDO
 import com.projectronin.clinical.trial.server.data.model.SubjectDO
 import com.projectronin.clinical.trial.server.data.model.SubjectStatus
+import com.projectronin.clinical.trial.server.data.model.SubjectStatusDO
 import org.ktorm.database.Database
+import org.ktorm.dsl.and
 import org.ktorm.dsl.eq
 import org.ktorm.dsl.from
 import org.ktorm.dsl.inList
@@ -69,5 +73,21 @@ class SubjectDAO(private val database: Database) {
             set(it.subjectNumber, subjectDO.subjectNumber)
         }
         return subjectDO.subjectId
+    }
+
+    /**
+     * get active Subject, with corresponding SubjectStatus and StudySite for given Ronin FHIR ID
+     */
+    fun getSubjectByRoninFhirId(fhirId: String): Triple<SubjectDO, SubjectStatusDO, StudySiteDO>? {
+        return database.from(SubjectDOs).innerJoin(SubjectStatusDOs, SubjectDOs.subjectId eq SubjectStatusDOs.subjectId).innerJoin(
+            StudySiteDOs,
+            SubjectStatusDOs.studySiteId eq StudySiteDOs.studySiteId,
+        ).select().where { (SubjectDOs.roninPatientId eq fhirId) and (SubjectStatusDOs.status eq SubjectStatus.ACTIVE) }
+            .map {
+                val subjectDO = SubjectDOs.createEntity(it)
+                val subjectStatusDO = SubjectStatusDOs.createEntity(it)
+                val studySiteDO = StudySiteDOs.createEntity(it)
+                Triple(subjectDO, subjectStatusDO, studySiteDO)
+            }.firstOrNull()
     }
 }

@@ -257,4 +257,45 @@ class ClinicalTrialClientTest {
         assertEquals(true, request.path?.endsWith("/subjects?activeIdsOnly=true"))
         assertEquals("Bearer $authenticationToken", request.getHeader("Authorization"))
     }
+
+    @Test
+    fun `getSubjectById works with roninFhirId`() {
+        val subjectReturned =
+            Subject(
+                id = "newid",
+                roninFhirId = "tenant-fhirid",
+                siteId = "siteid",
+                status = "ACTIVE",
+                studyId = "studyId",
+                number = "subjectNumber",
+            )
+
+        val mockWebServer = MockWebServer()
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(HttpStatusCode.OK.value)
+                .setBody(JacksonManager.objectMapper.writeValueAsString(subjectReturned))
+                .setHeader("Content-Type", "application/json"),
+        )
+
+        val url = mockWebServer.url("/test")
+        val response =
+            runBlocking {
+                val subjectToReturn =
+                    ClinicalTrialClient(url.toString(), client, authenticationService)
+                        .getSubjectById(subjectReturned.roninFhirId)
+                subjectToReturn
+            }
+        val returnedSubject = response as Subject
+        assertEquals(subjectReturned.id, returnedSubject.id)
+        assertEquals(subjectReturned.roninFhirId, returnedSubject.roninFhirId)
+        assertEquals(subjectReturned.siteId, returnedSubject.siteId)
+        assertEquals(subjectReturned.status, returnedSubject.status)
+        assertEquals(subjectReturned.studyId, returnedSubject.studyId)
+        assertEquals(subjectReturned.number, returnedSubject.number)
+
+        val request = mockWebServer.takeRequest()
+        assertEquals(true, request.path?.endsWith("/subjects/${subjectReturned.roninFhirId}"))
+        assertEquals("Bearer $authenticationToken", request.getHeader("Authorization"))
+    }
 }

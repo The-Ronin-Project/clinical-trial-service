@@ -41,7 +41,9 @@ class ClinicalTrialClient(
                         }
                         accept(ContentType.Application.Json)
                         contentType(ContentType.Application.Json)
-                        url { parameters.append("activeIdsOnly", activeIdsOnly.toString()) }
+                        url {
+                            parameters.append("activeIdsOnly", activeIdsOnly.toString())
+                        }
                     }
                 }
 
@@ -51,6 +53,35 @@ class ClinicalTrialClient(
             onFailure = {
                 if (it is ClientFailureException && it.status == HttpStatusCode.NotFound) {
                     emptyList()
+                } else {
+                    throw it
+                }
+            },
+        )
+    }
+
+    suspend fun getSubjectById(roninFhirId: String? = null): Subject? {
+        return runCatching<Subject> {
+            val subjectUrl = "$hostUrl/subjects/$roninFhirId"
+            val authentication = authenticationService.getAuthentication()
+
+            val response: HttpResponse =
+                client.request(serverName, subjectUrl) { url ->
+                    get(url) {
+                        headers {
+                            append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                        }
+                        accept(ContentType.Application.Json)
+                        contentType(ContentType.Application.Json)
+                    }
+                }
+
+            response.body()
+        }.fold(
+            onSuccess = { it },
+            onFailure = {
+                if (it is ClientFailureException && it.status == HttpStatusCode.NotFound) {
+                    null
                 } else {
                     throw it
                 }

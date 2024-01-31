@@ -145,6 +145,27 @@ class SubjectControllerIT : BaseIT() {
     }
 
     @Test
+    fun `get active subject by roninFhirId`() {
+        seedDB()
+
+        val subject = Subject(
+            roninFhirId = "tenant-fhirId",
+            siteId = siteId,
+            studyId = studyId
+        )
+
+        runBlocking {
+            client.createSubject(subject)
+        }
+
+        val response = runBlocking {
+            client.getSubjectById(roninFhirId = "tenant-fhirId")
+        }
+
+        assertEquals(response?.roninFhirId, subject.roninFhirId)
+    }
+
+    @Test
     fun `create a subject`() {
         seedDB()
         consumer.subscribe(listOf("oci.us-phoenix-1.interop-mirth.resource-request.v1"))
