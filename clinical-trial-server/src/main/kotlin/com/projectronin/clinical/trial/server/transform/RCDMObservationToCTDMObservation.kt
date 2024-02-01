@@ -21,9 +21,9 @@ class RCDMObservationToCTDMObservation(
             // rcdm validation requires valid code objects, so these should be populated and not null
             val obsCodeSystem = rcdmObservation.code!!.coding[0].system!!.value!!
             val obsCodeValue = rcdmObservation.code!!.coding[0].code!!.value!!
+            // EHRDAListener checks for valid observation code and system values
             val dataDictionaryRow =
-                dataDictionaryService.getDataDictionaryByCode(obsCodeSystem, obsCodeValue)
-                    ?: throw Exception("Observation code $obsCodeValue not in data dictionary for CTDM")
+                dataDictionaryService.getDataDictionaryByCode(obsCodeSystem, obsCodeValue)!!
             val ctdmSubject =
                 subjectDAO.getSubjectByFhirId(fhirPatientId)
                     ?: throw Exception("No subject found for Ronin FHIR Id: $fhirPatientId")

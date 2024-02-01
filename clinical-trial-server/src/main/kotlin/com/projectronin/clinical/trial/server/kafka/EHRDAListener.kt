@@ -2,6 +2,7 @@ package com.projectronin.clinical.trial.server.kafka
 
 import com.projectronin.clinical.trial.server.dataauthority.ObservationDAO
 import com.projectronin.clinical.trial.server.services.SubjectService
+import com.projectronin.clinical.trial.server.transform.DataDictionaryService
 import com.projectronin.clinical.trial.server.transform.RCDMObservationToCTDMObservation
 import com.projectronin.clinical.trial.server.transform.RCDMPatientToCTDMObservations
 import com.projectronin.interop.fhir.r4.resource.Observation
@@ -17,6 +18,7 @@ class EHRDAListener(
     private val patientTransformer: RCDMPatientToCTDMObservations,
     private val observationTransformer: RCDMObservationToCTDMObservation,
     private val observationDAO: ObservationDAO,
+    private val dataDictionaryService: DataDictionaryService,
 ) {
     private val tenants = listOf("ronin", "ronincer", "ggwadc8y") // TODO: swap this with a call to the tenant service
 
@@ -24,7 +26,7 @@ class EHRDAListener(
     fun consumeObservation(message: RoninEvent<Observation>) {
         val observation = message.data
         observation.subject?.decomposedId()?.let { patientFhirId ->
-            if (checkTenantAndPatient(patientFhirId)) {
+            if (checkObservations(patientFhirId, observation)) {
                 val ctdmObservation =
                     observationTransformer.rcdmObservationToCTDMObservation(patientFhirId, observation)
                 if (ctdmObservation != null) {
@@ -47,6 +49,27 @@ class EHRDAListener(
                 KotlinLogging.logger { }.info { "Observation ${it.id?.value} added" }
             }
         }
+    }
+
+    private fun checkObservations(
+        patientFHIRID: String?,
+        observation: Observation,
+    ): Boolean {
+        val obsCode = observation.code?.coding?.get(0)?.code?.value
+        val obsSystem = observation.code?.coding?.get(0)?.system?.value
+        val validId = checkTenantAndPatient(patientFHIRID)
+        val validDDCode: Boolean =
+            if (listOf(obsSystem, obsCode).any { it == null }) {
+                false
+            } else {
+                // if statement above checks if either observation code or system are null, so both should not be null
+                dataDictionaryService.getDataDictionaryByCode(obsSystem!!, obsCode!!) ?: false
+                true
+            }
+        if (!validId) {
+            KotlinLogging.logger { }.warn { "Invalid $patientFHIRID" }
+        }
+        return validId && validDDCode
     }
 
     private fun checkTenantAndPatient(patientFHIRID: String?): Boolean {

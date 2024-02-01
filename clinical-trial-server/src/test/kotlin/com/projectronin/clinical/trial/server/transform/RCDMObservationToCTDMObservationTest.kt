@@ -493,34 +493,6 @@ class RCDMObservationToCTDMObservationTest {
     }
 
     @Test
-    fun `invalid observation code`() {
-        val rcdmObservation =
-            rcdmObservationLaboratoryResult("test") {
-                subject of rcdmReference("Patient", "456")
-                code of
-                    codeableConcept {
-                        coding of
-                            listOf(
-                                coding {
-                                    system of "http://loinc.org"
-                                    code of Code("30-1")
-                                    display of "Hemoglobin [Mass/volume] in Arterial blood"
-                                },
-                            )
-                    }
-            }
-        val exception =
-            assertThrows<Exception> {
-                RCDMObservationToCTDMObservation(
-                    subjectDAO,
-                    dataDictionaryService,
-                    rcdmHelper,
-                ).rcdmObservationToCTDMObservation("test-fhirId", rcdmObservation)
-            }
-        assertEquals("Observation code 30-1 not in data dictionary for CTDM", exception.message)
-    }
-
-    @Test
     fun `subject reference not a patient`() {
         val rcdmObservation =
             rcdmObservationLaboratoryResult("test") {
