@@ -2,26 +2,26 @@
 idea-ext = "1.1.7"
 interop-common = "4.1.0"
 interop-datalake = "9.0.0"
-interop-rcdm = "1.1.0"
 interop-event-resource-request = "1.1.0"
 interop-fhir = "9.1.1"
-interop-gradle = "4.0.0"
-jackson = "2.16.0"
+interop-gradle = "4.0.3"
+interop-rcdm = "1.2.2"
+jackson = "2.16.1"
 kotlin-logging = "3.0.5"
 kotlinx-coroutines-core = "1.7.3"
 ktor = "2.3.7"
 ktorm = "3.6.0"
-liquibase = "4.25.0"
+liquibase = "4.25.1"
 logstash = "7.4"
-mockk = "1.13.8"
+mockk = "1.13.9"
 mockwebserver = "4.12.0"
-mysql-connector-java = "8.2.0"
-protobuf-java = "3.25.1"
+mysql-connector-java = "8.3.0"
+protobuf-java = "3.25.2"
 ronin-kafka = "1.1.2"
 ronin-test = "0.2.0"
-spring-boot = "3.2.0"
-spring-kafka = "3.1.0"
-testcontainers-bom = "1.19.3"
+spring-boot = "3.2.2"
+spring-kafka = "3.1.1"
+testcontainers-bom = "1.19.4"
 
 [libraries]
 event-interop-resource-request = { module = "com.projectronin.contract.event:event-interop-resource-request", version.ref = "interop-event-resource-request" }
@@ -31,9 +31,9 @@ interop-commonJackson = { module = "com.projectronin.interop:interop-common-jack
 interop-commonKtorm = { module = "com.projectronin.interop:interop-common-ktorm", version.ref = "interop-common" }
 interop-commonTestDb = { module = "com.projectronin.interop:interop-common-test-db", version.ref = "interop-common" }
 interop-datalake = { module = "com.projectronin.interop.publish:interop-datalake", version.ref = "interop-datalake" }
-interop-rcdm-fhir-roninGenerators = { module = "com.projectronin.interop.rcdm:interop-fhir-ronin-generators", version.ref = "interop-rcdm" }
 interop-fhir = { module = "com.projectronin.interop.fhir:interop-fhir", version.ref = "interop-fhir" }
 interop-fhirGenerators = { module = "com.projectronin.interop.fhir:interop-fhir-generators", version.ref = "interop-fhir" }
+interop-rcdm-fhir-roninGenerators = { module = "com.projectronin.interop.rcdm:interop-fhir-ronin-generators", version.ref = "interop-rcdm" }
 jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }
 jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
 jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }

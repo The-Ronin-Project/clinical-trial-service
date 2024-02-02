@@ -73,28 +73,30 @@ class SubjectStatusControllerIT : BaseIT() {
 
     @Test
     fun `get subject status (no auth) - 401`() {
-        val response = runBlocking {
-            httpClient
-                .get(
-                    "$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/status"
-                )
-        }
+        val response =
+            runBlocking {
+                httpClient
+                    .get(
+                        "$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/status",
+                    )
+            }
         assertEquals(401, response.status.value)
     }
 
     @Test
     fun `get subject status (no data) - 404`() {
         val authentication = getAuth()
-        val response = runBlocking {
-            httpClient
-                .get("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/status") {
-                    headers {
-                        append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+        val response =
+            runBlocking {
+                httpClient
+                    .get("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/status") {
+                        headers {
+                            append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                        }
+                        accept(ContentType.Application.Json)
+                        contentType(ContentType.Application.Json)
                     }
-                    accept(ContentType.Application.Json)
-                    contentType(ContentType.Application.Json)
-                }
-        }
+            }
         assertEquals(404, response.status.value)
     }
 
@@ -102,16 +104,17 @@ class SubjectStatusControllerIT : BaseIT() {
     fun `get subject status - 200`() {
         seedDB()
         val authentication = getAuth()
-        val response = runBlocking {
-            httpClient
-                .get("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/status") {
-                    headers {
-                        append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+        val response =
+            runBlocking {
+                httpClient
+                    .get("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/status") {
+                        headers {
+                            append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                        }
+                        accept(ContentType.Application.Json)
+                        contentType(ContentType.Application.Json)
                     }
-                    accept(ContentType.Application.Json)
-                    contentType(ContentType.Application.Json)
-                }
-        }
+            }
         assertEquals(200, response.status.value)
     }
 
@@ -120,15 +123,16 @@ class SubjectStatusControllerIT : BaseIT() {
         seedDB()
         val authentication = getAuth()
         runBlocking {
-            val response = httpClient
-                .post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/status") {
-                    headers {
-                        append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+            val response =
+                httpClient
+                    .post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/status") {
+                        headers {
+                            append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                        }
+                        accept(ContentType.Application.Json)
+                        contentType(ContentType.Application.Json)
+                        setBody(UpdateStatusRequest("WITHDRAWN"))
                     }
-                    accept(ContentType.Application.Json)
-                    contentType(ContentType.Application.Json)
-                    setBody(UpdateStatusRequest("WITHDRAWN"))
-                }
 
             assertEquals(200, response.status.value)
             assertEquals("Enrollment status updated successfully.", response.body<StatusResponse>().message)

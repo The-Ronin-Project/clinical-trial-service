@@ -33,6 +33,7 @@ import java.time.ZoneOffset
 import java.util.Properties
 import java.util.UUID
 
+@Suppress("ktlint:standard:max-line-length")
 class SubjectControllerIT : BaseIT() {
     private val studyId = "009C2CB46A6F458F9BE7082193A75128"
     private val siteId = "F1AEC0AE8C6F44A6B0A4E50015D4ABED"
@@ -42,15 +43,22 @@ class SubjectControllerIT : BaseIT() {
     private val studySiteID = UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770")
 
     private val consumer: KafkaConsumer<String, RoninEvent<*>> by lazy {
-        val props = Properties().apply {
-            put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092") // Kafka broker address
-            put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer::class.java.name)
-            put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.springframework.kafka.support.serializer.ErrorHandlingDeserializer")
-            put("spring.deserializer.value.delegate.class", RoninEventDeserializer::class.java.name)
-            put("ronin.json.deserializer.topics", "oci.us-phoenix-1.interop-mirth.resource-request.v1:com.projectronin.event.interop.resource.request.v1.InteropResourceRequestV1")
-            put(ConsumerConfig.GROUP_ID_CONFIG, "clinical-trial-service-it") // Consumer group ID
-            put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest") // or "latest", based on your requirement
-        }
+        val props =
+            Properties().apply {
+                put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092") // Kafka broker address
+                put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer::class.java.name)
+                put(
+                    ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                    "org.springframework.kafka.support.serializer.ErrorHandlingDeserializer",
+                )
+                put("spring.deserializer.value.delegate.class", RoninEventDeserializer::class.java.name)
+                put(
+                    "ronin.json.deserializer.topics",
+                    "oci.us-phoenix-1.interop-mirth.resource-request.v1:com.projectronin.event.interop.resource.request.v1.InteropResourceRequestV1",
+                )
+                put(ConsumerConfig.GROUP_ID_CONFIG, "clinical-trial-service-it") // Consumer group ID
+                put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest") // or "latest", based on your requirement
+            }
         KafkaConsumer<String, RoninEvent<*>>(props)
     }
 
@@ -96,28 +104,31 @@ class SubjectControllerIT : BaseIT() {
 
     @Test
     fun `get fails auth`() {
-        val response = runBlocking {
-            httpClient.get("$serverUrl/subject&activeIdsOnly=true") {
-                contentType(ContentType.Application.Json)
+        val response =
+            runBlocking {
+                httpClient.get("$serverUrl/subject&activeIdsOnly=true") {
+                    contentType(ContentType.Application.Json)
+                }
             }
-        }
         assertEquals(HttpStatusCode.Unauthorized, response.status)
     }
 
     @Test
     fun `create fails auth`() {
-        val subject = Subject(
-            roninFhirId = "tenant-fhirId",
-            siteId = "siteId",
-            studyId = "studyId",
-            number = "subjectNumber"
-        )
-        val response = runBlocking {
-            httpClient.post("$serverUrl/subjects") {
-                setBody(subject)
-                contentType(ContentType.Application.Json)
+        val subject =
+            Subject(
+                roninFhirId = "tenant-fhirId",
+                siteId = "siteId",
+                studyId = "studyId",
+                number = "subjectNumber",
+            )
+        val response =
+            runBlocking {
+                httpClient.post("$serverUrl/subjects") {
+                    setBody(subject)
+                    contentType(ContentType.Application.Json)
+                }
             }
-        }
 
         assertEquals(HttpStatusCode.Unauthorized, response.status)
     }
@@ -126,20 +137,22 @@ class SubjectControllerIT : BaseIT() {
     fun `get active subjects with subjects`() {
         seedDB()
 
-        val subject = Subject(
-            roninFhirId = "tenant-fhirId",
-            siteId = siteId,
-            studyId = studyId,
-            number = subjectNumber
-        )
+        val subject =
+            Subject(
+                roninFhirId = "tenant-fhirId",
+                siteId = siteId,
+                studyId = studyId,
+                number = subjectNumber,
+            )
 
         runBlocking {
             client.createSubject(subject)
         }
 
-        val response = runBlocking {
-            client.getSubjects(true)
-        }
+        val response =
+            runBlocking {
+                client.getSubjects(true)
+            }
 
         assertTrue(response.isNotEmpty())
     }
@@ -148,19 +161,21 @@ class SubjectControllerIT : BaseIT() {
     fun `get active subject by roninFhirId`() {
         seedDB()
 
-        val subject = Subject(
-            roninFhirId = "tenant-fhirId",
-            siteId = siteId,
-            studyId = studyId
-        )
+        val subject =
+            Subject(
+                roninFhirId = "tenant-fhirId",
+                siteId = siteId,
+                studyId = studyId,
+            )
 
         runBlocking {
             client.createSubject(subject)
         }
 
-        val response = runBlocking {
-            client.getSubjectById(roninFhirId = "tenant-fhirId")
-        }
+        val response =
+            runBlocking {
+                client.getSubjectById(roninFhirId = "tenant-fhirId")
+            }
 
         assertEquals(response?.roninFhirId, subject.roninFhirId)
     }
@@ -169,17 +184,19 @@ class SubjectControllerIT : BaseIT() {
     fun `create a subject`() {
         seedDB()
         consumer.subscribe(listOf("oci.us-phoenix-1.interop-mirth.resource-request.v1"))
-        val subject = Subject(
-            roninFhirId = "tenant-fhirId",
-            siteId = siteId,
-            studyId = studyId
-        )
+        val subject =
+            Subject(
+                roninFhirId = "tenant-fhirId",
+                siteId = siteId,
+                studyId = studyId,
+            )
 
         val expectedSubjectId = "0CEE019CE0A9460BB9291A29EB67719B"
 
-        val response = runBlocking {
-            client.createSubject(subject)
-        }
+        val response =
+            runBlocking {
+                client.createSubject(subject)
+            }
 
         assertTrue(response.id.isNotEmpty())
         assertTrue(response.number.isNotEmpty())

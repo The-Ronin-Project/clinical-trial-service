@@ -37,7 +37,6 @@ import java.time.ZoneOffset
 import java.util.UUID
 
 class ObservationControllerIT : BaseIT() {
-
     private val observationDAO = ObservationDAO(ctdaDatabase)
     private val studyId = "studyId"
     private val siteId = "siteId"
@@ -45,22 +44,24 @@ class ObservationControllerIT : BaseIT() {
     private val roninFhirId = "fhirId"
     private val studySiteID = UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770")
     private val authentication = getAuth()
-    private val testObservations1 = (1..8).toList().map {
-        observation {
-            id of Id("observationID-$it")
-            meta of Meta(tag = listOf(Coding(system = Uri("10f8c49a-635b-4928-aee6-f6e47c2e7c50"), display = FHIRString("Birth Date"))))
-            effective of DynamicValue(DynamicValueType.DATE_TIME, DateTime("2023-12-01T00:00:00"))
-            extension of setCTDMExtensions(subjectId = subjectId)
+    private val testObservations1 =
+        (1..8).toList().map {
+            observation {
+                id of Id("observationID-$it")
+                meta of Meta(tag = listOf(Coding(system = Uri("10f8c49a-635b-4928-aee6-f6e47c2e7c50"), display = FHIRString("Birth Date"))))
+                effective of DynamicValue(DynamicValueType.DATE_TIME, DateTime("2023-12-01T00:00:00"))
+                extension of setCTDMExtensions(subjectId = subjectId)
+            }
         }
-    }
-    private val testObservations2 = (9..12).toList().map {
-        observation {
-            id of Id("observationID-$it")
-            meta of Meta(tag = listOf(Coding(system = Uri("daf6a5fc-5705-400b-abd0-852e060c9325"), display = FHIRString("Sex"))))
-            effective of DynamicValue(DynamicValueType.DATE_TIME, DateTime("2023-12-01T00:00:00"))
-            extension of setCTDMExtensions(subjectId = subjectId)
+    private val testObservations2 =
+        (9..12).toList().map {
+            observation {
+                id of Id("observationID-$it")
+                meta of Meta(tag = listOf(Coding(system = Uri("daf6a5fc-5705-400b-abd0-852e060c9325"), display = FHIRString("Sex"))))
+                effective of DynamicValue(DynamicValueType.DATE_TIME, DateTime("2023-12-01T00:00:00"))
+                extension of setCTDMExtensions(subjectId = subjectId)
+            }
         }
-    }
     private val allObservations = listOf(testObservations1, testObservations2).flatten()
 
     private fun seedDB() {
@@ -95,6 +96,7 @@ class ObservationControllerIT : BaseIT() {
             observationDAO.insert(it)
         }
     }
+
     private fun clearDB() {
         database.deleteAll(SubjectStatusDOs)
         database.deleteAll(SubjectDOs)
@@ -112,28 +114,30 @@ class ObservationControllerIT : BaseIT() {
 
     @Test
     fun `get observations - 200`() {
-        val expectedResponse = GetObservationsResponse(
-            subjectId,
-            testObservations1,
-            Pagination(1, 10, false, 8)
-        )
+        val expectedResponse =
+            GetObservationsResponse(
+                subjectId,
+                testObservations1,
+                Pagination(1, 10, false, 8),
+            )
 
         runBlocking {
-            val response = httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/observations") {
-                contentType(ContentType.Application.Json)
-                headers {
-                    append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
-                }
-                setBody(
-                    mapOf(
-                        "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50"),
-                        "date_range" to mapOf("start_date" to "2023-11-11T00:00:00", "end_date" to "2023-12-12"),
-                        "offset" to 1,
-                        "limit" to 10,
-                        "test_mode" to false
+            val response =
+                httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/observations") {
+                    contentType(ContentType.Application.Json)
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                    }
+                    setBody(
+                        mapOf(
+                            "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50"),
+                            "date_range" to mapOf("start_date" to "2023-11-11T00:00:00", "end_date" to "2023-12-12"),
+                            "offset" to 1,
+                            "limit" to 10,
+                            "test_mode" to false,
+                        ),
                     )
-                )
-            }
+                }
             assertEquals(HttpStatusCode.OK, response.status)
             assertEquals(expectedResponse, response.body<GetObservationsResponse>())
         }
@@ -141,51 +145,55 @@ class ObservationControllerIT : BaseIT() {
 
     @Test
     fun `get observations - 200 multiple pages and observation types`() {
-        val expectedResponse1 = GetObservationsResponse(
-            subjectId,
-            testObservations1 + testObservations2.slice(0..1),
-            Pagination(1, 10, true, 12)
-        )
-        val expectedResponse2 = GetObservationsResponse(
-            subjectId,
-            testObservations2.slice(2..3),
-            Pagination(11, 10, false, 12)
-        )
+        val expectedResponse1 =
+            GetObservationsResponse(
+                subjectId,
+                testObservations1 + testObservations2.slice(0..1),
+                Pagination(1, 10, true, 12),
+            )
+        val expectedResponse2 =
+            GetObservationsResponse(
+                subjectId,
+                testObservations2.slice(2..3),
+                Pagination(11, 10, false, 12),
+            )
 
         runBlocking {
-            val response = httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/observations") {
-                contentType(ContentType.Application.Json)
-                headers {
-                    append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
-                }
-                setBody(
-                    mapOf(
-                        "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50", "daf6a5fc-5705-400b-abd0-852e060c9325"),
-                        "date_range" to mapOf("start_date" to "2023-11-11T00:00:00", "end_date" to "2023-12-12"),
-                        "offset" to 1,
-                        "limit" to 10,
-                        "test_mode" to false
+            val response =
+                httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/observations") {
+                    contentType(ContentType.Application.Json)
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                    }
+                    setBody(
+                        mapOf(
+                            "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50", "daf6a5fc-5705-400b-abd0-852e060c9325"),
+                            "date_range" to mapOf("start_date" to "2023-11-11T00:00:00", "end_date" to "2023-12-12"),
+                            "offset" to 1,
+                            "limit" to 10,
+                            "test_mode" to false,
+                        ),
                     )
-                )
-            }
+                }
             assertEquals(HttpStatusCode.OK, response.status)
             assertEquals(expectedResponse1, response.body<GetObservationsResponse>())
 
-            val response2 = httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/observations") {
-                contentType(ContentType.Application.Json)
-                headers {
-                    append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
-                }
-                setBody(
-                    mapOf(
-                        "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50", "daf6a5fc-5705-400b-abd0-852e060c9325"),
-                        "date_range" to mapOf("start_date" to "2023-11-11T00:00:00", "end_date" to "2023-12-12"),
-                        "offset" to 11,
-                        "limit" to 10,
-                        "test_mode" to false
+            val response2 =
+                httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/observations") {
+                    contentType(ContentType.Application.Json)
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                    }
+                    setBody(
+                        mapOf(
+                            "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50", "daf6a5fc-5705-400b-abd0-852e060c9325"),
+                            "date_range" to mapOf("start_date" to "2023-11-11T00:00:00", "end_date" to "2023-12-12"),
+                            "offset" to 11,
+                            "limit" to 10,
+                            "test_mode" to false,
+                        ),
                     )
-                )
-            }
+                }
             assertEquals(HttpStatusCode.OK, response2.status)
             assertEquals(expectedResponse2, response2.body<GetObservationsResponse>())
         }
@@ -194,21 +202,22 @@ class ObservationControllerIT : BaseIT() {
     @Test
     fun `get observations - 404 patient not found`() {
         runBlocking {
-            val response = httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/anotherSubject/observations") {
-                contentType(ContentType.Application.Json)
-                headers {
-                    append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
-                }
-                setBody(
-                    mapOf(
-                        "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50"),
-                        "date_range" to mapOf("start_date" to "2023-11-11T00:00:00", "end_date" to "2023-12-12"),
-                        "offset" to 1,
-                        "limit" to 100,
-                        "test_mode" to false
+            val response =
+                httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/anotherSubject/observations") {
+                    contentType(ContentType.Application.Json)
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                    }
+                    setBody(
+                        mapOf(
+                            "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50"),
+                            "date_range" to mapOf("start_date" to "2023-11-11T00:00:00", "end_date" to "2023-12-12"),
+                            "offset" to 1,
+                            "limit" to 100,
+                            "test_mode" to false,
+                        ),
                     )
-                )
-            }
+                }
             assertEquals(HttpStatusCode.NotFound, response.status)
             assertEquals("Subject ID not found: anotherSubject", response.body<ErrorResponse>().message)
         }
@@ -217,21 +226,22 @@ class ObservationControllerIT : BaseIT() {
     @Test
     fun `get observations - 400 invalid date range`() {
         runBlocking {
-            val response = httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/observations") {
-                contentType(ContentType.Application.Json)
-                headers {
-                    append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
-                }
-                setBody(
-                    mapOf(
-                        "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50"),
-                        "date_range" to mapOf("start_date" to "2023-11-1", "end_date" to "2023-12-"),
-                        "offset" to 1,
-                        "limit" to 100,
-                        "test_mode" to false
+            val response =
+                httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/observations") {
+                    contentType(ContentType.Application.Json)
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                    }
+                    setBody(
+                        mapOf(
+                            "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50"),
+                            "date_range" to mapOf("start_date" to "2023-11-1", "end_date" to "2023-12-"),
+                            "offset" to 1,
+                            "limit" to 100,
+                            "test_mode" to false,
+                        ),
                     )
-                )
-            }
+                }
             assertEquals(HttpStatusCode.BadRequest, response.status)
             assertEquals("Invalid start_date: 2023-11-1", response.body<ErrorResponse>().message)
         }
@@ -240,21 +250,22 @@ class ObservationControllerIT : BaseIT() {
     @Test
     fun `get observations - 400 invalid offset`() {
         runBlocking {
-            val response = httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/observations") {
-                contentType(ContentType.Application.Json)
-                headers {
-                    append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
-                }
-                setBody(
-                    mapOf(
-                        "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50"),
-                        "date_range" to mapOf("start_date" to "2023-11-11", "end_date" to "2023-12-12"),
-                        "offset" to 0,
-                        "limit" to 100,
-                        "test_mode" to false
+            val response =
+                httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/observations") {
+                    contentType(ContentType.Application.Json)
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                    }
+                    setBody(
+                        mapOf(
+                            "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50"),
+                            "date_range" to mapOf("start_date" to "2023-11-11", "end_date" to "2023-12-12"),
+                            "offset" to 0,
+                            "limit" to 100,
+                            "test_mode" to false,
+                        ),
                     )
-                )
-            }
+                }
             assertEquals(HttpStatusCode.BadRequest, response.status)
             assertEquals("offset must be at least 1.", response.body<ErrorResponse>().message)
         }

@@ -13,17 +13,10 @@ plugins {
     alias(libs.plugins.interop.server.publish) apply false
     alias(libs.plugins.interop.server.version)
     alias(libs.plugins.interop.version.catalog)
-//    alias(libs.plugins.interop.sonarqube)
-    id("org.sonarqube") version "4.4.1.3373"
+    alias(libs.plugins.interop.sonarqube)
 
     // We need to force IntelliJ to do some actions they expose through this plugin.
     alias(libs.plugins.idea.ext)
-}
-
-sonar {
-    properties {
-        property("sonar.projectKey", project.rootProject.name)
-    }
 }
 
 subprojects {
@@ -31,12 +24,5 @@ subprojects {
 
     if (project.name != "clinical-trial-server") {
         apply(plugin = "com.projectronin.interop.gradle.server-publish")
-    }
-
-    sonar {
-        properties {
-            property("sonar.sources", "src/main")
-            property("sonar.tests", "src/test")
-        }
     }
 }

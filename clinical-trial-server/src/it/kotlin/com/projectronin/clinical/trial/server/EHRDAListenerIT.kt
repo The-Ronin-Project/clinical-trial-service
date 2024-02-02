@@ -91,50 +91,55 @@ class EHRDAListenerIT : BaseIT() {
     }
 
     private val producer: KafkaProducer<String, RoninEvent<*>> by lazy {
-        val props = Properties().apply {
-            put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092") // Update with your Kafka broker address
-            put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java.name)
-            put(
-                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-                RoninEventSerializer::class.java.name
-            )
-        }
+        val props =
+            Properties().apply {
+                put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092") // Update with your Kafka broker address
+                put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java.name)
+                put(
+                    ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                    RoninEventSerializer::class.java.name,
+                )
+            }
         KafkaProducer<String, RoninEvent<*>>(props)
     }
 
     @Test
     fun `listens to patient topic`() {
         seedDB()
-        val subject = Subject(
-            roninFhirId = "ronincer-PatientId2",
-            siteId = siteId,
-            studyId = studyId,
-            number = subjectNumber
-        )
+        val subject =
+            Subject(
+                roninFhirId = "ronincer-PatientId2",
+                siteId = siteId,
+                studyId = studyId,
+                number = subjectNumber,
+            )
 
         runBlocking {
             client.createSubject(subject)
         }
-        val patient = patient {
-            id of Id("ronincer-PatientId2")
-            birthDate of Date("01-01-1999")
-            identifier of listOf(
-                Identifier(
-                    system = CodeSystem.RONIN_FHIR_ID.uri,
-                    value = "ronincer-PatientId2".asFHIR(),
-                    type = CodeableConcepts.RONIN_FHIR_ID
-                )
+        val patient =
+            patient {
+                id of Id("ronincer-PatientId2")
+                birthDate of Date("01-01-1999")
+                identifier of
+                    listOf(
+                        Identifier(
+                            system = CodeSystem.RONIN_FHIR_ID.uri,
+                            value = "ronincer-PatientId2".asFHIR(),
+                            type = CodeableConcepts.RONIN_FHIR_ID,
+                        ),
+                    )
+            }
+        val event =
+            RoninEvent(
+                specVersion = "1.0",
+                dataSchema = "dataSchema",
+                dataContentType = "dataContentType",
+                source = "integrationTest",
+                type = "type",
+                data = patient,
+                subject = "subject",
             )
-        }
-        val event = RoninEvent(
-            specVersion = "1.0",
-            dataSchema = "dataSchema",
-            dataContentType = "dataContentType",
-            source = "integrationTest",
-            type = "type",
-            data = patient,
-            subject = "subject"
-        )
         producer.send(ProducerRecord("oci.us-phoenix-1.ehr-data-authority.patient.v1", event)).get()
         // wait for listener to process message
         do {
@@ -147,49 +152,55 @@ class EHRDAListenerIT : BaseIT() {
     @Test
     fun `listens to observation topic`() {
         seedDB()
-        val testSubject = Subject(
-            roninFhirId = "ronincer-PatientId3",
-            siteId = siteId,
-            studyId = studyId,
-            number = subjectNumber
-        )
+        val testSubject =
+            Subject(
+                roninFhirId = "ronincer-PatientId3",
+                siteId = siteId,
+                studyId = studyId,
+                number = subjectNumber,
+            )
 
         runBlocking {
             client.createSubject(testSubject)
         }
 
-        val observation = rcdmObservationLaboratoryResult("ronincer") {
-            subject of rcdmReference("Patient", "ronincer-PatientId3")
-            code of codeableConcept {
-                coding of listOf(
-                    coding {
-                        system of "http://loinc.org"
-                        version of "2.74"
-                        code of Code("8302-2")
-                        display of "Body height"
+        val observation =
+            rcdmObservationLaboratoryResult("ronincer") {
+                subject of rcdmReference("Patient", "ronincer-PatientId3")
+                code of
+                    codeableConcept {
+                        coding of
+                            listOf(
+                                coding {
+                                    system of "http://loinc.org"
+                                    version of "2.74"
+                                    code of Code("8302-2")
+                                    display of "Body height"
+                                },
+                            )
                     }
-                )
+                value of DynamicValues.string("1")
+                identifier of
+                    listOf(
+                        Identifier(
+                            system = CodeSystem.RONIN_FHIR_ID.uri,
+                            value = "ronincer-PatientId3".asFHIR(),
+                            type = CodeableConcepts.RONIN_FHIR_ID,
+                        ),
+                    )
+                effective of DynamicValues.dateTime("2023-01-01")
             }
-            value of DynamicValues.string("1")
-            identifier of listOf(
-                Identifier(
-                    system = CodeSystem.RONIN_FHIR_ID.uri,
-                    value = "ronincer-PatientId3".asFHIR(),
-                    type = CodeableConcepts.RONIN_FHIR_ID
-                )
-            )
-            effective of DynamicValues.dateTime("2023-01-01")
-        }
 
-        val event = RoninEvent(
-            specVersion = "1.0",
-            dataSchema = "dataSchema",
-            dataContentType = "dataContentType",
-            source = "integrationTest",
-            type = "type",
-            data = observation,
-            subject = "subject"
-        )
+        val event =
+            RoninEvent(
+                specVersion = "1.0",
+                dataSchema = "dataSchema",
+                dataContentType = "dataContentType",
+                source = "integrationTest",
+                type = "type",
+                data = observation,
+                subject = "subject",
+            )
         producer.send(ProducerRecord("oci.us-phoenix-1.ehr-data-authority.observation.v1", event)).get()
         // wait for listener to process message
         do {

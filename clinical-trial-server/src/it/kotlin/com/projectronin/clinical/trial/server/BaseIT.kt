@@ -27,15 +27,16 @@ abstract class BaseIT {
 
     protected val database = Database.connect(url = "jdbc:mysql://springuser:ThePassword@localhost:3306/clinical-trial-db")
 
-    protected val ctdaDatabase = ClinicalTrialDataAuthorityDatabase(
-        XDevConfig(
-            "localhost",
-            "33060",
-            "clinical-trial-db",
-            "springuser",
-            "ThePassword"
+    protected val ctdaDatabase =
+        ClinicalTrialDataAuthorityDatabase(
+            XDevConfig(
+                "localhost",
+                "33060",
+                "clinical-trial-db",
+                "springuser",
+                "ThePassword",
+            ),
         )
-    )
 
     protected val serverUrl = "http://localhost:8080"
     protected val httpClient = HttpSpringConfig().getHttpClient()
@@ -47,26 +48,31 @@ abstract class BaseIT {
             "https://clinical-trial-service.dev.projectronin.io",
             "id",
             "secret",
-            false
+            false,
         )
 
     protected val client = ClinicalTrialClient(serverUrl, httpClient, authenticationService)
+
     data class FormBasedAuthentication(override val accessToken: String) : Authentication {
         override val tokenType: String = "Bearer"
         override val expiresAt: Instant? = null
         override val refreshToken: String? = null
         override val scope: String? = null
     }
-    protected fun getAuth(): Authentication = runBlocking {
-        val json: JsonNode = httpClient.submitForm(
-            url = authUrl,
-            formParameters = Parameters.build {
-                append("grant_type", "client_credentials")
-                append("client_id", "id")
-                append("client_secret", "secret")
-            }
-        ).body()
-        val accessToken = json.get("access_token").asText()
-        FormBasedAuthentication(accessToken)
-    }
+
+    protected fun getAuth(): Authentication =
+        runBlocking {
+            val json: JsonNode =
+                httpClient.submitForm(
+                    url = authUrl,
+                    formParameters =
+                        Parameters.build {
+                            append("grant_type", "client_credentials")
+                            append("client_id", "id")
+                            append("client_secret", "secret")
+                        },
+                ).body()
+            val accessToken = json.get("access_token").asText()
+            FormBasedAuthentication(accessToken)
+        }
 }
