@@ -4,6 +4,7 @@ import com.projectronin.clinical.trial.server.dataauthority.ObservationDAO
 import com.projectronin.clinical.trial.server.services.SubjectService
 import com.projectronin.clinical.trial.server.transform.DataDictionaryRow
 import com.projectronin.clinical.trial.server.transform.DataDictionaryService
+import com.projectronin.clinical.trial.server.transform.RCDMMedicationRequestToCTDMMedicationRequest
 import com.projectronin.clinical.trial.server.transform.RCDMObservationToCTDMObservation
 import com.projectronin.clinical.trial.server.transform.RCDMPatientToCTDMObservations
 import com.projectronin.interop.fhir.r4.datatype.Coding
@@ -11,6 +12,7 @@ import com.projectronin.interop.fhir.r4.datatype.Reference
 import com.projectronin.interop.fhir.r4.datatype.primitive.Code
 import com.projectronin.interop.fhir.r4.datatype.primitive.Uri
 import com.projectronin.interop.fhir.r4.datatype.primitive.asFHIR
+import com.projectronin.interop.fhir.r4.resource.MedicationRequest
 import com.projectronin.interop.fhir.r4.resource.Observation
 import com.projectronin.interop.fhir.r4.resource.Patient
 import com.projectronin.kafka.data.RoninEvent
@@ -25,12 +27,21 @@ class EHRDAListenerTest {
     private var subjectService = mockk<SubjectService>()
     private var patientTransformer = mockk<RCDMPatientToCTDMObservations>()
     private var observationTransformer = mockk<RCDMObservationToCTDMObservation>()
+    private var medicationRequestTransformer = mockk<RCDMMedicationRequestToCTDMMedicationRequest>()
     private var observationDAO =
         mockk<ObservationDAO> {
             every { update(any()) } just Runs
         }
     private var dictionaryService = mockk<DataDictionaryService>()
-    private val listener = EHRDAListener(subjectService, patientTransformer, observationTransformer, observationDAO, dictionaryService)
+    private val listener =
+        EHRDAListener(
+            subjectService,
+            patientTransformer,
+            observationTransformer,
+            medicationRequestTransformer,
+            observationDAO,
+            dictionaryService,
+        )
 
     @Test
     fun `patient listener works`() {
@@ -203,5 +214,64 @@ class EHRDAListenerTest {
         } returns listOf(DataDictionaryRow("test", "test", "test", "test"))
         every { observationTransformer.rcdmObservationToCTDMObservation("ronincer-patientId1", any()) } returns null
         assertDoesNotThrow { listener.consumeObservation(message) }
+    }
+
+    @Test
+    fun `medicationRequest listener works when matching subject found but transform fails`() {
+        val message =
+            mockk<RoninEvent<MedicationRequest>> {
+                every { data } returns
+                    mockk {
+                        every { subject?.decomposedId() } returns "ronincer-patientId1"
+                    }
+                every { tenantId } returns "ronincer"
+            }
+        every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId1")
+        every { medicationRequestTransformer.rcdmMedicationRequestToCTDMMedicationRequest("ronincer-patientId1", any()) } returns null
+        assertDoesNotThrow { listener.consumeMedicationRequest(message) }
+    }
+
+    @Test
+    fun `medicationRequest listener works when no matching subject found`() {
+        val message =
+            mockk<RoninEvent<MedicationRequest>> {
+                every { data } returns
+                    mockk {
+                        every { subject?.decomposedId() } returns "ronincer-patientId1"
+                    }
+                every { tenantId } returns "ronincer"
+            }
+        every { subjectService.getActiveFhirIds() } returns setOf()
+        assertDoesNotThrow { listener.consumeMedicationRequest(message) }
+    }
+
+    @Test
+    fun `medicationRequest listener works when matching subject found and transform succeeds`() {
+        val message =
+            mockk<RoninEvent<MedicationRequest>> {
+                every { data } returns
+                    mockk {
+                        every { subject?.decomposedId() } returns "ronincer-patientId1"
+                    }
+                every { tenantId } returns "ronincer"
+            }
+        every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId1")
+        every {
+            medicationRequestTransformer.rcdmMedicationRequestToCTDMMedicationRequest("ronincer-patientId1", any())
+        } returns mockk()
+        assertDoesNotThrow { listener.consumeMedicationRequest(message) }
+    }
+
+    @Test
+    fun `medicationRequest listener works when no fhir id found on request`() {
+        val message =
+            mockk<RoninEvent<MedicationRequest>> {
+                every { data } returns
+                    mockk {
+                        every { subject?.decomposedId() } returns null
+                    }
+                every { tenantId } returns "ronincer"
+            }
+        assertDoesNotThrow { listener.consumeMedicationRequest(message) }
     }
 }

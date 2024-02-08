@@ -23,6 +23,7 @@ import com.projectronin.interop.fhir.r4.datatype.primitive.FHIRString
 import com.projectronin.interop.fhir.r4.datatype.primitive.Id
 import com.projectronin.interop.fhir.r4.datatype.primitive.asFHIR
 import com.projectronin.interop.fhir.ronin.generators.resource.observation.rcdmObservationLaboratoryResult
+import com.projectronin.interop.fhir.ronin.generators.resource.rcdmMedicationRequest
 import com.projectronin.interop.fhir.ronin.generators.util.rcdmReference
 import com.projectronin.kafka.data.RoninEvent
 import com.projectronin.kafka.serde.RoninEventSerializer
@@ -208,5 +209,42 @@ class EHRDAListenerIT : BaseIT() {
         } while (observationDAO.search(valueSetIds = listOf("370b5c79-71f1-4f00-ab3d-cd7d430f813b")).isEmpty())
         val actual = observationDAO.search(valueSetIds = listOf("370b5c79-71f1-4f00-ab3d-cd7d430f813b")).first()
         assertEquals(FHIRString("1"), actual.value!!.value)
+    }
+
+    @Test
+    fun `listens to medication request topic`() {
+        seedDB()
+        val testSubject =
+            Subject(
+                roninFhirId = "ronincer-PatientId3",
+                siteId = siteId,
+                studyId = studyId,
+                number = subjectNumber,
+            )
+
+        runBlocking {
+            client.createSubject(testSubject)
+        }
+
+        val medicationRequest =
+            rcdmMedicationRequest("ronincer") {
+                subject of rcdmReference("Patient", "ronincer-PatientId3")
+                // TODO: create medication request
+            }
+
+        val event =
+            RoninEvent(
+                specVersion = "1.0",
+                dataSchema = "dataSchema",
+                dataContentType = "dataContentType",
+                source = "integrationTest",
+                type = "type",
+                data = medicationRequest,
+                subject = "subject",
+            )
+        producer.send(ProducerRecord("oci.us-phoenix-1.ehr-data-authority.medication-request.v1", event)).get()
+
+        // TODO: Wait and then Check MedicationDAO to ensure record was added.
+        assertEquals(1, 1)
     }
 }

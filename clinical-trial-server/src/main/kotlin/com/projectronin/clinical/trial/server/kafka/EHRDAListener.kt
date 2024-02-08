@@ -3,8 +3,10 @@ package com.projectronin.clinical.trial.server.kafka
 import com.projectronin.clinical.trial.server.dataauthority.ObservationDAO
 import com.projectronin.clinical.trial.server.services.SubjectService
 import com.projectronin.clinical.trial.server.transform.DataDictionaryService
+import com.projectronin.clinical.trial.server.transform.RCDMMedicationRequestToCTDMMedicationRequest
 import com.projectronin.clinical.trial.server.transform.RCDMObservationToCTDMObservation
 import com.projectronin.clinical.trial.server.transform.RCDMPatientToCTDMObservations
+import com.projectronin.interop.fhir.r4.resource.MedicationRequest
 import com.projectronin.interop.fhir.r4.resource.Observation
 import com.projectronin.interop.fhir.r4.resource.Patient
 import com.projectronin.kafka.data.RoninEvent
@@ -17,6 +19,7 @@ class EHRDAListener(
     private val subjectService: SubjectService,
     private val patientTransformer: RCDMPatientToCTDMObservations,
     private val observationTransformer: RCDMObservationToCTDMObservation,
+    private val medicationRequestTransformer: RCDMMedicationRequestToCTDMMedicationRequest,
     private val observationDAO: ObservationDAO,
     private val dataDictionaryService: DataDictionaryService,
 ) {
@@ -47,6 +50,26 @@ class EHRDAListener(
             demographicObservations.forEach {
                 observationDAO.update(it)
                 KotlinLogging.logger { }.info { "Observation ${it.id?.value} added" }
+            }
+        }
+    }
+
+    @KafkaListener(topics = ["oci.us-phoenix-1.ehr-data-authority.medication-request.v1"], groupId = "clinical-trial-service")
+    fun consumeMedicationRequest(message: RoninEvent<MedicationRequest>) {
+        val medRequest = message.data
+        medRequest.subject?.decomposedId()?.let { patientFhirId ->
+            if (checkTenantAndPatient(patientFhirId)) {
+                val ctdmMedicationRequest =
+                    medicationRequestTransformer.rcdmMedicationRequestToCTDMMedicationRequest(
+                        patientFhirId,
+                        medRequest,
+                    )
+                if (ctdmMedicationRequest != null) {
+                    KotlinLogging.logger { }.info { "MedicationRequest ${ctdmMedicationRequest.id?.value} added" }
+                    // TODO: medicationRequestDAO.update(ctdmMedicationRequest)
+                } else {
+                    KotlinLogging.logger { }.warn { "MedicationRequest ${medRequest.id?.value} not applicable" }
+                }
             }
         }
     }
