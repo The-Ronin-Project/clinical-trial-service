@@ -1,7 +1,7 @@
 [versions]
 idea-ext = "1.1.7"
 interop-common = "4.1.0"
-interop-datalake = "9.1.0"
+interop-datalake = "9.2.0"
 interop-event-resource-request = "1.1.0"
 interop-fhir = "9.1.1"
 interop-gradle = "4.0.3"
@@ -21,7 +21,7 @@ ronin-kafka = "1.1.2"
 ronin-test = "0.2.0"
 spring-boot = "3.2.2"
 spring-kafka = "3.1.1"
-testcontainers-bom = "1.19.4"
+testcontainers-bom = "1.19.5"
 
 [libraries]
 event-interop-resource-request = { module = "com.projectronin.contract.event:event-interop-resource-request", version.ref = "interop-event-resource-request" }
