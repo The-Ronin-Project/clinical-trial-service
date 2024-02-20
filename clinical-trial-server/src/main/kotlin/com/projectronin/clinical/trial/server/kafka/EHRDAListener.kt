@@ -3,9 +3,11 @@ package com.projectronin.clinical.trial.server.kafka
 import com.projectronin.clinical.trial.server.dataauthority.ObservationDAO
 import com.projectronin.clinical.trial.server.services.SubjectService
 import com.projectronin.clinical.trial.server.transform.DataDictionaryService
+import com.projectronin.clinical.trial.server.transform.RCDMConditionToCTDMCondition
 import com.projectronin.clinical.trial.server.transform.RCDMMedicationRequestToCTDMMedicationRequest
 import com.projectronin.clinical.trial.server.transform.RCDMObservationToCTDMObservation
 import com.projectronin.clinical.trial.server.transform.RCDMPatientToCTDMObservations
+import com.projectronin.interop.fhir.r4.resource.Condition
 import com.projectronin.interop.fhir.r4.resource.MedicationRequest
 import com.projectronin.interop.fhir.r4.resource.Observation
 import com.projectronin.interop.fhir.r4.resource.Patient
@@ -20,10 +22,30 @@ class EHRDAListener(
     private val patientTransformer: RCDMPatientToCTDMObservations,
     private val observationTransformer: RCDMObservationToCTDMObservation,
     private val medicationRequestTransformer: RCDMMedicationRequestToCTDMMedicationRequest,
+    private val conditionTransformer: RCDMConditionToCTDMCondition,
     private val observationDAO: ObservationDAO,
     private val dataDictionaryService: DataDictionaryService,
 ) {
     private val tenants = listOf("ronin", "ronincer", "ggwadc8y") // TODO: swap this with a call to the tenant service
+
+    @KafkaListener(topics = ["oci.us-phoenix-1.ehr-data-authority.condition.v1"], groupId = "clinical-trial-service")
+    fun consumeCondition(message: RoninEvent<Condition>) {
+        val condition = message.data
+        condition.subject?.decomposedId()?.let { patientFhirId ->
+            if (checkTenantAndPatient(patientFhirId)) {
+                val ctdmCondition =
+                    conditionTransformer.rcdmConditionToCTDMCondition(
+                        patientFhirId,
+                        condition,
+                    )
+                if (ctdmCondition != null) {
+                    KotlinLogging.logger { }.info { "Condition ${condition.id?.value} added" }
+                } else {
+                    KotlinLogging.logger { }.warn { "Condition ${condition.id?.value} not applicable" }
+                }
+            }
+        }
+    }
 
     @KafkaListener(topics = ["oci.us-phoenix-1.ehr-data-authority.observation.v1"], groupId = "clinical-trial-service")
     fun consumeObservation(message: RoninEvent<Observation>) {

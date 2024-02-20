@@ -4,6 +4,7 @@ import com.projectronin.clinical.trial.server.dataauthority.ObservationDAO
 import com.projectronin.clinical.trial.server.services.SubjectService
 import com.projectronin.clinical.trial.server.transform.DataDictionaryRow
 import com.projectronin.clinical.trial.server.transform.DataDictionaryService
+import com.projectronin.clinical.trial.server.transform.RCDMConditionToCTDMCondition
 import com.projectronin.clinical.trial.server.transform.RCDMMedicationRequestToCTDMMedicationRequest
 import com.projectronin.clinical.trial.server.transform.RCDMObservationToCTDMObservation
 import com.projectronin.clinical.trial.server.transform.RCDMPatientToCTDMObservations
@@ -12,6 +13,7 @@ import com.projectronin.interop.fhir.r4.datatype.Reference
 import com.projectronin.interop.fhir.r4.datatype.primitive.Code
 import com.projectronin.interop.fhir.r4.datatype.primitive.Uri
 import com.projectronin.interop.fhir.r4.datatype.primitive.asFHIR
+import com.projectronin.interop.fhir.r4.resource.Condition
 import com.projectronin.interop.fhir.r4.resource.MedicationRequest
 import com.projectronin.interop.fhir.r4.resource.Observation
 import com.projectronin.interop.fhir.r4.resource.Patient
@@ -28,6 +30,7 @@ class EHRDAListenerTest {
     private var patientTransformer = mockk<RCDMPatientToCTDMObservations>()
     private var observationTransformer = mockk<RCDMObservationToCTDMObservation>()
     private var medicationRequestTransformer = mockk<RCDMMedicationRequestToCTDMMedicationRequest>()
+    private var conditionTransformer = mockk<RCDMConditionToCTDMCondition>()
     private var observationDAO =
         mockk<ObservationDAO> {
             every { update(any()) } just Runs
@@ -39,6 +42,7 @@ class EHRDAListenerTest {
             patientTransformer,
             observationTransformer,
             medicationRequestTransformer,
+            conditionTransformer,
             observationDAO,
             dictionaryService,
         )
@@ -76,6 +80,85 @@ class EHRDAListenerTest {
                 every { tenantId } returns "ronincer"
             }
         assertDoesNotThrow { listener.consumePatient(message3) }
+    }
+
+    @Test
+    fun `condition listener works when subject found but transform fails`() {
+        every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId2")
+
+        val message =
+            mockk<RoninEvent<Condition>> {
+                every { data } returns
+                    mockk {
+                        every { subject?.decomposedId() } returns "ronincer-patientId2"
+                    }
+                every { tenantId } returns "ronincer"
+            }
+        every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId2")
+        every {
+            conditionTransformer.rcdmConditionToCTDMCondition("ronincer-patientId2", any())
+        } returns null
+
+        assertDoesNotThrow { listener.consumeCondition(message) }
+    }
+
+    @Test
+    fun `condition listener works when no matching subject found`() {
+        val message =
+            mockk<RoninEvent<Condition>> {
+                every { data } returns
+                    mockk {
+                        every { subject?.decomposedId() } returns "ronincer-patientId0"
+                    }
+                every { tenantId } returns "ronincer"
+            }
+        every { subjectService.getActiveFhirIds() } returns setOf()
+        assertDoesNotThrow { listener.consumeCondition(message) }
+    }
+
+    @Test
+    fun `condition listener works when matching subject found and transform succeeds`() {
+        val message =
+            mockk<RoninEvent<Condition>> {
+                every { data } returns
+                    mockk {
+                        every { subject?.decomposedId() } returns "ronincer-patientId3"
+                    }
+                every { tenantId } returns "ronincer"
+            }
+        every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId3")
+        every {
+            conditionTransformer.rcdmConditionToCTDMCondition("ronincer-patientId3", any())
+        } returns mockk()
+        assertDoesNotThrow { listener.consumeCondition(message) }
+    }
+
+    @Test
+    fun `condition listener works when no fhir id found on request`() {
+        val message =
+            mockk<RoninEvent<Condition>> {
+                every { data } returns
+                    mockk {
+                        every { subject?.decomposedId() } returns null
+                    }
+                every { tenantId } returns "ronincer"
+            }
+
+        assertDoesNotThrow { listener.consumeCondition(message) }
+    }
+
+    @Test
+    fun `conditioner listener works when no matching tenant is found`() {
+        val message =
+            mockk<RoninEvent<Condition>> {
+                every { data } returns
+                    mockk {
+                        every { subject?.decomposedId() } returns "badtenant-patientId0"
+                    }
+                every { tenantId } returns "badtenant"
+            }
+
+        assertDoesNotThrow { listener.consumeCondition(message) }
     }
 
     @Test

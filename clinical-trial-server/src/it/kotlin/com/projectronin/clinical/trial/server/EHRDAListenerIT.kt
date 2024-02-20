@@ -22,6 +22,7 @@ import com.projectronin.interop.fhir.r4.datatype.primitive.DateTime
 import com.projectronin.interop.fhir.r4.datatype.primitive.FHIRString
 import com.projectronin.interop.fhir.r4.datatype.primitive.Id
 import com.projectronin.interop.fhir.r4.datatype.primitive.asFHIR
+import com.projectronin.interop.fhir.ronin.generators.resource.condition.rcdmConditionEncounterDiagnosis
 import com.projectronin.interop.fhir.ronin.generators.resource.observation.rcdmObservationLaboratoryResult
 import com.projectronin.interop.fhir.ronin.generators.resource.rcdmMedicationRequest
 import com.projectronin.interop.fhir.ronin.generators.util.rcdmReference
@@ -245,6 +246,60 @@ class EHRDAListenerIT : BaseIT() {
         producer.send(ProducerRecord("oci.us-phoenix-1.ehr-data-authority.medication-request.v1", event)).get()
 
         // TODO: Wait and then Check MedicationDAO to ensure record was added.
+        assertEquals(1, 1)
+    }
+
+    @Test
+    fun `listens to condition topic`() {
+        seedDB()
+        val testSubject =
+            Subject(
+                roninFhirId = "ronincer-PatientId4",
+                siteId = siteId,
+                studyId = studyId,
+                number = subjectNumber,
+            )
+
+        runBlocking {
+            client.createSubject(testSubject)
+        }
+
+        val condition =
+            rcdmConditionEncounterDiagnosis("ronincer") {
+                subject of rcdmReference("Patient", "ronincer-PatientId4")
+                code of
+                    codeableConcept {
+                        coding of
+                            listOf(
+                                coding {
+                                    system of "http://hl7.org/fhir/sid/icd-10-cm"
+                                    code of Code("C64.9")
+                                    display of "Malignant neoplasm of unspecified kidney except renal pelvis"
+                                },
+                            )
+                    }
+                identifier of
+                    listOf(
+                        Identifier(
+                            system = CodeSystem.RONIN_FHIR_ID.uri,
+                            value = "ronincer-PatientId4".asFHIR(),
+                            type = CodeableConcepts.RONIN_FHIR_ID,
+                        ),
+                    )
+            }
+        val event =
+            RoninEvent(
+                specVersion = "1.0",
+                dataSchema = "dataSchema",
+                dataContentType = "dataContentType",
+                source = "integrationTest",
+                type = "type",
+                data = condition,
+                subject = "subject",
+            )
+        producer.send(ProducerRecord("oci.us-phoenix-1.ehr-data-authority.condition.v1", event)).get()
+
+        // TODO: Wait and then Check ConditionDAO to ensure record was added.
         assertEquals(1, 1)
     }
 }
