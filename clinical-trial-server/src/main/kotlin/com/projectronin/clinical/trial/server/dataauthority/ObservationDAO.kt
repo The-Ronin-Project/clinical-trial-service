@@ -56,7 +56,7 @@ class ObservationDAO(private val resourceDatabase: ClinicalTrialDataAuthorityDat
             resourceDatabase.run(collection) {
                 replaceOne(
                     it,
-                    JacksonUtil.writeJsonValue(observation),
+                    JacksonUtil.writeJsonValue(observation.populateDataUpdateTimestampExtension()),
                 )
             }
         } ?: insert(observation) // add new resource if not found

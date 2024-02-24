@@ -18,6 +18,8 @@ import com.projectronin.interop.fhir.r4.resource.Observation
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertInstanceOf
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -90,6 +92,7 @@ internal class ObservationDAOTest : BaseMySQLTest() {
         collection.add(JacksonUtil.writeJsonValue(testObs)).execute()
         assertEquals(1, dao.getAll().size)
 
+        val expectedExtensionUri = "https://projectronin.io/fhir/StructureDefinition/DataUpdateTimestamp"
         val testObsUpdate =
             observation {
                 id of Id("TestObservation1")
@@ -98,7 +101,12 @@ internal class ObservationDAOTest : BaseMySQLTest() {
         dao.update(testObsUpdate)
         val result = dao.getAll()
         assertEquals(1, result.size)
-        assertEquals(testObsUpdate, result.first())
+        assertEquals(testObsUpdate.id, result.first().id)
+        assertEquals(testObsUpdate.meta, result.first().meta)
+        assertNotNull(result.first().extension)
+        assertEquals(expectedExtensionUri, result.first().extension.first().url?.value)
+        assertEquals(DynamicValueType.DATE_TIME, result.first().extension.first().value?.type)
+        assertInstanceOf(DateTime::class.java, result.first().extension.first().value?.value)
     }
 
     @Test
