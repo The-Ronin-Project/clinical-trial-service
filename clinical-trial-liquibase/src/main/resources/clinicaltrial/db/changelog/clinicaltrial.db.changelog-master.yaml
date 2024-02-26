@@ -7,3 +7,5 @@ databaseChangeLog:
       file: clinicaltrial/db/changelog/clinicaltrial.db.changelog-003.yaml
   - include:
       file: clinicaltrial/db/changelog/clinicaltrial.db.changelog-004.yaml
+  - include:
+      file: clinicaltrial/db/changelog/clinicaltrial.db.changelog-005.yaml

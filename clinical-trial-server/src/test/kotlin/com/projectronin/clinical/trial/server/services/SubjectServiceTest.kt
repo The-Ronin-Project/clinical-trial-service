@@ -2,6 +2,7 @@ package com.projectronin.clinical.trial.server.services
 
 import com.projectronin.clinical.trial.models.Subject
 import com.projectronin.clinical.trial.server.clinicalone.ClinicalOneClient
+import com.projectronin.clinical.trial.server.clinicalone.model.SubjectResult
 import com.projectronin.clinical.trial.server.data.StudySiteDAO
 import com.projectronin.clinical.trial.server.data.SubjectDAO
 import com.projectronin.clinical.trial.server.data.SubjectStatusDAO
@@ -136,7 +137,7 @@ class SubjectServiceTest {
         every { studySiteDAO.getStudySiteByStudyIdAndSiteId(subject.studyId, subject.siteId) } returns
             studySiteDO
         every { clinicalOneClient.getSubjectIdAndSubjectNumber(subject.siteId, subject.studyId) } returns
-            Pair(
+            SubjectResult(
                 expectedSubjectId,
                 subjectNumber,
             )

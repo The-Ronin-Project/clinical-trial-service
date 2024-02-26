@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: sponsor-add-tenant
+      author: Jiahan Deng
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - columnExists:
+                tableName: sponsor
+                columnName: clinicalone_tenant
+      changes:
+        - addColumn:
+            tableName: sponsor
+            columns:
+              - column:
+                  name: clinicalone_tenant
+                  type: VARCHAR(32)

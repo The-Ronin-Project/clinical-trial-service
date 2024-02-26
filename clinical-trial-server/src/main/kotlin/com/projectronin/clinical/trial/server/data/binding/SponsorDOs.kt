@@ -6,4 +6,5 @@ import org.ktorm.schema.varchar
 
 object SponsorDOs : Table<SponsorDO>("sponsor") {
     val sponsorId = varchar("sponsor_id").primaryKey().bindTo { it.sponsorId }
+    val clinicaloneTenant = varchar("clinicalone_tenant").bindTo { it.clinicaloneTenant }
 }

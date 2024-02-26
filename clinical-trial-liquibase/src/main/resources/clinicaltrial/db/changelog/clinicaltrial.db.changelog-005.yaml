@@ -1,0 +1,3 @@
+databaseChangeLog:
+  - include:
+      file: clinicaltrial/db/changelog/sponsor/sponsor-02.yaml

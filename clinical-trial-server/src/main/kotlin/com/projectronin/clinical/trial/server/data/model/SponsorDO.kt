@@ -6,4 +6,5 @@ interface SponsorDO : Entity<SponsorDO> {
     companion object : Entity.Factory<SponsorDO>()
 
     var sponsorId: String
+    var clinicaloneTenant: String
 }

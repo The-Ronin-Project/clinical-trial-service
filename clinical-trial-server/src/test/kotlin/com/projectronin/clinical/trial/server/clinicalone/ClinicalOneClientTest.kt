@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.projectronin.clinical.trial.server.clinicalone.auth.ClinicalOneAuthenticationBroker
 import com.projectronin.clinical.trial.server.clinicalone.model.ClinicalOneAddSubjectPayload
 import com.projectronin.clinical.trial.server.clinicalone.model.ClinicalOneAddSubjectResponse
+import com.projectronin.clinical.trial.server.clinicalone.model.ClinicalOneGetStudyNameResponse
 import com.projectronin.interop.common.jackson.JacksonManager
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
@@ -18,10 +19,14 @@ import io.ktor.serialization.jackson.jackson
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class ClinicalOneClientTest {
-    private val subjectUrl = "http://localhost:9999/"
+    private val subjectUrl = "http://localhost:9999"
+    private val dcUrl = "dc/rest"
+    private val designerUrl = "designer/rest"
 
     @Test
     fun `retrieve id test`() {
@@ -51,14 +56,65 @@ class ClinicalOneClientTest {
             )
         val client =
             createClient(
-                expectedUrl = "$subjectUrl/studies/$studyId/test/subjects",
+                expectedUrl = "$subjectUrl/$dcUrl/v2.0/studies/$studyId/test/subjects",
                 expectedBody = JacksonManager.objectMapper.writeValueAsString(body),
                 responseBody = response,
             )
 
-        val (id, number) = client.getSubjectIdAndSubjectNumber(siteId, studyId)
-        assertEquals(subjectId, id)
-        assertEquals(subjectNumber, number)
+        val subject = client.getSubjectIdAndSubjectNumber(siteId, studyId)
+        assertEquals(subjectId, subject.subjectId)
+        assertEquals(subjectNumber, subject.subjectNumber)
+    }
+
+    @Test
+    fun `retrieve study name test`() {
+        val responseBody =
+            ClinicalOneGetStudyNameResponse(
+                status = "success",
+                result =
+                    listOf(
+                        ClinicalOneGetStudyNameResponse.ClinicalOneGetStudyNameResponseResult(
+                            identity = "studyId:studyVersion",
+                            id = "studyId",
+                            version = "studyVersion",
+                            versionStart = "2023-10-19T20:12:44.429Z",
+                            versionEnd = "2023-10-30T16:46:41.991Z",
+                            studyTitle = "Ronin POC",
+                            studyDescription = "Ronin POC",
+                        ),
+                        ClinicalOneGetStudyNameResponse.ClinicalOneGetStudyNameResponseResult(
+                            identity = "studyId:studyVersion",
+                            id = "studyId",
+                            version = "studyVersion",
+                            versionStart = "2024-01-01T20:12:44.429Z",
+                            versionEnd = "2099-10-30T16:46:41.991Z",
+                            studyTitle = "Ronin POC",
+                            studyDescription = "Ronin POC",
+                        ),
+                    ),
+            )
+        val response = JacksonManager.objectMapper.writeValueAsString(responseBody)
+
+        val client =
+            createClient(
+                expectedUrl = "$subjectUrl/$designerUrl/v6.0/studies/studyId/statuses",
+                responseBody = response,
+            )
+        val study = client.getStudyName("studyId")
+        assertEquals("studyId:studyVersion", study.studyIdentity)
+        assertEquals("Ronin POC", study.studyName)
+        assertEquals("studyId", study.studyId)
+    }
+
+    @Test
+    fun `retrieve study status not OK`() {
+        val client =
+            createClient(
+                expectedUrl = "$subjectUrl/$designerUrl/v6.0/studies/studyId/statuses",
+                responseStatus = HttpStatusCode.Forbidden,
+            )
+        val exception = assertThrows<Exception> { client.getStudyName("studyId") }
+        exception.message?.let { assertTrue(it.startsWith("Received 403 Forbidden when calling ClinicalOne")) }
     }
 
     private fun createClient(
@@ -101,6 +157,6 @@ class ClinicalOneClientTest {
                 }
             }
 
-        return ClinicalOneClient(httpClient, baseUrl, authenticationBroker)
+        return ClinicalOneClient(httpClient, baseUrl, dcUrl, designerUrl, authenticationBroker)
     }
 }
