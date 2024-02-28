@@ -17,8 +17,16 @@ fun DomainResource<*>.populateDataUpdateTimestampExtension(): DomainResource<*> 
             "extension" to
                 this.extension +
                 Extension(
-                    url = Uri("https://projectronin.io/fhir/StructureDefinition/DataUpdateTimestamp"),
+                    url = Uri(ExtensionUrls.DATA_UPDATE_TIMESTAMP_URL),
                     value = DynamicValue(DynamicValueType.DATE_TIME, DateTime(OffsetDateTime.now(ZoneOffset.UTC).toString())),
                 ),
         ),
     )
+
+class ExtensionUrls {
+    companion object {
+        const val DATA_UPDATE_TIMESTAMP_URL = "https://projectronin.io/fhir/StructureDefinition/DataUpdateTimestamp"
+        const val DATA_TRANSFORM_TIMESTAMP_URL = "https://projectronin.io/fhir/StructureDefinition/DataTransformTimestamp"
+        const val SUBJECT_ID_URL = "https://projectronin.io/fhir/StructureDefinition/subjectId"
+    }
+}

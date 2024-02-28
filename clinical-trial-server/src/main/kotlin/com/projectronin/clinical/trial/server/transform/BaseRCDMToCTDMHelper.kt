@@ -1,5 +1,6 @@
 package com.projectronin.clinical.trial.server.transform
 
+import com.projectronin.clinical.trial.server.dataauthority.ExtensionUrls
 import com.projectronin.interop.fhir.r4.CodeSystem
 import com.projectronin.interop.fhir.r4.datatype.CodeableConcept
 import com.projectronin.interop.fhir.r4.datatype.Coding
@@ -41,11 +42,11 @@ class BaseRCDMToCTDMHelper(
 fun setCTDMExtensions(subjectId: String): List<Extension> {
     return listOf(
         Extension(
-            url = Uri("https://projectronin.io/fhir/StructureDefinition/subjectId"),
+            url = Uri(ExtensionUrls.SUBJECT_ID_URL),
             value = DynamicValue(DynamicValueType.STRING, subjectId.asFHIR()),
         ),
         Extension(
-            url = Uri("https://projectronin.io/fhir/StructureDefinition/DataTransformTimestamp"),
+            url = Uri(ExtensionUrls.DATA_TRANSFORM_TIMESTAMP_URL),
             value = DynamicValue(DynamicValueType.DATE_TIME, DateTime(OffsetDateTime.now(ZoneOffset.UTC).toString())),
         ),
     )

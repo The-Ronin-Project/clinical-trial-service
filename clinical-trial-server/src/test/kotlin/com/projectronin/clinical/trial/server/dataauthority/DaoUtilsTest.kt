@@ -51,4 +51,22 @@ class DaoUtilsTest {
         assertEquals(DynamicValueType.DATE_TIME, actualCondition.extension[1].value?.type)
         assertInstanceOf(DateTime::class.java, actualCondition.extension[1].value?.value)
     }
+
+    @Test
+    fun `extension urls are what is expected`() {
+        assertEquals(
+            "https://projectronin.io/fhir/StructureDefinition/DataUpdateTimestamp",
+            ExtensionUrls.DATA_UPDATE_TIMESTAMP_URL,
+        )
+
+        assertEquals(
+            "https://projectronin.io/fhir/StructureDefinition/DataTransformTimestamp",
+            ExtensionUrls.DATA_TRANSFORM_TIMESTAMP_URL,
+        )
+
+        assertEquals(
+            "https://projectronin.io/fhir/StructureDefinition/subjectId",
+            ExtensionUrls.SUBJECT_ID_URL,
+        )
+    }
 }

@@ -18,9 +18,7 @@ import com.projectronin.interop.fhir.r4.resource.MedicationRequest
 import com.projectronin.interop.fhir.r4.resource.Observation
 import com.projectronin.interop.fhir.r4.resource.Patient
 import com.projectronin.kafka.data.RoninEvent
-import io.mockk.Runs
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -31,10 +29,7 @@ class EHRDAListenerTest {
     private var observationTransformer = mockk<RCDMObservationToCTDMObservation>()
     private var medicationRequestTransformer = mockk<RCDMMedicationRequestToCTDMMedicationRequest>()
     private var conditionTransformer = mockk<RCDMConditionToCTDMCondition>()
-    private var observationDAO =
-        mockk<ObservationDAO> {
-            every { update(any()) } just Runs
-        }
+    private var observationDAO = mockk<ObservationDAO>(relaxed = true)
     private var dictionaryService = mockk<DataDictionaryService>()
     private val listener =
         EHRDAListener(
@@ -355,6 +350,7 @@ class EHRDAListenerTest {
                     }
                 every { tenantId } returns "ronincer"
             }
+
         assertDoesNotThrow { listener.consumeMedicationRequest(message) }
     }
 }
