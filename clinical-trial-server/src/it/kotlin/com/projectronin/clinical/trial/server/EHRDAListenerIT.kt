@@ -27,7 +27,8 @@ import com.projectronin.interop.fhir.ronin.generators.resource.observation.rcdmO
 import com.projectronin.interop.fhir.ronin.generators.resource.rcdmMedicationRequest
 import com.projectronin.interop.fhir.ronin.generators.util.rcdmReference
 import com.projectronin.kafka.data.RoninEvent
-import com.projectronin.kafka.serde.RoninEventSerializer
+import com.projectronin.kafka.serialization.RoninEventSerializer
+import com.projectronin.test.jwt.withAuthWiremockServer
 import kotlinx.coroutines.runBlocking
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
@@ -107,199 +108,203 @@ class EHRDAListenerIT : BaseIT() {
 
     @Test
     fun `listens to patient topic`() {
-        seedDB()
-        val subject =
-            Subject(
-                roninFhirId = "ronincer-PatientId2",
-                siteId = siteId,
-                studyId = studyId,
-                number = subjectNumber,
-            )
+        withAuthWiremockServer(key, ISSUER) {
+            val providerToken = jwtAuthToken(key, ISSUER)
+            seedDB()
+            val subject =
+                Subject(
+                    roninFhirId = "ronincer-PatientId2",
+                    siteId = siteId,
+                    studyId = studyId,
+                    number = subjectNumber,
+                )
 
-        runBlocking {
-            client.createSubject(subject)
-        }
-        val patient =
-            patient {
-                id of Id("ronincer-PatientId2")
-                birthDate of Date("01-01-1999")
-                identifier of
-                    listOf(
-                        Identifier(
-                            system = CodeSystem.RONIN_FHIR_ID.uri,
-                            value = "ronincer-PatientId2".asFHIR(),
-                            type = CodeableConcepts.RONIN_FHIR_ID,
-                        ),
-                    )
+            runBlocking {
+                client.createSubject(subject, providerToken)
             }
-        val event =
-            RoninEvent(
-                specVersion = "1.0",
-                dataSchema = "dataSchema",
-                dataContentType = "dataContentType",
-                source = "integrationTest",
-                type = "type",
-                data = patient,
-                subject = "subject",
-            )
-        producer.send(ProducerRecord("oci.us-phoenix-1.ehr-data-authority.patient.v1", event)).get()
-        // wait for listener to process message
-        do {
-            Thread.sleep(5000)
-        } while (observationDAO.search(valueSetIds = listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50")).isEmpty())
-        val actual = observationDAO.search(valueSetIds = listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50")).first()
-        assertEquals(DateTime("01-01-1999"), actual.value!!.value)
+            val patient =
+                patient {
+                    id of Id("ronincer-PatientId2")
+                    birthDate of Date("01-01-1999")
+                    identifier of
+                        listOf(
+                            Identifier(
+                                system = CodeSystem.RONIN_FHIR_ID.uri,
+                                value = "ronincer-PatientId2".asFHIR(),
+                                type = CodeableConcepts.RONIN_FHIR_ID,
+                            ),
+                        )
+                }
+            val event =
+                RoninEvent(
+                    dataSchema = "dataSchema",
+                    dataContentType = "dataContentType",
+                    source = "integrationTest",
+                    type = "ronin.ehr-data-authority.patient.create",
+                    data = patient,
+                )
+            producer.send(ProducerRecord("oci.us-phoenix-1.ehr-data-authority.patient.v1", event)).get()
+            // wait for listener to process message
+            do {
+                Thread.sleep(5000)
+            } while (observationDAO.search(valueSetIds = listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50")).isEmpty())
+            val actual = observationDAO.search(valueSetIds = listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50")).first()
+            assertEquals(DateTime("01-01-1999"), actual.value!!.value)
+        }
     }
 
     @Test
     fun `listens to observation topic`() {
-        seedDB()
-        val testSubject =
-            Subject(
-                roninFhirId = "ronincer-PatientId3",
-                siteId = siteId,
-                studyId = studyId,
-                number = subjectNumber,
-            )
+        withAuthWiremockServer(key, ISSUER) {
+            val providerToken = jwtAuthToken(key, ISSUER)
+            seedDB()
+            val testSubject =
+                Subject(
+                    roninFhirId = "ronincer-PatientId3",
+                    siteId = siteId,
+                    studyId = studyId,
+                    number = subjectNumber,
+                )
 
-        runBlocking {
-            client.createSubject(testSubject)
-        }
-
-        val observation =
-            rcdmObservationLaboratoryResult("ronincer") {
-                subject of rcdmReference("Patient", "ronincer-PatientId3")
-                code of
-                    codeableConcept {
-                        coding of
-                            listOf(
-                                coding {
-                                    system of "http://loinc.org"
-                                    version of "2.74"
-                                    code of Code("8302-2")
-                                    display of "Body height"
-                                },
-                            )
-                    }
-                value of DynamicValues.string("1")
-                identifier of
-                    listOf(
-                        Identifier(
-                            system = CodeSystem.RONIN_FHIR_ID.uri,
-                            value = "ronincer-PatientId3".asFHIR(),
-                            type = CodeableConcepts.RONIN_FHIR_ID,
-                        ),
-                    )
-                effective of DynamicValues.dateTime("2023-01-01")
+            runBlocking {
+                client.createSubject(testSubject, providerToken)
             }
 
-        val event =
-            RoninEvent(
-                specVersion = "1.0",
-                dataSchema = "dataSchema",
-                dataContentType = "dataContentType",
-                source = "integrationTest",
-                type = "type",
-                data = observation,
-                subject = "subject",
-            )
-        producer.send(ProducerRecord("oci.us-phoenix-1.ehr-data-authority.observation.v1", event)).get()
-        // wait for listener to process message
-        do {
-            Thread.sleep(5000)
-        } while (observationDAO.search(valueSetIds = listOf("370b5c79-71f1-4f00-ab3d-cd7d430f813b")).isEmpty())
-        val actual = observationDAO.search(valueSetIds = listOf("370b5c79-71f1-4f00-ab3d-cd7d430f813b")).first()
-        assertEquals(FHIRString("1"), actual.value!!.value)
+            val observation =
+                rcdmObservationLaboratoryResult("ronincer") {
+                    subject of rcdmReference("Patient", "ronincer-PatientId3")
+                    code of
+                        codeableConcept {
+                            coding of
+                                listOf(
+                                    coding {
+                                        system of "http://loinc.org"
+                                        version of "2.74"
+                                        code of Code("8302-2")
+                                        display of "Body height"
+                                    },
+                                )
+                        }
+                    value of DynamicValues.string("1")
+                    identifier of
+                        listOf(
+                            Identifier(
+                                system = CodeSystem.RONIN_FHIR_ID.uri,
+                                value = "ronincer-PatientId3".asFHIR(),
+                                type = CodeableConcepts.RONIN_FHIR_ID,
+                            ),
+                        )
+                    effective of DynamicValues.dateTime("2023-01-01")
+                }
+
+            val event =
+                RoninEvent(
+                    dataSchema = "dataSchema",
+                    dataContentType = "dataContentType",
+                    source = "integrationTest",
+                    type = "ronin.ehr-data-authority.observation.create",
+                    data = observation,
+                )
+            producer.send(ProducerRecord("oci.us-phoenix-1.ehr-data-authority.observation.v1", event)).get()
+            // wait for listener to process message
+            do {
+                Thread.sleep(5000)
+            } while (observationDAO.search(valueSetIds = listOf("370b5c79-71f1-4f00-ab3d-cd7d430f813b")).isEmpty())
+            val actual = observationDAO.search(valueSetIds = listOf("370b5c79-71f1-4f00-ab3d-cd7d430f813b")).first()
+            assertEquals(FHIRString("1"), actual.value!!.value)
+        }
     }
 
     @Test
     fun `listens to medication request topic`() {
-        seedDB()
-        val testSubject =
-            Subject(
-                roninFhirId = "ronincer-PatientId3",
-                siteId = siteId,
-                studyId = studyId,
-                number = subjectNumber,
-            )
+        withAuthWiremockServer(key, ISSUER) {
+            val providerToken = jwtAuthToken(key, ISSUER)
+            seedDB()
+            val testSubject =
+                Subject(
+                    roninFhirId = "ronincer-PatientId3",
+                    siteId = siteId,
+                    studyId = studyId,
+                    number = subjectNumber,
+                )
 
-        runBlocking {
-            client.createSubject(testSubject)
-        }
-
-        val medicationRequest =
-            rcdmMedicationRequest("ronincer") {
-                subject of rcdmReference("Patient", "ronincer-PatientId3")
-                // TODO: create medication request
+            runBlocking {
+                client.createSubject(testSubject, providerToken)
             }
 
-        val event =
-            RoninEvent(
-                specVersion = "1.0",
-                dataSchema = "dataSchema",
-                dataContentType = "dataContentType",
-                source = "integrationTest",
-                type = "type",
-                data = medicationRequest,
-                subject = "subject",
-            )
-        producer.send(ProducerRecord("oci.us-phoenix-1.ehr-data-authority.medication-request.v1", event)).get()
+            val medicationRequest =
+                rcdmMedicationRequest("ronincer") {
+                    subject of rcdmReference("Patient", "ronincer-PatientId3")
+                    // TODO: create medication request
+                }
 
-        // TODO: Wait and then Check MedicationDAO to ensure record was added.
-        assertEquals(1, 1)
+            val event =
+                RoninEvent(
+                    dataSchema = "dataSchema",
+                    dataContentType = "dataContentType",
+                    source = "integrationTest",
+                    type = "ronin.ehr-data-authority.medication-request.create",
+                    data = medicationRequest,
+                )
+            producer.send(ProducerRecord("oci.us-phoenix-1.ehr-data-authority.medication-request.v1", event)).get()
+
+            // TODO: Wait and then Check MedicationDAO to ensure record was added.
+            assertEquals(1, 1)
+        }
     }
 
     @Test
     fun `listens to condition topic`() {
-        seedDB()
-        val testSubject =
-            Subject(
-                roninFhirId = "ronincer-PatientId4",
-                siteId = siteId,
-                studyId = studyId,
-                number = subjectNumber,
-            )
+        withAuthWiremockServer(key, ISSUER) {
+            val providerToken = jwtAuthToken(key, ISSUER)
+            seedDB()
+            val testSubject =
+                Subject(
+                    roninFhirId = "ronincer-PatientId4",
+                    siteId = siteId,
+                    studyId = studyId,
+                    number = subjectNumber,
+                )
 
-        runBlocking {
-            client.createSubject(testSubject)
-        }
-
-        val condition =
-            rcdmConditionEncounterDiagnosis("ronincer") {
-                subject of rcdmReference("Patient", "ronincer-PatientId4")
-                code of
-                    codeableConcept {
-                        coding of
-                            listOf(
-                                coding {
-                                    system of "http://hl7.org/fhir/sid/icd-10-cm"
-                                    code of Code("C64.9")
-                                    display of "Malignant neoplasm of unspecified kidney except renal pelvis"
-                                },
-                            )
-                    }
-                identifier of
-                    listOf(
-                        Identifier(
-                            system = CodeSystem.RONIN_FHIR_ID.uri,
-                            value = "ronincer-PatientId4".asFHIR(),
-                            type = CodeableConcepts.RONIN_FHIR_ID,
-                        ),
-                    )
+            runBlocking {
+                client.createSubject(testSubject, providerToken)
             }
-        val event =
-            RoninEvent(
-                specVersion = "1.0",
-                dataSchema = "dataSchema",
-                dataContentType = "dataContentType",
-                source = "integrationTest",
-                type = "type",
-                data = condition,
-                subject = "subject",
-            )
-        producer.send(ProducerRecord("oci.us-phoenix-1.ehr-data-authority.condition.v1", event)).get()
 
-        // TODO: Wait and then Check ConditionDAO to ensure record was added.
-        assertEquals(1, 1)
+            val condition =
+                rcdmConditionEncounterDiagnosis("ronincer") {
+                    subject of rcdmReference("Patient", "ronincer-PatientId4")
+                    code of
+                        codeableConcept {
+                            coding of
+                                listOf(
+                                    coding {
+                                        system of "http://hl7.org/fhir/sid/icd-10-cm"
+                                        code of Code("C64.9")
+                                        display of "Malignant neoplasm of unspecified kidney except renal pelvis"
+                                    },
+                                )
+                        }
+                    identifier of
+                        listOf(
+                            Identifier(
+                                system = CodeSystem.RONIN_FHIR_ID.uri,
+                                value = "ronincer-PatientId4".asFHIR(),
+                                type = CodeableConcepts.RONIN_FHIR_ID,
+                            ),
+                        )
+                }
+            val event =
+                RoninEvent(
+                    dataSchema = "dataSchema",
+                    dataContentType = "dataContentType",
+                    source = "integrationTest",
+                    type = "type",
+                    data = condition,
+                )
+            producer.send(ProducerRecord("oci.us-phoenix-1.ehr-data-authority.condition.v1", event)).get()
+
+            // TODO: Wait and then Check ConditionDAO to ensure record was added.
+            assertEquals(1, 1)
+        }
     }
 }

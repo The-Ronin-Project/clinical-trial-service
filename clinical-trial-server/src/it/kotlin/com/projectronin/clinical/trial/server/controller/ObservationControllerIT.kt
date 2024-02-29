@@ -43,7 +43,6 @@ class ObservationControllerIT : BaseIT() {
     private val subjectId = "subjectId"
     private val roninFhirId = "fhirId"
     private val studySiteID = UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770")
-    private val authentication = getAuth()
     private val testObservations1 =
         (1..8).toList().map {
             observation {
@@ -63,6 +62,7 @@ class ObservationControllerIT : BaseIT() {
             }
         }
     private val allObservations = listOf(testObservations1, testObservations2).flatten()
+    val m2mToken = authenticationService.getAuthentication().accessToken
 
     private fun seedDB() {
         database.insert(StudyDOs) {
@@ -120,18 +120,21 @@ class ObservationControllerIT : BaseIT() {
                 testObservations1,
                 Pagination(1, 10, false, 8),
             )
-
         runBlocking {
             val response =
                 httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/observations") {
                     contentType(ContentType.Application.Json)
                     headers {
-                        append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                        append(HttpHeaders.Authorization, "Bearer $m2mToken")
                     }
                     setBody(
                         mapOf(
                             "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50"),
-                            "date_range" to mapOf("start_date" to "2023-11-11T00:00:00", "end_date" to "2023-12-12"),
+                            "date_range" to
+                                mapOf(
+                                    "start_date" to "2023-11-11T00:00:00",
+                                    "end_date" to "2023-12-12",
+                                ),
                             "offset" to 1,
                             "limit" to 10,
                             "test_mode" to false,
@@ -163,12 +166,20 @@ class ObservationControllerIT : BaseIT() {
                 httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/observations") {
                     contentType(ContentType.Application.Json)
                     headers {
-                        append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                        append(HttpHeaders.Authorization, "Bearer $m2mToken")
                     }
                     setBody(
                         mapOf(
-                            "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50", "daf6a5fc-5705-400b-abd0-852e060c9325"),
-                            "date_range" to mapOf("start_date" to "2023-11-11T00:00:00", "end_date" to "2023-12-12"),
+                            "observation_name" to
+                                listOf(
+                                    "10f8c49a-635b-4928-aee6-f6e47c2e7c50",
+                                    "daf6a5fc-5705-400b-abd0-852e060c9325",
+                                ),
+                            "date_range" to
+                                mapOf(
+                                    "start_date" to "2023-11-11T00:00:00",
+                                    "end_date" to "2023-12-12",
+                                ),
                             "offset" to 1,
                             "limit" to 10,
                             "test_mode" to false,
@@ -182,12 +193,20 @@ class ObservationControllerIT : BaseIT() {
                 httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/observations") {
                     contentType(ContentType.Application.Json)
                     headers {
-                        append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                        append(HttpHeaders.Authorization, "Bearer $m2mToken")
                     }
                     setBody(
                         mapOf(
-                            "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50", "daf6a5fc-5705-400b-abd0-852e060c9325"),
-                            "date_range" to mapOf("start_date" to "2023-11-11T00:00:00", "end_date" to "2023-12-12"),
+                            "observation_name" to
+                                listOf(
+                                    "10f8c49a-635b-4928-aee6-f6e47c2e7c50",
+                                    "daf6a5fc-5705-400b-abd0-852e060c9325",
+                                ),
+                            "date_range" to
+                                mapOf(
+                                    "start_date" to "2023-11-11T00:00:00",
+                                    "end_date" to "2023-12-12",
+                                ),
                             "offset" to 11,
                             "limit" to 10,
                             "test_mode" to false,
@@ -206,12 +225,16 @@ class ObservationControllerIT : BaseIT() {
                 httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/anotherSubject/observations") {
                     contentType(ContentType.Application.Json)
                     headers {
-                        append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                        append(HttpHeaders.Authorization, "Bearer $m2mToken")
                     }
                     setBody(
                         mapOf(
                             "observation_name" to listOf("10f8c49a-635b-4928-aee6-f6e47c2e7c50"),
-                            "date_range" to mapOf("start_date" to "2023-11-11T00:00:00", "end_date" to "2023-12-12"),
+                            "date_range" to
+                                mapOf(
+                                    "start_date" to "2023-11-11T00:00:00",
+                                    "end_date" to "2023-12-12",
+                                ),
                             "offset" to 1,
                             "limit" to 100,
                             "test_mode" to false,
@@ -230,7 +253,7 @@ class ObservationControllerIT : BaseIT() {
                 httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/observations") {
                     contentType(ContentType.Application.Json)
                     headers {
-                        append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                        append(HttpHeaders.Authorization, "Bearer $m2mToken")
                     }
                     setBody(
                         mapOf(
@@ -254,7 +277,7 @@ class ObservationControllerIT : BaseIT() {
                 httpClient.post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/observations") {
                     contentType(ContentType.Application.Json)
                     headers {
-                        append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                        append(HttpHeaders.Authorization, "Bearer $m2mToken")
                     }
                     setBody(
                         mapOf(

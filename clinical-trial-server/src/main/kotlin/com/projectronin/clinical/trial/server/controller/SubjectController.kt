@@ -50,9 +50,10 @@ class SubjectController(
         }
     }
 
+    // TODO: We should add tenantid and patientid to route and switch preauth to @PreAuthPatient
     @GetMapping("/{roninFhirId}")
+    @PreAuthorize("authentication.providerRoninId != null")
     @CrossOrigin(origins = ["\${cors.ronin.frontend}"], maxAge = 1800)
-    @PreAuthorize("hasAuthority('SCOPE_read:subject')")
     fun retrieveByRoninFhirId(
         @PathVariable roninFhirId: String,
     ): ResponseEntity<Subject> {
@@ -64,8 +65,9 @@ class SubjectController(
         }
     }
 
+    // TODO: We should add tenantid and patientid to route and switch preauth to @PreAuthPatient
     @PutMapping
-    @PreAuthorize("hasAuthority('SCOPE_write:subject')")
+    @PreAuthorize("authentication.providerRoninId != null")
     @CrossOrigin(origins = ["\${cors.ronin.frontend}"], maxAge = 1800)
     fun createWithSubjectNumber(
         @RequestBody subject: Subject,
@@ -78,7 +80,7 @@ class SubjectController(
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('SCOPE_write:subject')")
+    @PreAuthorize("authentication.providerRoninId != null")
     @CrossOrigin(origins = ["\${cors.ronin.frontend}"], maxAge = 1800)
     fun create(
         @RequestBody subject: Subject,

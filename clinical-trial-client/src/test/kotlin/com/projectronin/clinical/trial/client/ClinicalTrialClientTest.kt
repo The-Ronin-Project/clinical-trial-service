@@ -233,14 +233,13 @@ class ClinicalTrialClientTest {
                         .getSubjects()
                 subjectsToReturn
             }
-        val returnedSubjects = response as List<Subject>
-        assertEquals(1, returnedSubjects.size)
-        assertEquals(subjectReturned.id, returnedSubjects[0].id)
-        assertEquals(subjectReturned.roninFhirId, returnedSubjects[0].roninFhirId)
-        assertEquals(subjectReturned.siteId, returnedSubjects[0].siteId)
-        assertEquals(subjectReturned.status, returnedSubjects[0].status)
-        assertEquals(subjectReturned.studyId, returnedSubjects[0].studyId)
-        assertEquals(subjectReturned.number, returnedSubjects[0].number)
+        assertEquals(1, response.size)
+        assertEquals(subjectReturned.id, response[0].id)
+        assertEquals(subjectReturned.roninFhirId, response[0].roninFhirId)
+        assertEquals(subjectReturned.siteId, response[0].siteId)
+        assertEquals(subjectReturned.status, response[0].status)
+        assertEquals(subjectReturned.studyId, response[0].studyId)
+        assertEquals(subjectReturned.number, response[0].number)
 
         val request = mockWebServer.takeRequest()
         assertEquals(true, request.path?.endsWith("/subjects?activeIdsOnly=false"))
@@ -275,14 +274,13 @@ class ClinicalTrialClientTest {
                         .getSubjects(true)
                 subjectsToReturn
             }
-        val returnedSubjects = response as List<Subject>
-        assertEquals(1, returnedSubjects.size)
-        assertEquals(subjectReturned.id, returnedSubjects[0].id)
-        assertEquals(subjectReturned.roninFhirId, returnedSubjects[0].roninFhirId)
-        assertEquals(subjectReturned.siteId, returnedSubjects[0].siteId)
-        assertEquals(subjectReturned.status, returnedSubjects[0].status)
-        assertEquals(subjectReturned.studyId, returnedSubjects[0].studyId)
-        assertEquals(subjectReturned.number, returnedSubjects[0].number)
+        assertEquals(1, response.size)
+        assertEquals(subjectReturned.id, response[0].id)
+        assertEquals(subjectReturned.roninFhirId, response[0].roninFhirId)
+        assertEquals(subjectReturned.siteId, response[0].siteId)
+        assertEquals(subjectReturned.status, response[0].status)
+        assertEquals(subjectReturned.studyId, response[0].studyId)
+        assertEquals(subjectReturned.number, response[0].number)
 
         val request = mockWebServer.takeRequest()
         assertEquals(true, request.path?.endsWith("/subjects?activeIdsOnly=true"))

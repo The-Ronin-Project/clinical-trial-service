@@ -8,6 +8,7 @@ import com.projectronin.clinical.trial.server.transform.RCDMConditionToCTDMCondi
 import com.projectronin.clinical.trial.server.transform.RCDMMedicationRequestToCTDMMedicationRequest
 import com.projectronin.clinical.trial.server.transform.RCDMObservationToCTDMObservation
 import com.projectronin.clinical.trial.server.transform.RCDMPatientToCTDMObservations
+import com.projectronin.common.TenantId
 import com.projectronin.interop.fhir.r4.datatype.Coding
 import com.projectronin.interop.fhir.r4.datatype.Reference
 import com.projectronin.interop.fhir.r4.datatype.primitive.Code
@@ -50,7 +51,7 @@ class EHRDAListenerTest {
                     mockk {
                         every { id?.value } returns "ronincer-patientId1"
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId1")
         every { patientTransformer.splitPatientDemographics(any()) } returns listOf(mockk())
@@ -62,7 +63,7 @@ class EHRDAListenerTest {
                     mockk {
                         every { id?.value } returns null
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         assertDoesNotThrow { listener.consumePatient(message2) }
 
@@ -72,7 +73,7 @@ class EHRDAListenerTest {
                     mockk {
                         every { id } returns null
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         assertDoesNotThrow { listener.consumePatient(message3) }
     }
@@ -87,7 +88,7 @@ class EHRDAListenerTest {
                     mockk {
                         every { subject?.decomposedId() } returns "ronincer-patientId2"
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId2")
         every {
@@ -105,7 +106,7 @@ class EHRDAListenerTest {
                     mockk {
                         every { subject?.decomposedId() } returns "ronincer-patientId0"
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         every { subjectService.getActiveFhirIds() } returns setOf()
         assertDoesNotThrow { listener.consumeCondition(message) }
@@ -119,7 +120,7 @@ class EHRDAListenerTest {
                     mockk {
                         every { subject?.decomposedId() } returns "ronincer-patientId3"
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId3")
         every {
@@ -136,7 +137,7 @@ class EHRDAListenerTest {
                     mockk {
                         every { subject?.decomposedId() } returns null
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
 
         assertDoesNotThrow { listener.consumeCondition(message) }
@@ -150,7 +151,7 @@ class EHRDAListenerTest {
                     mockk {
                         every { subject?.decomposedId() } returns "badtenant-patientId0"
                     }
-                every { tenantId } returns "badtenant"
+                every { tenantId } returns TenantId.random()
             }
 
         assertDoesNotThrow { listener.consumeCondition(message) }
@@ -166,7 +167,7 @@ class EHRDAListenerTest {
                         every { code?.coding?.get(0)?.system?.value } returns null
                         every { code?.coding?.get(0)?.code?.value } returns "37581-6"
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId1")
         assertDoesNotThrow { listener.consumeObservation(message) }
@@ -179,7 +180,7 @@ class EHRDAListenerTest {
                         every { code?.coding?.get(0)?.system?.value } returns "http://loinc.org"
                         every { code?.coding?.get(0)?.code?.value } returns null
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId2")
         assertDoesNotThrow { listener.consumeObservation(message2) }
@@ -192,7 +193,7 @@ class EHRDAListenerTest {
                         every { code?.coding?.get(0)?.system?.value } returns "http://loinc.org"
                         every { code?.coding?.get(0)?.code } returns null
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId3")
         assertDoesNotThrow { listener.consumeObservation(message3) }
@@ -205,7 +206,7 @@ class EHRDAListenerTest {
                         every { code?.coding?.get(0)?.system } returns null
                         every { code?.coding?.get(0)?.code?.value } returns "37581-6"
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         assertDoesNotThrow { listener.consumeObservation(message4) }
 
@@ -217,7 +218,7 @@ class EHRDAListenerTest {
                         every { code?.coding?.get(0)?.system } returns Uri("http://loinc.org")
                         every { code?.coding?.get(0)?.code } returns Code("37581-6")
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         assertDoesNotThrow { listener.consumeObservation(message5) }
 
@@ -228,7 +229,7 @@ class EHRDAListenerTest {
                         every { subject } returns Reference(reference = "potato-patientId3".asFHIR())
                         every { code?.coding?.get(0) } returns Coding()
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         assertDoesNotThrow { listener.consumeObservation(message6) }
 
@@ -239,7 +240,7 @@ class EHRDAListenerTest {
                         every { subject } returns Reference(reference = "potato-patientId3".asFHIR())
                         every { code?.coding } returns listOf()
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         assertDoesNotThrow { listener.consumeObservation(message7) }
         val message8 =
@@ -249,7 +250,7 @@ class EHRDAListenerTest {
                         every { subject } returns Reference(reference = "potato-patientId3".asFHIR())
                         every { code } returns null
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         assertDoesNotThrow { listener.consumeObservation(message8) }
     }
@@ -264,7 +265,7 @@ class EHRDAListenerTest {
                         every { code?.coding?.get(0)?.system?.value } returns "http://loinc.org"
                         every { code?.coding?.get(0)?.code?.value } returns "37581-6"
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId1")
         every {
@@ -284,7 +285,7 @@ class EHRDAListenerTest {
                         every { code?.coding?.get(0)?.system?.value } returns "http://loinc.org"
                         every { code?.coding?.get(0)?.code?.value } returns "37581-6"
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId1")
         every {
@@ -302,7 +303,7 @@ class EHRDAListenerTest {
                     mockk {
                         every { subject?.decomposedId() } returns "ronincer-patientId1"
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId1")
         every { medicationRequestTransformer.rcdmMedicationRequestToCTDMMedicationRequest("ronincer-patientId1", any()) } returns null
@@ -317,7 +318,7 @@ class EHRDAListenerTest {
                     mockk {
                         every { subject?.decomposedId() } returns "ronincer-patientId1"
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         every { subjectService.getActiveFhirIds() } returns setOf()
         assertDoesNotThrow { listener.consumeMedicationRequest(message) }
@@ -331,7 +332,7 @@ class EHRDAListenerTest {
                     mockk {
                         every { subject?.decomposedId() } returns "ronincer-patientId1"
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
         every { subjectService.getActiveFhirIds() } returns setOf("ronincer-patientId1")
         every {
@@ -348,7 +349,7 @@ class EHRDAListenerTest {
                     mockk {
                         every { subject?.decomposedId() } returns null
                     }
-                every { tenantId } returns "ronincer"
+                every { tenantId } returns TenantId.ronincer
             }
 
         assertDoesNotThrow { listener.consumeMedicationRequest(message) }
