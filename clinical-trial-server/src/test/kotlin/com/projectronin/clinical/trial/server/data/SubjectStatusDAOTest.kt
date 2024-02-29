@@ -24,7 +24,7 @@ class SubjectStatusDAOTest {
 
     @Test
     @DataSet(value = ["/dbunit/subjectstatus/NoSubjectStatus.yaml"], cleanAfter = true)
-    @ExpectedDataSet(value = ["/dbunit/subjectstatus/OneSubjectStatus.yaml"], ignoreCols = ["created_datetime"])
+    @ExpectedDataSet(value = ["/dbunit/subjectstatus/OneSubjectStatus.yaml"], ignoreCols = ["created_datetime", "subject_number"])
     fun `insert Subject Status`() {
         subjectStatusDAO.insertSubjectStatus(
             SubjectStatusDO {
@@ -52,7 +52,7 @@ class SubjectStatusDAOTest {
     @Test
     fun `get all Subject Status`() {
         val subjectStatus = subjectStatusDAO.getSubjectStatus()
-        assertEquals(subjectStatus.size, 9)
+        assertEquals(subjectStatus.size, 10)
     }
 
     @DataSet(value = ["/dbunit/subjectstatus/MultipleSubjectStatuses.yaml"], cleanAfter = true)
@@ -76,7 +76,7 @@ class SubjectStatusDAOTest {
     fun `get Subject Status by Status`() {
         val status = listOf(SubjectStatus.ACTIVE, SubjectStatus.NEW, SubjectStatus.ENROLLED)
         val subjectStatus = subjectStatusDAO.getSubjectsByStatus(status)
-        assertEquals(subjectStatus.size, 6)
+        assertEquals(subjectStatus.size, 7)
     }
 
     @DataSet(value = ["/dbunit/subjectstatus/MultipleSubjectStatuses.yaml"], cleanAfter = true)

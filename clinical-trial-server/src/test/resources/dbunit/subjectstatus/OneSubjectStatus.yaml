@@ -11,6 +11,7 @@ study_site:
 subject:
   - subject_id: "subjectId"
     ronin_patient_id: "roninFhirId"
+    subject_number: "001-001"
 subject_status:
   - study_site_id: "X3gcMALzTwatz3BVvLxXcA=="
     subject_id: "subjectId"

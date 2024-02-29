@@ -9,10 +9,12 @@ import com.projectronin.clinical.trial.server.data.binding.SubjectDOs
 import com.projectronin.clinical.trial.server.data.binding.SubjectStatusDOs
 import com.projectronin.clinical.trial.server.data.model.SubjectStatus
 import com.projectronin.event.interop.resource.request.v1.InteropResourceRequestV1
+import com.projectronin.interop.common.http.exceptions.ClientFailureException
 import com.projectronin.kafka.data.RoninEvent
 import com.projectronin.kafka.serde.RoninEventDeserializer
 import io.ktor.client.request.get
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -25,6 +27,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.ktorm.dsl.deleteAll
 import org.ktorm.dsl.insert
 import java.time.Duration
@@ -134,6 +137,26 @@ class SubjectControllerIT : BaseIT() {
     }
 
     @Test
+    fun `create with subject number fails auth`() {
+        val subject =
+            Subject(
+                roninFhirId = "tenant-fhirId",
+                siteId = "siteId",
+                studyId = "studyId",
+                number = "subjectNumber",
+            )
+        val response =
+            runBlocking {
+                httpClient.put("$serverUrl/subjects") {
+                    setBody(subject)
+                    contentType(ContentType.Application.Json)
+                }
+            }
+
+        assertEquals(HttpStatusCode.Unauthorized, response.status)
+    }
+
+    @Test
     fun `get active subjects with subjects`() {
         seedDB()
 
@@ -207,5 +230,43 @@ class SubjectControllerIT : BaseIT() {
         assertEquals(expectedSubjectId, response.id)
         val records = consumer.poll(Duration.ofSeconds(5)).map { it.value().data as InteropResourceRequestV1 }
         assertTrue(records.any { it.resourceFHIRId == "tenant-fhirId" })
+    }
+
+    @Test
+    fun `create a subject with subject number returns bad request when subject number is not in clinical one`() {
+        seedDB()
+        val subject =
+            Subject(
+                roninFhirId = "tenant-fhirId",
+                siteId = siteId,
+                studyId = studyId,
+                number = subjectNumber,
+            )
+
+        val exception =
+            assertThrows<ClientFailureException> {
+                runBlocking {
+                    client.createSubjectWithSubjectNumber(subject)
+                }
+            }
+        assertTrue(exception.message?.contains("Received 400") ?: false)
+    }
+
+    @Test
+    fun `create a subject with subject number`() {
+        seedDB()
+        val subject =
+            Subject(
+                roninFhirId = "tenant-fhirId",
+                siteId = siteId,
+                studyId = studyId,
+                number = "001-021",
+            )
+
+        val response =
+            runBlocking {
+                client.createSubjectWithSubjectNumber(subject)
+            }
+        assertEquals(subject.roninFhirId, response.roninFhirId)
     }
 }

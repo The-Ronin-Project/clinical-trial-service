@@ -81,6 +81,54 @@ class SubjectService(
             newSubject
         }
 
+    fun createSubjectWithSubjectNumber(subject: Subject): Subject? {
+        val dbSubject = getSubjectBySubjectNumberAndSiteIdAndStudyId(subject.number, subject.siteId, subject.studyId)
+        if (dbSubject != null) {
+            if (dbSubject.roninFhirId != subject.roninFhirId) {
+                throw IllegalArgumentException("Subject number currently bound to different patient")
+            } else {
+                // This shouldn't be possible through frontend but just in case
+                throw IllegalArgumentException("Subject is already bound with this subject number")
+            }
+        }
+
+        // TODO: call c1 api to see if subject number is valid
+        val c1Subject: Subject? = clinicalOneClient.validateSubjectNumber(subject)
+        if (c1Subject !== null) {
+            val studySite = getStudySiteByStudyIdAndSiteId(c1Subject.studyId, c1Subject.siteId)
+            if (studySite != null) {
+                subjectDAO.insertSubject(c1Subject.toSubjectDO())
+                insertSubjectStatus(c1Subject.id, studySite.studySiteId, SubjectStatus.ACTIVE)
+                return c1Subject
+            } else {
+                throw IllegalArgumentException("Study site not found")
+            }
+        } else {
+            throw IllegalArgumentException("Subject with given subject number not found in Clinical One Trial")
+        }
+    }
+
+    fun getSubjectBySubjectNumberAndSiteIdAndStudyId(
+        subjectNumber: String,
+        siteId: String,
+        studyId: String,
+    ): Subject? {
+        return subjectDAO.getFullSubjectBySubjectNumberAndSiteIdAndStudyId(
+            subjectNumber,
+            siteId,
+            studyId,
+        )?.let {
+            Subject(
+                id = it.first.subjectId,
+                roninFhirId = it.first.roninPatientId,
+                siteId = it.third.siteId,
+                status = it.second.status.toString(),
+                studyId = it.third.studyId,
+                number = it.first.subjectNumber,
+            )
+        }
+    }
+
     fun updateSubjectStatus(
         subject: Subject,
         studySiteId: UUID,

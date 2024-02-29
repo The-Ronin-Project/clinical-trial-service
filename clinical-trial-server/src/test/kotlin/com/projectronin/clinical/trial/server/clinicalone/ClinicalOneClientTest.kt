@@ -2,10 +2,13 @@ package com.projectronin.clinical.trial.server.clinicalone
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.projectronin.clinical.trial.models.Subject
 import com.projectronin.clinical.trial.server.clinicalone.auth.ClinicalOneAuthenticationBroker
 import com.projectronin.clinical.trial.server.clinicalone.model.ClinicalOneAddSubjectPayload
 import com.projectronin.clinical.trial.server.clinicalone.model.ClinicalOneAddSubjectResponse
 import com.projectronin.clinical.trial.server.clinicalone.model.ClinicalOneGetStudyNameResponse
+import com.projectronin.clinical.trial.server.clinicalone.model.ClinicalOneSearchSubjectResponse
+import com.projectronin.clinical.trial.server.clinicalone.model.ClinicalOneSubjectResponseResult
 import com.projectronin.interop.common.jackson.JacksonManager
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
@@ -38,7 +41,7 @@ class ClinicalOneClientTest {
             ClinicalOneAddSubjectResponse(
                 status = "success",
                 result =
-                    ClinicalOneAddSubjectResponse.ClinicalOneAddSubjectResponseResult(
+                    ClinicalOneSubjectResponseResult(
                         state = "new",
                         studyId = studyId,
                         siteId = siteId,
@@ -115,6 +118,51 @@ class ClinicalOneClientTest {
             )
         val exception = assertThrows<Exception> { client.getStudyName("studyId") }
         exception.message?.let { assertTrue(it.startsWith("Received 403 Forbidden when calling ClinicalOne")) }
+    }
+
+    @Test
+    fun `retrieve subject by number test`() {
+        val siteId = "daffeda1f0084b358a355d4bdc7ae98b"
+        val studyId = "dca7919d25b64416bbf58631aff66882"
+        val subjectId = "47e71e98170d492fb54c2f93d8084860"
+        val subjectNumber = "001-001"
+        val responseBody =
+            ClinicalOneSearchSubjectResponse(
+                status = "success",
+                result =
+                    listOf(
+                        ClinicalOneSubjectResponseResult(
+                            state = "new",
+                            studyId = studyId,
+                            siteId = siteId,
+                            id = subjectId,
+                            subjectNumber = subjectNumber,
+                        ),
+                    ),
+            )
+        val response = JacksonManager.objectMapper.writeValueAsString(responseBody)
+
+        val client =
+            createClient(
+                expectedUrl =
+                    "$subjectUrl/$dcUrl/v7.0/studies/$studyId" +
+                        "/test/subjects/sitestudyversion?exactSearchKeyword=$subjectNumber",
+                responseBody = response,
+            )
+
+        val res =
+            client.validateSubjectNumber(
+                subject =
+                    Subject(
+                        id = subjectId,
+                        roninFhirId = "",
+                        siteId = siteId,
+                        studyId = studyId,
+                        number = subjectNumber,
+                    ),
+            )
+        assertEquals(subjectId, res?.id)
+        assertEquals(subjectNumber, res?.number)
     }
 
     private fun createClient(

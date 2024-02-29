@@ -205,5 +205,77 @@
         "errorData": null
       }
     }
+  },
+  {
+    "httpRequest":
+    {
+      "method": "GET",
+      "path": "/itsp2/ec-dc-svc/rest/v7.0/studies/.*/test/subjects/sitestudyversion",
+      "queryStringParameters" : {
+        "exactSearchKeyword" : [ "001-021" ]
+      }
+    },
+    "httpResponse":
+    {
+      "statusCode": 200,
+      "headers": {
+        "Content-Type": [
+          "application/json"
+        ]
+      },
+      "body" : {
+        "status": "success",
+        "result": [{
+          "screeningDate": null,
+          "codeBreak": null,
+          "userId": "87093B66B62F43F193B4409D586A6F52",
+          "eventType": "New",
+          "subjectTransferId": null,
+          "objectVersionNumber": 1,
+          "id": "0CEE019CE0A9460BB9291A29EB67719A",
+          "versionStart": "2023-11-30T15:46:08.652Z",
+          "description": null,
+          "subjectNumber": "001-021",
+          "studyId": "009C2CB46A6F458F9BE7082193A75128",
+          "siteId": "F1AEC0AE8C6F44A6B0A4E50015D4ABED",
+          "dob": null,
+          "state": "New",
+          "stateDate": "2023-11-30T15:46:08.468Z",
+          "screeningFailure": null,
+          "enrollmentFailure": null,
+          "enrollmentOverride": null,
+          "informedConsentDate": null,
+          "gender": null,
+          "reason": null,
+          "comment": null,
+          "studyVersion": "1.0.0.1"
+        }],
+        "errorData": null
+      }
+    }
+  },
+  {
+    "httpRequest":
+    {
+      "method": "GET",
+      "path": "/itsp2/ec-dc-svc/rest/v7.0/studies/.*/test/subjects/sitestudyversion",
+      "queryStringParameters" : {
+        "exactSearchKeyword" : [ ".*" ]
+      }
+    },
+    "httpResponse":
+    {
+      "statusCode": 200,
+      "headers": {
+        "Content-Type": [
+          "application/json"
+        ]
+      },
+      "body" : {
+        "status": "success",
+        "result": [],
+        "errorData": null
+      }
+    }
   }
 ]

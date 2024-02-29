@@ -1,9 +1,11 @@
 package com.projectronin.clinical.trial.server.clinicalone
 
+import com.projectronin.clinical.trial.models.Subject
 import com.projectronin.clinical.trial.server.clinicalone.auth.ClinicalOneAuthenticationBroker
 import com.projectronin.clinical.trial.server.clinicalone.model.ClinicalOneAddSubjectPayload
 import com.projectronin.clinical.trial.server.clinicalone.model.ClinicalOneAddSubjectResponse
 import com.projectronin.clinical.trial.server.clinicalone.model.ClinicalOneGetStudyNameResponse
+import com.projectronin.clinical.trial.server.clinicalone.model.ClinicalOneSearchSubjectResponse
 import com.projectronin.clinical.trial.server.clinicalone.model.StudyResult
 import com.projectronin.clinical.trial.server.clinicalone.model.SubjectResult
 import com.projectronin.interop.common.http.request
@@ -11,6 +13,7 @@ import com.projectronin.interop.common.jackson.JacksonManager
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.accept
+import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -76,6 +79,57 @@ class ClinicalOneClient(
                     SubjectResult(responseBody.result?.id ?: "", responseBody.result?.subjectNumber ?: "")
                 } else {
                     throw Exception("Failed to create subject with Clinical One API. Status Code: ${res.status}. ${res.bodyAsText()}")
+                }
+            }
+        }
+    }
+
+    fun validateSubjectNumber(subject: Subject): Subject? {
+        logger.info {
+            "Retrieving subject id from ClinicalOne based on " +
+                "site: $subject.siteId and " +
+                "study: ${subject.studyId} and " +
+                "subject number: ${subject.number}"
+        }
+
+        val authentication = authenticationBroker.getAuthentication()
+        val clinicalOneStudiesUrl = "$clinicalOneBaseUrl/$clinicalOneDataCaptureUrl/v7.0/studies/${subject.studyId}"
+        val clinicalOneSubjectUrl = "$clinicalOneStudiesUrl/test/subjects/sitestudyversion?exactSearchKeyword=${subject.number}"
+        logger.debug { "Auth: ${authentication.tokenType} ${authentication.accessToken}" }
+        return runBlocking {
+            val response: HttpResponse =
+                httpClient.request("ClinicalOne", clinicalOneSubjectUrl) { url ->
+                    get(url) {
+                        headers {
+                            append(
+                                HttpHeaders.Authorization,
+                                "${authentication.tokenType} ${authentication.accessToken}",
+                            )
+                        }
+                        contentType(ContentType.Application.Json)
+                        accept(ContentType.Application.Json)
+                    }
+                }
+            logger.debug { response }
+            response.let { res ->
+                if (res.status == HttpStatusCode.OK) {
+                    val responseBody = res.body<ClinicalOneSearchSubjectResponse>()
+                    if (responseBody.result?.isEmpty() == true) {
+                        return@runBlocking null
+                    } else if (responseBody.result?.size == 1) {
+                        Subject(
+                            id = responseBody.result[0].id ?: "",
+                            roninFhirId = subject.roninFhirId,
+                            siteId = responseBody.result[0].siteId ?: "",
+                            studyId = responseBody.result[0].studyId ?: "",
+                            number = responseBody.result[0].subjectNumber ?: "",
+                        )
+                    } else {
+                        // TODO: We may be able to handle this without erroring but I'd need to see real data to figure out how
+                        throw Exception("Found multiple matching subjects with Clinical One API.")
+                    }
+                } else {
+                    throw Exception("Failed to find subject with Clinical One API. Status Code: ${res.status}. ${res.bodyAsText()}")
                 }
             }
         }

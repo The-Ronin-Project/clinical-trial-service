@@ -118,4 +118,21 @@ class SubjectControllerTest {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.statusCode)
     }
+
+    @Test
+    fun `put returns created subject`() {
+        every { subjectService.createSubjectWithSubjectNumber(subjectToCreate) } returns createdSubject
+        val response = subjectController.createWithSubjectNumber(subjectToCreate)
+
+        assertEquals(HttpStatus.CREATED, response.statusCode)
+        assertEquals(createdSubject, response.body)
+    }
+
+    @Test
+    fun `put errors`() {
+        every { subjectService.createSubjectWithSubjectNumber(subjectToCreate) } returns null
+        val response = subjectController.createWithSubjectNumber(subjectToCreate)
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.statusCode)
+    }
 }

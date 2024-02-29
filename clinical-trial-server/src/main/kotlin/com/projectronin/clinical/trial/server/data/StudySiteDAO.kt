@@ -4,6 +4,7 @@ import com.projectronin.clinical.trial.server.data.binding.SiteDOs
 import com.projectronin.clinical.trial.server.data.binding.StudySiteDOs
 import com.projectronin.clinical.trial.server.data.model.StudySiteDO
 import org.ktorm.database.Database
+import org.ktorm.dsl.and
 import org.ktorm.dsl.eq
 import org.ktorm.dsl.from
 import org.ktorm.dsl.innerJoin
@@ -56,8 +57,7 @@ class StudySiteDAO(private val database: Database) {
     ): StudySiteDO? {
         return database.from(StudySiteDOs)
             .select()
-            .where(StudySiteDOs.siteId eq siteId)
-            .where(StudySiteDOs.studyId eq studyId)
+            .where { (StudySiteDOs.siteId eq siteId) and (StudySiteDOs.studyId eq studyId) }
             .map { StudySiteDOs.createEntity(it) }.firstOrNull()
     }
 

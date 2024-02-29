@@ -9,6 +9,7 @@ import com.projectronin.interop.common.test.database.dbrider.DBRiderConnection
 import com.projectronin.interop.common.test.database.ktorm.KtormHelper
 import com.projectronin.interop.common.test.database.liquibase.LiquibaseTest
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -59,9 +60,9 @@ class SubjectDAOTest {
     fun `get Subject Ronin FHIR ids by status`() {
         val status = listOf(SubjectStatus.ACTIVE, SubjectStatus.NEW, SubjectStatus.ENROLLED)
         val subjects = subjectDAO.getFhirIdsByStatus(status)
-        assertEquals(subjects.size, 6)
+        assertEquals(subjects.size, 7)
         assertEquals(subjects.first(), "roninFhirId1")
-        assertEquals(subjects.last(), "roninFhirId7")
+        assertEquals(subjects.last(), "roninFhirId8")
     }
 
     @DataSet(value = ["/dbunit/subjectstatus/OneSubjectStatus.yaml"], cleanAfter = true)
@@ -87,5 +88,28 @@ class SubjectDAOTest {
         assertEquals("subjectId", subject?.subjectId)
         assertEquals("roninFhirId", subject?.roninPatientId)
         assertEquals("001-001", subject?.subjectNumber)
+    }
+
+    @DataSet(value = ["/dbunit/subjectstatus/OneSubjectStatus.yaml"], cleanAfter = true)
+    @Test
+    fun `get full subject by site id, study id and subject number`() {
+        val subject = subjectDAO.getFullSubjectBySubjectNumberAndSiteIdAndStudyId("001-001", "siteId", "studyId")
+        assertEquals(subject?.first?.roninPatientId, "roninFhirId")
+        assertEquals(subject?.second?.studySiteId, UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770"))
+        assertEquals(subject?.third?.studyId, "studyId")
+    }
+
+    @DataSet(value = ["/dbunit/subjectstatus/OneSubjectStatus.yaml"], cleanAfter = true)
+    @Test
+    fun `get full subject within invalid subject number`() {
+        val subject = subjectDAO.getFullSubjectBySubjectNumberAndSiteIdAndStudyId("001-002", "siteId", "studyId")
+        assertNull(subject)
+    }
+
+    @DataSet(value = ["/dbunit/subjectstatus/MultipleSubjectStatuses.yaml"], cleanAfter = true)
+    @Test
+    fun `get full subject with conflicting subject number`() {
+        val subject = subjectDAO.getFullSubjectBySubjectNumberAndSiteIdAndStudyId("001-003", "siteId1", "studyId1")
+        assertEquals(subject?.first?.subjectId, "subjectId3")
     }
 }

@@ -10,6 +10,7 @@ import io.ktor.client.request.accept
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
@@ -97,6 +98,31 @@ class ClinicalTrialClient(
             val response: HttpResponse =
                 client.request(serverName, subjectUrl) { url ->
                     post(url) {
+                        headers {
+                            append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
+                        }
+                        accept(ContentType.Application.Json)
+                        contentType(ContentType.Application.Json)
+                        setBody(subject)
+                    }
+                }
+            response.body()
+        }.fold(
+            onSuccess = { it },
+            onFailure = {
+                throw it
+            },
+        )
+    }
+
+    suspend fun createSubjectWithSubjectNumber(subject: Subject): Subject {
+        return runCatching<Subject> {
+            val subjectUrl = "$hostUrl/subjects"
+            val authentication = authenticationService.getAuthentication()
+
+            val response: HttpResponse =
+                client.request(serverName, subjectUrl) { url ->
+                    put(url) {
                         headers {
                             append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
                         }

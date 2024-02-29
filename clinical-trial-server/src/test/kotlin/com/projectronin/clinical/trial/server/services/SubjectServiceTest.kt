@@ -15,6 +15,7 @@ import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.util.UUID
 
 class SubjectServiceTest {
@@ -241,6 +242,141 @@ class SubjectServiceTest {
 
         val res = subjectService.getSubjectsByRoninFhirId("Patient/fhirID")
         assertEquals(res, null)
+    }
+
+    @Test
+    fun `get subject by site, study and number returns null when no records found`() {
+        every {
+            subjectDAO.getFullSubjectBySubjectNumberAndSiteIdAndStudyId("subjectNumber", "siteId", "studyId")
+        } returns null
+
+        val res = subjectService.getSubjectBySubjectNumberAndSiteIdAndStudyId("subjectNumber", "siteId", "studyId")
+        assertEquals(res, null)
+    }
+
+    @Test
+    fun `get subject by site, study and number`() {
+        val expected = subject
+        val subjectDO = subject.toSubjectDO()
+        val subjectStatusDO =
+            SubjectStatusDO {
+                studySiteId = studySiteId1
+                subjectId = subject.id
+                status = SubjectStatus.ACTIVE
+            }
+        val studySiteDO =
+            StudySiteDO {
+                siteId = subject.siteId
+                studyId = subject.studyId
+            }
+        every {
+            subjectDAO.getFullSubjectBySubjectNumberAndSiteIdAndStudyId("subjectNumber", "siteId", "studyId")
+        } returns Triple(subjectDO, subjectStatusDO, studySiteDO)
+
+        val res = subjectService.getSubjectBySubjectNumberAndSiteIdAndStudyId("subjectNumber", "siteId", "studyId")
+        assertEquals(res, expected)
+    }
+
+    @Test
+    fun `create subject with subject number happy path`() {
+        studySiteDO["studySiteId"] = studySiteId
+        every {
+            subjectDAO.getFullSubjectBySubjectNumberAndSiteIdAndStudyId("001-001", "siteId", "studyId")
+        } returns null
+
+        every {
+            clinicalOneClient.validateSubjectNumber(subject)
+        } returns subject
+
+        every {
+            subjectService.getStudySiteByStudyIdAndSiteId(any(), any())
+        } returns studySiteDO
+
+        every {
+            subjectDAO.insertSubject(subject.toSubjectDO())
+        } returns ""
+        every {
+            subjectStatusDAO.insertSubjectStatus(any())
+        } returns Pair(studySiteId, "")
+        val res = subjectService.createSubjectWithSubjectNumber(subject)
+        assertEquals(res, subject)
+    }
+
+    @Test
+    fun `create subject with subject number with subject number already used in db with matching fhir id`() {
+        val subjectDO = subject.toSubjectDO()
+        val subjectStatusDO =
+            SubjectStatusDO {
+                studySiteId = studySiteId1
+                subjectId = subject.id
+                status = SubjectStatus.ACTIVE
+            }
+        val studySiteDO =
+            StudySiteDO {
+                siteId = subject.siteId
+                studyId = subject.studyId
+            }
+        every {
+            subjectDAO.getFullSubjectBySubjectNumberAndSiteIdAndStudyId("001-001", "siteId", "studyId")
+        } returns Triple(subjectDO, subjectStatusDO, studySiteDO)
+
+        every {
+            clinicalOneClient.validateSubjectNumber(subject)
+        } returns subject
+
+        val exception =
+            assertThrows<IllegalArgumentException> {
+                subjectService.createSubjectWithSubjectNumber(subject)
+            }
+        assertEquals(exception.message, "Subject is already bound with this subject number")
+    }
+
+    @Test
+    fun `create subject with subject number with subject number already used in db with no matching fhir id`() {
+        val expected = subject
+        val subjectDO = subject.toSubjectDO()
+        subjectDO.roninPatientId = "wrongFhirId"
+        val subjectStatusDO =
+            SubjectStatusDO {
+                studySiteId = studySiteId1
+                subjectId = subject.id
+                status = SubjectStatus.ACTIVE
+            }
+        val studySiteDO =
+            StudySiteDO {
+                siteId = subject.siteId
+                studyId = subject.studyId
+            }
+        every {
+            subjectDAO.getFullSubjectBySubjectNumberAndSiteIdAndStudyId("001-001", "siteId", "studyId")
+        } returns Triple(subjectDO, subjectStatusDO, studySiteDO)
+
+        every {
+            clinicalOneClient.validateSubjectNumber(subject)
+        } returns subject
+
+        val exception =
+            assertThrows<IllegalArgumentException> {
+                subjectService.createSubjectWithSubjectNumber(subject)
+            }
+        assertEquals(exception.message, "Subject number currently bound to different patient")
+    }
+
+    @Test
+    fun `create subject with subject number with subject number not found in clinical one`() {
+        every {
+            subjectDAO.getFullSubjectBySubjectNumberAndSiteIdAndStudyId("001-001", "siteId", "studyId")
+        } returns null
+
+        every {
+            clinicalOneClient.validateSubjectNumber(subject)
+        } returns null
+
+        val exception =
+            assertThrows<IllegalArgumentException> {
+                subjectService.createSubjectWithSubjectNumber(subject)
+            }
+        assertEquals(exception.message, "Subject with given subject number not found in Clinical One Trial")
     }
 
     // Utility

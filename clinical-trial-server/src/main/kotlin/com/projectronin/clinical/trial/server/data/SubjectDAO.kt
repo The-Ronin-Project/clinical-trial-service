@@ -90,4 +90,29 @@ class SubjectDAO(private val database: Database) {
                 Triple(subjectDO, subjectStatusDO, studySiteDO)
             }.firstOrNull()
     }
+
+    /**
+     * get active Subject, with corresponding SubjectStatus and StudySite for that matches given subject number, site id and study id
+     */
+    fun getFullSubjectBySubjectNumberAndSiteIdAndStudyId(
+        subjectNumber: String,
+        siteId: String,
+        studyId: String,
+    ): Triple<SubjectDO, SubjectStatusDO, StudySiteDO>? {
+        return database.from(SubjectDOs).innerJoin(SubjectStatusDOs, SubjectDOs.subjectId eq SubjectStatusDOs.subjectId).innerJoin(
+            StudySiteDOs,
+            SubjectStatusDOs.studySiteId eq StudySiteDOs.studySiteId,
+        ).select().where {
+            (SubjectDOs.subjectNumber eq subjectNumber) and
+                (StudySiteDOs.siteId eq siteId) and
+                (StudySiteDOs.studyId eq studyId) and
+                (SubjectStatusDOs.status eq SubjectStatus.ACTIVE)
+        }
+            .map {
+                val subjectDO = SubjectDOs.createEntity(it)
+                val subjectStatusDO = SubjectStatusDOs.createEntity(it)
+                val studySiteDO = StudySiteDOs.createEntity(it)
+                Triple(subjectDO, subjectStatusDO, studySiteDO)
+            }.firstOrNull()
+    }
 }
