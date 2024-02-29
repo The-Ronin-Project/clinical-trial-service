@@ -16,7 +16,6 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
-import io.ktor.http.headers
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -32,7 +31,6 @@ class SubjectStatusControllerIT : BaseIT() {
     private val siteId = "siteId"
     private val subjectId = "subjectId"
     private val studySiteID = UUID.fromString("5f781c30-02f3-4f06-adcf-7055bcbc5770")
-    val m2mToken = authenticationService.getAuthentication().accessToken
 
     private fun seedDB() {
         database.insert(StudyDOs) {
@@ -87,48 +85,49 @@ class SubjectStatusControllerIT : BaseIT() {
 
     @Test
     fun `get subject status (no data) - 404`() {
-        runBlocking {
-            val response =
+        val authentication = getAuth()
+        val response =
+            runBlocking {
                 httpClient
                     .get("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/status") {
                         headers {
-                            append(HttpHeaders.Authorization, "Bearer $m2mToken")
+                            append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
                         }
                         accept(ContentType.Application.Json)
                         contentType(ContentType.Application.Json)
                     }
-
-            assertEquals(404, response.status.value)
-        }
+            }
+        assertEquals(404, response.status.value)
     }
 
     @Test
     fun `get subject status - 200`() {
-        runBlocking {
-            seedDB()
-            val response =
+        seedDB()
+        val authentication = getAuth()
+        val response =
+            runBlocking {
                 httpClient
                     .get("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/status") {
                         headers {
-                            append(HttpHeaders.Authorization, "Bearer $m2mToken")
+                            append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
                         }
                         accept(ContentType.Application.Json)
                         contentType(ContentType.Application.Json)
                     }
-
-            assertEquals(200, response.status.value)
-        }
+            }
+        assertEquals(200, response.status.value)
     }
 
     @Test
     fun `update subject status - 200`() {
         seedDB()
+        val authentication = getAuth()
         runBlocking {
             val response =
                 httpClient
                     .post("$serverUrl/studies/$studyId/sites/$siteId/subject/$subjectId/status") {
                         headers {
-                            append(HttpHeaders.Authorization, "Bearer $m2mToken")
+                            append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
                         }
                         accept(ContentType.Application.Json)
                         contentType(ContentType.Application.Json)

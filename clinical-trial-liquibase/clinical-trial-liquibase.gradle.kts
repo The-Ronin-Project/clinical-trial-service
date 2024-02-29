@@ -1,3 +1,3 @@
-plugins {
-    alias(roningradle.plugins.buildconventions.spring.database)
+sonar {
+    isSkipProject = true
 }

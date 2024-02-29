@@ -15,6 +15,6 @@ internal class DataLoadEventProducerTest {
                 every { send(any(), any(), any()) } returns mockk()
             }
         val producer = DataLoadEventProducer(template)
-        assertDoesNotThrow { producer.producePatientResourceRequest("12345", "ronincer") }
+        assertDoesNotThrow { producer.producePatientResourceRequest("12345", "tenant") }
     }
 }

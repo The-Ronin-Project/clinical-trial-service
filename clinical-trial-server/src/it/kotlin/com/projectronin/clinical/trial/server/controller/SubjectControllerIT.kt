@@ -11,8 +11,7 @@ import com.projectronin.clinical.trial.server.data.model.SubjectStatus
 import com.projectronin.event.interop.resource.request.v1.InteropResourceRequestV1
 import com.projectronin.interop.common.http.exceptions.ClientFailureException
 import com.projectronin.kafka.data.RoninEvent
-import com.projectronin.kafka.serialization.RoninEventDeserializer
-import com.projectronin.test.jwt.withAuthWiremockServer
+import com.projectronin.kafka.serde.RoninEventDeserializer
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.put
@@ -57,8 +56,8 @@ class SubjectControllerIT : BaseIT() {
                 )
                 put("spring.deserializer.value.delegate.class", RoninEventDeserializer::class.java.name)
                 put(
-                    "ronin.json.deserializer.types",
-                    "ronin.interop-mirth.resource.:com.projectronin.event.interop.resource.request.v1.InteropResourceRequestV1",
+                    "ronin.json.deserializer.topics",
+                    "oci.us-phoenix-1.interop-mirth.resource-request.v1:com.projectronin.event.interop.resource.request.v1.InteropResourceRequestV1",
                 )
                 put(ConsumerConfig.GROUP_ID_CONFIG, "clinical-trial-service-it") // Consumer group ID
                 put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest") // or "latest", based on your requirement
@@ -159,130 +158,115 @@ class SubjectControllerIT : BaseIT() {
 
     @Test
     fun `get active subjects with subjects`() {
-        withAuthWiremockServer(key, ISSUER) {
-            val providerToken = jwtAuthToken(key, ISSUER)
-            seedDB()
+        seedDB()
 
-            val subject =
-                Subject(
-                    roninFhirId = "ronincer-fhirId",
-                    siteId = siteId,
-                    studyId = studyId,
-                    number = subjectNumber,
-                )
+        val subject =
+            Subject(
+                roninFhirId = "tenant-fhirId",
+                siteId = siteId,
+                studyId = studyId,
+                number = subjectNumber,
+            )
 
+        runBlocking {
+            client.createSubject(subject)
+        }
+
+        val response =
             runBlocking {
-                client.createSubject(subject, providerToken)
+                client.getSubjects(true)
             }
 
-            val response =
-                runBlocking {
-                    client.getSubjects(true)
-                }
-
-            assertTrue(response.isNotEmpty())
-        }
+        assertTrue(response.isNotEmpty())
     }
 
     @Test
     fun `get active subject by roninFhirId`() {
-        withAuthWiremockServer(key, ISSUER) {
-            val providerToken = jwtAuthToken(key, ISSUER)
-            seedDB()
+        seedDB()
 
-            val subject =
-                Subject(
-                    roninFhirId = "ronincer-fhirId",
-                    siteId = siteId,
-                    studyId = studyId,
-                )
+        val subject =
+            Subject(
+                roninFhirId = "tenant-fhirId",
+                siteId = siteId,
+                studyId = studyId,
+            )
 
+        runBlocking {
+            client.createSubject(subject)
+        }
+
+        val response =
             runBlocking {
-                client.createSubject(subject, providerToken)
+                client.getSubjectById(roninFhirId = "tenant-fhirId")
             }
 
-            val response =
-                runBlocking {
-                    client.getSubjectById(roninFhirId = "ronincer-fhirId", providerToken)
-                }
-
-            assertEquals(response?.roninFhirId, subject.roninFhirId)
-        }
+        assertEquals(response?.roninFhirId, subject.roninFhirId)
     }
 
     @Test
     fun `create a subject`() {
-        withAuthWiremockServer(key, ISSUER) {
-            val providerToken = jwtAuthToken(key, ISSUER)
-            seedDB()
-            consumer.subscribe(listOf("oci.us-phoenix-1.interop-mirth.resource-request.v1"))
-            val subject =
-                Subject(
-                    roninFhirId = "ronincer-fhirId",
-                    siteId = siteId,
-                    studyId = studyId,
-                )
+        seedDB()
+        consumer.subscribe(listOf("oci.us-phoenix-1.interop-mirth.resource-request.v1"))
+        val subject =
+            Subject(
+                roninFhirId = "tenant-fhirId",
+                siteId = siteId,
+                studyId = studyId,
+            )
 
-            val expectedSubjectId = "0CEE019CE0A9460BB9291A29EB67719B"
+        val expectedSubjectId = "0CEE019CE0A9460BB9291A29EB67719B"
 
-            val response =
-                runBlocking {
-                    client.createSubject(subject, providerToken)
-                }
+        val response =
+            runBlocking {
+                client.createSubject(subject)
+            }
 
-            assertTrue(response.id.isNotEmpty())
-            assertTrue(response.number.isNotEmpty())
-            assertEquals(SubjectStatus.ACTIVE.toString(), response.status)
-            assertEquals(subject.roninFhirId, response.roninFhirId)
-            assertEquals(subject.siteId, response.siteId)
-            assertEquals(subject.studyId, response.studyId)
-            assertEquals(expectedSubjectId, response.id)
-            val records = consumer.poll(Duration.ofSeconds(5)).map { it.value().data as InteropResourceRequestV1 }
-            assertTrue(records.any { it.resourceFHIRId == "ronincer-fhirId" })
-        }
+        assertTrue(response.id.isNotEmpty())
+        assertTrue(response.number.isNotEmpty())
+        assertEquals(SubjectStatus.ACTIVE.toString(), response.status)
+        assertEquals(subject.roninFhirId, response.roninFhirId)
+        assertEquals(subject.siteId, response.siteId)
+        assertEquals(subject.studyId, response.studyId)
+        assertEquals(expectedSubjectId, response.id)
+        val records = consumer.poll(Duration.ofSeconds(5)).map { it.value().data as InteropResourceRequestV1 }
+        assertTrue(records.any { it.resourceFHIRId == "tenant-fhirId" })
     }
 
     @Test
     fun `create a subject with subject number returns bad request when subject number is not in clinical one`() {
-        withAuthWiremockServer(key, ISSUER) {
-            val providerToken = jwtAuthToken(key, ISSUER)
-            seedDB()
-            val subject =
-                Subject(
-                    roninFhirId = "ronincer-fhirId",
-                    siteId = siteId,
-                    studyId = studyId,
-                    number = subjectNumber,
-                )
+        seedDB()
+        val subject =
+            Subject(
+                roninFhirId = "tenant-fhirId",
+                siteId = siteId,
+                studyId = studyId,
+                number = subjectNumber,
+            )
 
-            val exception =
-                assertThrows<ClientFailureException> {
-                    runBlocking {
-                        client.createSubjectWithSubjectNumber(subject, providerToken)
-                    }
+        val exception =
+            assertThrows<ClientFailureException> {
+                runBlocking {
+                    client.createSubjectWithSubjectNumber(subject)
                 }
-            assertTrue(exception.message?.contains("Received 400") ?: false)
-        }
+            }
+        assertTrue(exception.message?.contains("Received 400") ?: false)
     }
 
     @Test
     fun `create a subject with subject number`() {
-        withAuthWiremockServer(key, ISSUER) {
-            val providerToken = jwtAuthToken(key, ISSUER)
-            seedDB()
-            val subject =
-                Subject(
-                    roninFhirId = "ronincer-fhirId",
-                    siteId = siteId,
-                    studyId = studyId,
-                    number = "001-021",
-                )
+        seedDB()
+        val subject =
+            Subject(
+                roninFhirId = "tenant-fhirId",
+                siteId = siteId,
+                studyId = studyId,
+                number = "001-021",
+            )
 
-            val response =
-                runBlocking {
-                    client.createSubjectWithSubjectNumber(subject, providerToken)
-                }
-            assertEquals(subject.roninFhirId, response.roninFhirId)
-        }
+        val response =
+            runBlocking {
+                client.createSubjectWithSubjectNumber(subject)
+            }
+        assertEquals(subject.roninFhirId, response.roninFhirId)
     }
 }

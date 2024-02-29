@@ -12,10 +12,8 @@ services:
       - CONEDA_DB_NAME=clinical-trial-db
       - CONEDA_DB_USER=springuser
       - CONEDA_DB_PASS=ThePassword
-      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://mock-oauth2:8080/clinical-trial
       - AUTH0_AUDIENCE=https://clinical-trial-service.dev.projectronin.io
-      - RONIN_AUTH_ISSUERS=http://ronin-auth:8080,http://mock-oauth2:8080/clinical-trial
-      - SEKI_URL=https://seki.dev.projectronin.io/
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://mock-oauth2:8080/clinical-trial
       - CLINICALONE_CLIENT_SCOPE=tenantqa2.ec-dc-svc.all
       - CLINICALONE_AUTH_URL=https://tenantqa2-hs-sso-uat.iams.hs.ocs.oraclecloud.com/ms_oauth/oauth2/endpoints/tenantqa2/tokens
       - CLINICALONE_BASE_URL=https://tenantqa2.clinicalone.oraclecloud.com/itsp2
@@ -33,8 +31,6 @@ services:
       - OCI_REGION=us-phoenix-1
       - OCI_TENANCY_OCID=ocid.tenancy
       - OCI_USER_OCID=userid
-      - RONIN_KAFKA_SASL_USERNAME=
-      - RONIN_KAFKA_SASL_PASSWORD=
     ports:
       - "8080:8080"
     depends_on:
@@ -109,12 +105,6 @@ services:
       - ./:/host
     environment:
       - JSON_CONFIG_PATH=/host/mock-oauth2-config.json
-
-  wiremock:
-    image: "wiremock/wiremock:latest"
-    container_name: ronin-auth
-    ports:
-      - 9999:8080
 
   mock-server:
     platform: linux/amd64

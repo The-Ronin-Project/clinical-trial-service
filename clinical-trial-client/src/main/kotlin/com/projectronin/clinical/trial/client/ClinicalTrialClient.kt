@@ -29,19 +29,16 @@ class ClinicalTrialClient(
 ) {
     private val serverName = "Clinical Trial Service"
 
-    suspend fun getSubjects(
-        activeIdsOnly: Boolean = false,
-        authToken: String? = null,
-    ): List<Subject> {
+    suspend fun getSubjects(activeIdsOnly: Boolean = false): List<Subject> {
         return runCatching<List<Subject>> {
             val subjectUrl = "$hostUrl/subjects"
-            val authentication = authToken ?: authenticationService.getAuthentication().accessToken
+            val authentication = authenticationService.getAuthentication()
 
             val response: HttpResponse =
                 client.request(serverName, subjectUrl) { url ->
                     get(url) {
                         headers {
-                            append(HttpHeaders.Authorization, "Bearer $authentication")
+                            append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
                         }
                         accept(ContentType.Application.Json)
                         contentType(ContentType.Application.Json)
@@ -64,19 +61,16 @@ class ClinicalTrialClient(
         )
     }
 
-    suspend fun getSubjectById(
-        roninFhirId: String,
-        authToken: String? = null,
-    ): Subject? {
+    suspend fun getSubjectById(roninFhirId: String? = null): Subject? {
         return runCatching<Subject> {
             val subjectUrl = "$hostUrl/subjects/$roninFhirId"
-            val authentication = authToken ?: authenticationService.getAuthentication().accessToken
+            val authentication = authenticationService.getAuthentication()
 
             val response: HttpResponse =
                 client.request(serverName, subjectUrl) { url ->
                     get(url) {
                         headers {
-                            append(HttpHeaders.Authorization, "Bearer $authentication")
+                            append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
                         }
                         accept(ContentType.Application.Json)
                         contentType(ContentType.Application.Json)
@@ -96,19 +90,16 @@ class ClinicalTrialClient(
         )
     }
 
-    suspend fun createSubject(
-        subject: Subject,
-        authToken: String? = null,
-    ): Subject {
+    suspend fun createSubject(subject: Subject): Subject {
         return runCatching<Subject> {
             val subjectUrl = "$hostUrl/subjects"
-            val authentication = authToken ?: authenticationService.getAuthentication().accessToken
+            val authentication = authenticationService.getAuthentication()
 
             val response: HttpResponse =
                 client.request(serverName, subjectUrl) { url ->
                     post(url) {
                         headers {
-                            append(HttpHeaders.Authorization, "Bearer $authentication")
+                            append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
                         }
                         accept(ContentType.Application.Json)
                         contentType(ContentType.Application.Json)
@@ -124,19 +115,16 @@ class ClinicalTrialClient(
         )
     }
 
-    suspend fun createSubjectWithSubjectNumber(
-        subject: Subject,
-        authToken: String? = null,
-    ): Subject {
+    suspend fun createSubjectWithSubjectNumber(subject: Subject): Subject {
         return runCatching<Subject> {
             val subjectUrl = "$hostUrl/subjects"
-            val authentication = authToken ?: authenticationService.getAuthentication().accessToken
+            val authentication = authenticationService.getAuthentication()
 
             val response: HttpResponse =
                 client.request(serverName, subjectUrl) { url ->
                     put(url) {
                         headers {
-                            append(HttpHeaders.Authorization, "Bearer $authentication")
+                            append(HttpHeaders.Authorization, "Bearer ${authentication.accessToken}")
                         }
                         accept(ContentType.Application.Json)
                         contentType(ContentType.Application.Json)
