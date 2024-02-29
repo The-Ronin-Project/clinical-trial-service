@@ -1,9 +1,7 @@
 services:
   clinical-trial-server:
     restart: on-failure
-    build:
-      context: ../../..
-      dockerfile: Dockerfile
+    build: ../../..
     image: clinical-trial-server:local
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://springuser:ThePassword@clinical-trial-db:3306/clinical-trial-db
@@ -37,6 +35,10 @@ services:
       - RONIN_KAFKA_SASL_PASSWORD=
     ports:
       - "8080:8080"
+    healthcheck:
+      test: [ "CMD", "curl", "-k", "-X", "GET", "localhost:8080/actuator/health" ]
+      timeout: 5s
+      retries: 30
     depends_on:
       clinical-trial-db:
         condition: service_healthy

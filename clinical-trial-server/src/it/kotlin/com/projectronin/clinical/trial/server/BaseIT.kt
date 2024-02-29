@@ -10,17 +10,9 @@ import com.projectronin.test.jwt.generateRandomRsa
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.ktorm.database.Database
-import org.testcontainers.containers.DockerComposeContainer
-import org.testcontainers.containers.wait.strategy.Wait
-import java.io.File
 
 abstract class BaseIT {
     companion object {
-        val docker =
-            DockerComposeContainer(File(BaseIT::class.java.getResource("/docker-compose-it.yaml")!!.file))
-                .waitingFor("clinical-trial-server", Wait.forLogMessage(".*Started ClinicalTrialServerKt.*", 1))
-                .start()
-
         val key = generateRandomRsa()
         const val ISSUER = "http://ronin-auth:8080"
 
